@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e1540f78-8c38-418c-ae9a-2d6db423086c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>McsPyDataTools.py</StartupFile>
+    <StartupFile>PlotExperimentData.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="McsPyDataTools.py" />
+    <Compile Include="PlotExperimentData.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>
