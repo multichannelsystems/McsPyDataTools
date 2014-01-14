@@ -9,6 +9,14 @@ DATASET = "Data/Electrode/Channels"
 
 from pylab import *
 
+def show_image_plot(data):
+    #matshow(data)
+    #imshow(data, interpolation='nearest', cmap='bone', origin='lower')
+    imshow(data, interpolation='nearest', aspect=10000)
+    #colorbar(shrink=.92)
+    #xticks([]), yticks([])
+    show()
+
 def run():
     file = h5py.File(FILE)
     #dset = file["Data/Electrode/Channels"]
@@ -41,6 +49,8 @@ def run():
     channels = channel_data[0, ...]
     plot(channels)
     show()
+
+    show_image_plot(channel_data[0:8, 0:100000])
 
     #X = np.linspace(-np.pi, np.pi, 256,endpoint=True)
     #C,S = np.cos(X), np.sin(X)
