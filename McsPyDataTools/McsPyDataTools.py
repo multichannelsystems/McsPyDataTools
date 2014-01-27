@@ -3,7 +3,14 @@ import McsData
 raw_data_file_path = "d:\\Programming\\MCSuite\\McsDataTools\\McsDataFileConverter\\bin\\Debug\\Experiment.h5"
 
 raw_data = McsData.RawData(raw_data_file_path)
-#grp_attrs = raw_data.h5_file['Data'].attrs.iteritems()
-#for (name, value) in grp_attrs: print(name, value)
-session_info = raw_data.session_info
-print(session_info)
+print(raw_data.comment)
+print(raw_data.date)
+print(raw_data.clr_date)
+print(raw_data.date_in_clr_ticks)
+print(raw_data.file_guid)
+print(raw_data.mea_id)
+print(raw_data.mea_name)
+print(raw_data.program_name)
+print(raw_data.program_version) 
+print(raw_data.recordings)
+print(raw_data.recordings[0].analog_streams)

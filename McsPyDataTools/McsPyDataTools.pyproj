@@ -21,12 +21,16 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="McsPyTests\TestRawDataStructures.py" />
+    <Compile Include="McsPyTests\__init__.py" />
     <Compile Include="McsPy\McsData.py" />
     <Compile Include="McsPy\__init__.py" />
     <Compile Include="McsPyDataTools.py" />
     <Compile Include="PlotExperimentData.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="McsPyTests\" />
+    <Folder Include="McsPyTests\TestData\" />
     <Folder Include="McsPy\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
