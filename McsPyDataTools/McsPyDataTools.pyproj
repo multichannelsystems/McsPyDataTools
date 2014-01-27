@@ -5,9 +5,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e1540f78-8c38-418c-ae9a-2d6db423086c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>PlotExperimentData.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <StartupFile>McsPyDataTools.py</StartupFile>
+    <SearchPath>McsPy</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>McsPyDataTools</Name>
@@ -22,8 +21,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="McsPy\McsData.py" />
+    <Compile Include="McsPy\__init__.py" />
     <Compile Include="McsPyDataTools.py" />
     <Compile Include="PlotExperimentData.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="McsPy\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>
