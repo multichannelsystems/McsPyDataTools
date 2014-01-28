@@ -3,6 +3,7 @@ import h5py
 import datetime
 import math
 import uuid
+import numpy as np
 
 # day -> number of clr ticks (100 ns)
 time_tick_clr = 24 * 60 * 60 * (10**7)
@@ -98,6 +99,7 @@ class AnalogStream(object):
     def __init__(self, stream_grp):
         self.__stream_grp = stream_grp
         self.__get_stream_info()
+        self.__read_channels()
 
     def __get_stream_info(self):
         stream_info = {}
@@ -109,3 +111,32 @@ class AnalogStream(object):
         self.source_stream_guid = uuid.UUID(stream_info['SourceStreamGUID'].rstrip()) 
         self.stream_guid = uuid.UUID(stream_info['StreamGUID'].rstrip()) 
         self.stream_type = stream_info['StreamType'].rstrip()
+
+    def __read_channels(self):
+        assert len(self.__stream_grp) == 3
+        for (name, value) in self.__stream_grp.iteritems():
+            print name, value
+        # Read time stamp index of channels:
+        #ts_index = self.__stream_grp['ChannelDataTimeStamps']
+        #self.time_stamp_index = np.empty(ts_index.shape, dtype = ts_index.dtype)
+        #ts_index.read_direct(self.time_stamp_index)
+        self.time_stamp_index = self.__stream_grp['ChannelDataTimeStamps'][...]
+        
+        # Read infos per channel 
+        ch_infos = self.__stream_grp['InfoChannel'][...]
+        self.channel_infos = {}
+        self.__map_row_to_channel_id = {}
+        for channel_info in ch_infos:
+            self.channel_infos[channel_info['ChannelID']] = ChannelInfo(channel_info)
+            self.__map_row_to_channel_id[channel_info['RowIndex']] = channel_info['ChannelID']
+
+        # Connect the data set 
+        self.channel_data = self.__stream_grp['ChannelData']
+
+class ChannelInfo(object):
+    """Contains all meta data for one channel"""
+    def __init__(self, ch_info):
+        self.info = {}
+        for name in ch_info.dtype.names:
+            self.info[name] = ch_info[name]
+        

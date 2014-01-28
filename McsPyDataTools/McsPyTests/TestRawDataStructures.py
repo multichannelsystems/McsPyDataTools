@@ -48,5 +48,16 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(str(first_analog_stream.stream_guid), 'b616b008-c7a8-47c3-b835-44a531cbe079', 'Analog stream GUID is different!')
         self.assertEqual(first_analog_stream.stream_type, 'Analog', 'Analog stream type is different!')
     
+    def test_analog_stream_data(self):
+        data_set = self.raw_data.recordings[0]. analog_streams[0].channel_data
+        self.assertEqual(data_set.shape, (8, 8100), 'Shape of dataset is different!')
+        
+        time_stamp_index = self.raw_data.recordings[0]. analog_streams[0].time_stamp_index
+        self.assertEqual(time_stamp_index.shape, (3, 1), 'Shape of time stamp index is different!')
+
+        channel_infos =  self.raw_data.recordings[0]. analog_streams[0].channel_infos
+        self.assertEqual(len(channel_infos), 8, 'Number of channel info objects is different!')
+        self.assertEqual(len(channel_infos[0].info), 16, 'Number of of components of an channel info object is different!')
+
 if __name__ == '__main__':
     unittest.main()
