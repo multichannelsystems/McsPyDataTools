@@ -5,6 +5,10 @@ import math
 import uuid
 import numpy as np
 
+#from pint import UnitRegistry
+#ureg = UnitRegistry()
+from McsPy import ureg, Q_
+
 # day -> number of clr ticks (100 ns)
 time_tick_clr = 24 * 60 * 60 * (10**7)
 
@@ -92,7 +96,10 @@ class Recording(object):
             self.__read_analog_streams()
         return self.__analog_streams
 
-
+    @property
+    def duration_time(self):
+        dur_time = (self.duration - self.timestamp) * 100 * ureg.ns
+        return dur_time
 
 class AnalogStream(object):
     """Container class for one analog stream"""

@@ -2,6 +2,10 @@ import unittest
 import McsData
 import datetime
 
+#from pint import UnitRegistry
+#ureg = UnitRegistry()
+from McsPy import ureg, Q_
+
 test_raw_data_file_path = "d:\\Programming\\MCSuite\\McsPyDataTools\\McsPyDataTools\\McsPyTests\\TestData\\Experiment.h5"
 
 @unittest.skip("showing the principle structure of python unit tests")
@@ -14,6 +18,7 @@ class Test_RawData(unittest.TestCase):
         self.raw_data = McsData.RawData(test_raw_data_file_path)
 
 class Test_RawDataContainer(Test_RawData):
+    # Test session:
     def test_session_attributes(self):
         self.assertEqual(self.raw_data.comment, '', 'Comment is different!')
         self.assertEqual(self.raw_data.clr_date, 'Mittwoch, 15. Januar 2014', 'Clr-Date is different!')
@@ -25,6 +30,8 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(self.raw_data.program_name, 'Multi Channel Experimenter', 'Program name is different!')
         self.assertEqual(self.raw_data.program_version, '0.8.4.3', 'Program version is different!') 
 
+
+    # Test recording:
     def test_count_recordings(self):
         self.assertEqual(len(self.raw_data.recordings), 1, 'There should be only one recording!')
 
@@ -36,7 +43,9 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(first_recording.recording_id, 0, 'Recording ID is different!')
         self.assertEqual(first_recording.recording_type, 'xyz', 'Recording type is different!')
         self.assertEqual(first_recording.timestamp, 45700000, 'Recording time stamp is different!')
+        self.assertEqual(first_recording.duration_time.to(ureg.sec), 0.8 * ureg.sec, 'Recording time stamp is different!')
 
+    # Test analog streams:
     def test_count_analog_streams(self):
          self.assertEqual(len(self.raw_data.recordings[0].analog_streams), 1, 'There should be only one recording!')
 

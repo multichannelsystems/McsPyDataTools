@@ -4,6 +4,9 @@ import matplotlib
 import pylab as pl
 import numpy as np
 
+from McsPy import ureg, Q_
+
+
 raw_data_file_path = "d:\\Programming\\MCSuite\\McsDataTools\\McsDataFileConverter\\bin\\Debug\\Experiment.h5"
 
 def show_image_plot(data, aspect_ratio = 10000):
