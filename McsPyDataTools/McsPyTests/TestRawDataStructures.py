@@ -2,8 +2,6 @@ import unittest
 import McsData
 import datetime
 
-#from pint import UnitRegistry
-#ureg = UnitRegistry()
 from McsPy import ureg, Q_
 
 test_raw_data_file_path = "d:\\Programming\\MCSuite\\McsPyDataTools\\McsPyDataTools\\McsPyTests\\TestData\\Experiment.h5"
@@ -18,6 +16,10 @@ class Test_RawData(unittest.TestCase):
         self.raw_data = McsData.RawData(test_raw_data_file_path)
 
 class Test_RawDataContainer(Test_RawData):
+    # Test MCS-HDF5 version
+    def test_mcs_hdf5_version(self):
+        self.assertEqual(self.raw_data.mcs_hdf5_version, 1, 'The MCS-HDF5-Version is different from the expected one!')
+
     # Test session:
     def test_session_attributes(self):
         self.assertEqual(self.raw_data.comment, '', 'Comment is different!')

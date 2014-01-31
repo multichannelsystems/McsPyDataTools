@@ -19,6 +19,26 @@ def show_image_plot(data, aspect_ratio = 10000):
     pl.title('Heatmap of Wireless Signal (Simulation)')
     pl.show()
 
+def draw_raw_data(raw_data):
+    '''Draw all raw data streams'''
+    channels = raw_data.recordings[0]. analog_streams[0].channel_data #channel_data[0, ...]
+    pl.figure(figsize=(20,12))
+    pl.plot(np.transpose(channels))
+    pl.title('Signal for Wireless (Simulation)')
+    pl.grid()
+    pl.show()
+
+def draw_channel_in_range(raw_data, channel_id):
+    ''' Draw one channel of given ID within its original range '''
+    time = raw_data.recordings[0].analog_streams[0].get_channel_timepoints(0,0,8100)
+    signal = raw_data.recordings[0].analog_streams[0].get_channel_in_range(0,0,8100)
+    pl.figure(figsize=(20,12))
+    pl.plot(time[0], signal[0])
+    pl.xlabel('time (%s)' % time[1])
+    pl.ylabel('voltage (%s)' % signal[1])
+    pl.title('Sampled signal')
+    pl.show()
+
 print('McsPy Version: %s' % McsPy.version)
 
 raw_data = McsData.RawData(raw_data_file_path)
@@ -34,11 +54,8 @@ print(raw_data.program_version)
 print(raw_data.recordings)
 print(raw_data.recordings[0].analog_streams)
 
-channels = raw_data.recordings[0]. analog_streams[0].channel_data #channel_data[0, ...]
-pl.figure(figsize=(20,12))
-pl.plot(np.transpose(channels))
-pl.title('Signal for Wireless (Simulation)')
-pl.grid()
-pl.show()
+draw_raw_data(raw_data)
+ 
+show_image_plot(raw_data.recordings[0]. analog_streams[0].channel_data[0:8, 0:8100], 850)
 
-show_image_plot(channels[0:8, 0:8100], 850)
+draw_channel_in_range(raw_data, 0)

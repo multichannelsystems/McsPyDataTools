@@ -5,12 +5,11 @@ import math
 import uuid
 import numpy as np
 
-#from pint import UnitRegistry
-#ureg = UnitRegistry()
-from McsPy import ureg, Q_
+from McsPy import ureg, Q_, supported_mcs_hdf5_versions
 
 # day -> number of clr ticks (100 ns)
-time_tick_clr = 24 * 60 * 60 * (10**7)
+clr_tick = 100 * ureg.ns
+day_to_clr_time_tick = 24 * 60 * 60 * (10**7)
 
 
 class RawData(object):
@@ -18,12 +17,24 @@ class RawData(object):
     def __init__(self, raw_data_path):
         self.raw_data_path = raw_data_path
         self.h5_file = h5py.File(raw_data_path,'r')
+        self.__validate_mcs_hdf5_version()
         self.__get_session_info()
         self.__recordings = None
 
     def __str__(self):
         #return '[RawData: File Path %s]' % self.raw_data_path
         return super(RawData, self).__str__()
+
+    def __validate_mcs_hdf5_version(self):
+        root_grp = self.h5_file['/']
+        if ('McsHdf5Version' in root_grp.attrs):
+            self.mcs_hdf5_version = root_grp.attrs['McsHdf5Version']
+            if ((self.mcs_hdf5_version < supported_mcs_hdf5_versions[0]) or 
+                (supported_mcs_hdf5_versions[1] < self.mcs_hdf5_version)):
+                raise IOError('Given HDF5 file has version %s and supported are all versions from %s to %s' % 
+                              (self.mcs_hdf5_version, supported_mcs_hdf5_versions[0], supported_mcs_hdf5_versions[1]))    
+        else:
+            raise IOError('The root group of this HDF5 file has no MCS-HDF5-Version attribute -> this file is not supported by McsPy!')
 
     def __get_session_info(self):
         data_attrs = self.h5_file['Data'].attrs.iteritems()
@@ -35,7 +46,7 @@ class RawData(object):
         self.comment = session_info['Comment'].rstrip()
         self.clr_date = session_info['Date'].rstrip()
         self.date_in_clr_ticks = session_info['DateInTicks']
-        self.date =  datetime.datetime.fromordinal(int(math.ceil(self.date_in_clr_ticks / time_tick_clr)) + 1)
+        self.date =  datetime.datetime.fromordinal(int(math.ceil(self.date_in_clr_ticks / day_to_clr_time_tick)) + 1)
         #self.file_guid = session_info['FileGUID'].rstrip()
         self.file_guid = uuid.UUID(session_info['FileGUID'].rstrip()) 
         self.mea_id = session_info['MeaID']
@@ -140,10 +151,77 @@ class AnalogStream(object):
         # Connect the data set 
         self.channel_data = self.__stream_grp['ChannelData']
 
+    def get_channel_in_range(self, channel_id, idx_start, idx_end):
+        if (channel_id in self.channel_infos.keys()):
+            if (idx_start < 0):
+                idx_start = 0
+            if (idx_end > self.channel_data.shape[1]):
+                idx_end = self.channel_data.shape[1]
+            signal = self.channel_data[self.channel_infos[channel_id].row_index, idx_start : idx_end]
+            scale = self.channel_infos[channel_id].adc_step.magnitude
+            #scale = self.channel_infos[channel_id].get_field('ConversionFactor') * (10**self.channel_infos[channel_id].get_field('Exponent'))
+            signal_corrected =  (signal - self.channel_infos[channel_id].get_field('ADZero'))  * scale
+            return (signal_corrected, str(self.channel_infos[channel_id].adc_step.units))
+
+    def get_channel_timepoints(self, channel_id, idx_start, idx_end):
+        if (channel_id in self.channel_infos.keys()):
+            start_ts = 0L
+            channel = self.channel_infos[channel_id]
+            tick = channel.get_field('Tick')
+            for ts_range in self.time_stamp_index.T:
+                if (ts_range[2] < idx_start): # start is behind the end of this range ->
+                    continue
+                else:
+                    start_ts = ts_range[0] + idx_start * tick # time stamp of first index
+                if (idx_end <= ts_range[2]):
+                    time_range = start_ts + np.arange(0, idx_end - idx_start, 1) * tick
+                else:
+                    time_range = start_ts + np.arange(0, ts_range[2] - idx_start, 1) * tick
+                    idx_start = ts_range[2] + 1
+                if 'time' in locals():
+                    time = np.append(time,time_range)
+                else:
+                    time = time_range
+            return (time * clr_tick.to_base_units().magnitude, clr_tick.to_base_units().units)
+
+    #def get_signal_in_range(self):
+    #    signal = (self.channel_data[...] - self.channel_infos[0].get_field('ADZero')) * self.channel_infos[0].get_field('ConversionFactor') * (10**self.channel_infos[0].get_field('Exponent'))   
+    #    return signal
+
 class ChannelInfo(object):
     """Contains all meta data for one channel"""
     def __init__(self, ch_info):
         self.info = {}
         for name in ch_info.dtype.names:
             self.info[name] = ch_info[name]
-        
+
+    def get_field(self, name):
+         return self.info[name]
+    @property
+    def row_index(self):
+        return self.info['RowIndex']
+
+    @property
+    def sampling_frequency(self):
+        frequency = 1 / self.sampling_tick.to_base_units()
+        return frequency.to(ureg.Hz)
+
+    @property
+    def sampling_tick(self):
+        tick_time = self.info['Tick']  * clr_tick # clr tick is 100 ns
+        return tick_time
+
+    @property
+    def label(self):
+        return self.info['Label']
+
+    @property
+    def data_type(self):
+        return self.info['RawDataType']
+
+    @property
+    def adc_step(self):
+        unit_name = self.info['Unit']
+        # Should be tested that unit_name is a available in ureg (unit register)
+        step = self.info['ConversionFactor'] * (10 ** self.info['Exponent']) * ureg[unit_name]
+        return step
