@@ -81,6 +81,7 @@ class Test_RawDataContainer(Test_RawData):
     # Test frame streams:
     def test_count_frame_streams(self):
          self.assertEqual(len(self.raw_frame_data.recordings[0].frame_streams), 1, 'There should be only one frame stream!')
+         self.assertEqual(len(self.raw_frame_data.recordings[0].frame_streams[0].frame_entity), 1, 'There should be only one frame entity inside the stream!')
 
     def test_frame_stream_attributes(self):
         first_frame_stream = self.raw_frame_data.recordings[0].frame_streams[0]
@@ -90,6 +91,9 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(str(first_frame_stream.stream_guid), 'd9b62795-9fb8-48c7-a9bf-97cb2f66a7b2', 'Frame stream GUID is different!')
         self.assertEqual(first_frame_stream.stream_type, 'Frame', 'Frame stream type is different!')
     
+    #def test_frame_entity(self):
+    #    frame_entity =  self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1]
+
     def test_frame_infos(self):
         conv_fact_expected = np.zeros(shape=(65,65), dtype=np.int32) + 100
         conv_fact_expected[64, : ] = 1
@@ -101,10 +105,8 @@ class Test_RawDataContainer(Test_RawData):
                      'ReferenceFrameRight': 65, 'ReferenceFrameBottom': 65, 'LowPassFilterType': '', 'HighPassFilterOrder': -1, 
                      'ReferenceFrameLeft': 1, 'FrameBottom': 65, 'Unit': 'V'
         }
-        frame_infos =  self.raw_frame_data.recordings[0].frame_streams[0].frame_infos
-        self.assertEqual(len(frame_infos), 1, 'Number of frame info objects is different!')
-        self.assertEqual(len(frame_infos[1].info), 24, 'Number of of components of an channel info object is different!')
-        frame_info = frame_infos[1]
+        frame_info =  self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1].info
+        self.assertEqual(len(frame_info.info), 24, 'Number of of components of an channel info object is different!')
         info_key_diff = set(frame_info.info.keys()) - set(info_expected.keys())
         if not info_key_diff:
             for key, value in frame_info.info.items():
@@ -124,9 +126,11 @@ class Test_RawDataContainer(Test_RawData):
         self.assertRaises(exceptions.IndexError, frame_info.adc_step_for_sensor, 65,65)          
 
     def test_frame_data(self):
-        frame_data = self.raw_frame_data.recordings[0].frame_streams[0].frame_data[0]
+        frame_entity =  self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1]
+        frame_data = frame_entity.data
         frame = frame_data[:,:,1]
-        a = frame_data[0,0,0]
+        time_stamps = frame_entity.get_frame_timestamps(0,1000)
+        sensor_signal = frame_entity.get_sensor_signal(30, 30, 0, 1000)
 
 
 if __name__ == '__main__':

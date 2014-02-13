@@ -3,6 +3,7 @@ import h5py
 import datetime
 import math
 import uuid
+import exceptions
 import numpy as np
 
 from McsPy import ureg, Q_, supported_mcs_hdf5_versions
@@ -196,7 +197,7 @@ class AnalogStream(Stream):
             signal_corrected =  (signal - self.channel_infos[channel_id].get_field('ADZero'))  * scale
             return (signal_corrected, str(self.channel_infos[channel_id].adc_step.units))
 
-    def get_channel_timepoints(self, channel_id, idx_start, idx_end):
+    def get_channel_sample_timestamps(self, channel_id, idx_start, idx_end):
         if (channel_id in self.channel_infos.keys()):
             start_ts = 0L
             channel = self.channel_infos[channel_id]
@@ -278,23 +279,60 @@ class FrameStream(Stream):
             print name, value
         # Read infos per frame 
         fr_infos = self.stream_grp['InfoFrame'][...]
-        self.frame_infos = {}
-        self.frame_data = {}
-        self.frame_time_stamp_index = {}
-        self.__map_frame_entity_id_to_frame_id = {}
+        self.frame_entity = {}
         for frame_entity_info in fr_infos:
             frame_entity_group = "FrameDataEntity_" + str(frame_entity_info['FrameDataID'])
             conv_fact = self.__read_conversion_factor_matrix(frame_entity_group)
-            self.frame_infos[frame_entity_info['FrameID']] = FrameEntityInfo(frame_entity_info, conv_fact)
-            self.__map_frame_entity_id_to_frame_id[frame_entity_info['FrameDataID']] = frame_entity_info['FrameID']
-            self.frame_time_stamp_index[frame_entity_info['FrameDataID']] = self.stream_grp[frame_entity_group + '/FrameDataTimeStamps'][...]
-            # Connect the data set 
-            self.frame_data[frame_entity_info['FrameDataID']] = self.stream_grp[frame_entity_group + '/FrameData']
+            frame_info = FrameEntityInfo(frame_entity_info, conv_fact)
+            self.frame_entity[frame_entity_info['FrameID']] = FrameEntity(self.stream_grp[frame_entity_group], frame_info)
 
     def __read_conversion_factor_matrix(self, frame_entity_group):
         frame_entity_conv_matrix = frame_entity_group + "/ConversionFactors"
         conv_fact = self.stream_grp[frame_entity_conv_matrix][...]
         return conv_fact;
+
+class FrameEntity(object):
+    def __init__(self, frame_entity_group, frame_info):
+        self.info = frame_info
+        self.group = frame_entity_group
+        self.time_stamp_index = self.group['FrameDataTimeStamps'][...]
+        # Connect the data set 
+        self.data = self.group['FrameData']
+
+    def get_sensor_signal(self, sensor_x, sensor_y , idx_start, idx_end):
+            if (sensor_x < 0 or self.data.shape[0] < sensor_x or sensor_y < 0 or self.data.shape[1] < sensor_y):
+                raise exception.IndexError
+            if (idx_start < 0):
+                idx_start = 0
+            if (idx_end > self.data.shape[2]):
+                idx_end = self.data.shape[2]
+            sensor_signal = self.data[sensor_x, sensor_y, idx_start : idx_end]
+            scale_factor = self.info.adc_step_for_sensor(sensor_x,sensor_y)
+            scale = scale_factor.magnitude
+            #scale = self.channel_infos[channel_id].get_field('ConversionFactor') * (10**self.channel_infos[channel_id].get_field('Exponent'))
+            sensor_signal_corrected =  (sensor_signal - self.info.get_field('ADZero'))  * scale
+            return (sensor_signal_corrected, str(scale_factor.units))
+
+    def get_frame_timestamps(self, idx_start, idx_end):
+        if (idx_start < 0 or self.data.shape[2] < idx_start or idx_end < idx_start or self.data.shape[2] < idx_end):
+                raise exception.IndexError
+        start_ts = 0L
+        tick = self.info.get_field('Tick')
+        for ts_range in self.time_stamp_index.T:
+            if (ts_range[2] < idx_start): # start is behind the end of this range ->
+                continue
+            else:
+                start_ts = ts_range[0] + idx_start * tick # time stamp of first index
+            if (idx_end <= ts_range[2]):
+                time_range = start_ts + np.arange(0, idx_end - idx_start, 1) * tick
+            else:
+                time_range = start_ts + np.arange(0, ts_range[2] - idx_start, 1) * tick
+                idx_start = ts_range[2] + 1
+            if 'time' in locals():
+                time = np.append(time,time_range)
+            else:
+                time = time_range
+        return (time * clr_tick.to_base_units().magnitude, clr_tick.to_base_units().units)        
         
 
 class Frame(object):

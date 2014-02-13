@@ -28,7 +28,7 @@ def draw_raw_data(stream):
 
 def draw_channel_in_range(stream, channel_id):
     ''' Draw one channel of given ID within its original range '''
-    time = stream.get_channel_timepoints(channel_id,0,100000)
+    time = stream.get_channel_sample_timestamps(channel_id,0,100000)
     signal = stream.get_channel_in_range(channel_id,0,100000)
     pl.figure(figsize=(20,12))
     pl.plot(time[0], signal[0])
@@ -81,12 +81,12 @@ def test_frame_raw_data():
     print(raw_data.program_version) 
     print(raw_data.recordings)
     #print(raw_data.recordings[0])
-    first_frame = raw_data.recordings[0].frame_streams[0].frame_data[0][:,:,0]
+    first_frame = raw_data.recordings[0].frame_streams[0].frame_entity[1].data[:,:,0]
     plotImage(first_frame)
     plotHistogram(first_frame)
     pl.show()
 
 
 print('McsPy Version: %s' % McsPy.version)
-#test_channel_raw_data()
+test_channel_raw_data()
 test_frame_raw_data()
