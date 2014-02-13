@@ -7,8 +7,6 @@ import numpy as np
 from McsPy import ureg, Q_
 
 
-raw_data_file_path = "d:\\Programming\\MCSuite\\McsDataTools\\McsDataFileConverter\\bin\\Debug\\Experiment.h5"
-
 def show_image_plot(data, aspect_ratio = 10000):
     #matshow(data)
     #imshow(data, interpolation='nearest', cmap='bone', origin='lower')
@@ -19,19 +17,19 @@ def show_image_plot(data, aspect_ratio = 10000):
     pl.title('Heatmap of Wireless Signal (Simulation)')
     pl.show()
 
-def draw_raw_data(raw_data):
+def draw_raw_data(stream):
     '''Draw all raw data streams'''
-    channels = raw_data.recordings[0]. analog_streams[0].channel_data #channel_data[0, ...]
+    channels = stream.channel_data
     pl.figure(figsize=(20,12))
     pl.plot(np.transpose(channels))
     pl.title('Signal for Wireless (Simulation)')
     pl.grid()
     pl.show()
 
-def draw_channel_in_range(raw_data, channel_id):
+def draw_channel_in_range(stream, channel_id):
     ''' Draw one channel of given ID within its original range '''
-    time = raw_data.recordings[0].analog_streams[0].get_channel_timepoints(0,0,8100)
-    signal = raw_data.recordings[0].analog_streams[0].get_channel_in_range(0,0,8100)
+    time = stream.get_channel_timepoints(channel_id,0,100000)
+    signal = stream.get_channel_in_range(channel_id,0,100000)
     pl.figure(figsize=(20,12))
     pl.plot(time[0], signal[0])
     pl.xlabel('time (%s)' % time[1])
@@ -39,23 +37,56 @@ def draw_channel_in_range(raw_data, channel_id):
     pl.title('Sampled signal')
     pl.show()
 
-print('McsPy Version: %s' % McsPy.version)
+def test_channel_raw_data():
+    test_raw_data_file_path = "d:\\Programming\\MCSuite\\McsPyDataTools\\McsPyDataTools\\McsPyTests\\TestData\\Experiment.h5"
 
-raw_data = McsData.RawData(raw_data_file_path)
-print(raw_data.comment)
-print(raw_data.date)
-print(raw_data.clr_date)
-print(raw_data.date_in_clr_ticks)
-print(raw_data.file_guid)
-print(raw_data.mea_id)
-print(raw_data.mea_name)
-print(raw_data.program_name)
-print(raw_data.program_version) 
-print(raw_data.recordings)
-print(raw_data.recordings[0].analog_streams)
+    raw_data = McsData.RawData(test_raw_data_file_path)
+    print(raw_data.comment)
+    print(raw_data.date)
+    print(raw_data.clr_date)
+    print(raw_data.date_in_clr_ticks)
+    print(raw_data.file_guid)
+    print(raw_data.mea_id)
+    print(raw_data.mea_name)
+    print(raw_data.program_name)
+    print(raw_data.program_version) 
+    print(raw_data.recordings)
+    print(raw_data.recordings[0].analog_streams)
+    # Channel raw data:
+    draw_raw_data(raw_data.recordings[0].analog_streams[0])
+    show_image_plot(raw_data.recordings[0].analog_streams[0].channel_data[:, 0:81000], 8500)
+    draw_channel_in_range(raw_data.recordings[0].analog_streams[0], raw_data.recordings[0].analog_streams[0].channel_infos.keys()[0])
 
-draw_raw_data(raw_data)
+def plotImage(arr) :
+    fig  = pl.figure(figsize=(8,8), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+    imAx = pl.imshow(arr, origin='lower', interpolation='nearest')
+    fig.colorbar(imAx, pad=0.01, fraction=0.1, shrink=1.00, aspect=20)
  
-show_image_plot(raw_data.recordings[0]. analog_streams[0].channel_data[0:8, 0:8100], 850)
+def plotHistogram(arr) :
+    fig  = pl.figure(figsize=(8,8), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+    pl.hist(arr.flatten(), bins=100)
+  
+def test_frame_raw_data():
+    test_raw_frame_data_file_path = "d:\\Programming\\MCSuite\\McsPyDataTools\\McsPyDataTools\\McsPyTests\\TestData\\Sensor200ms.h5"
+    #with McsData.RawData(test_raw_frame_data_file_path) as raw_data:
+    raw_data = McsData.RawData(test_raw_frame_data_file_path)
+    print(raw_data.comment)
+    print(raw_data.date)
+    print(raw_data.clr_date)
+    print(raw_data.date_in_clr_ticks)
+    print(raw_data.file_guid)
+    print(raw_data.mea_id)
+    print(raw_data.mea_name)
+    print(raw_data.program_name)
+    print(raw_data.program_version) 
+    print(raw_data.recordings)
+    #print(raw_data.recordings[0])
+    first_frame = raw_data.recordings[0].frame_streams[0].frame_data[0][:,:,0]
+    plotImage(first_frame)
+    plotHistogram(first_frame)
+    pl.show()
 
-draw_channel_in_range(raw_data, 0)
+
+print('McsPy Version: %s' % McsPy.version)
+#test_channel_raw_data()
+test_frame_raw_data()
