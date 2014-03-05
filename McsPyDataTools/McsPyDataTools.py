@@ -86,7 +86,19 @@ def test_frame_raw_data():
     plotHistogram(first_frame)
     pl.show()
 
+def test_event_raw_data():
+    test_raw_data_file_path = ".\\McsPyTests\\TestData\\2014-02-27T08-30-03W8SpikeCutoutsAndTimestampsAndRawData.h5"
+    raw_data = McsData.RawData(test_raw_data_file_path)
+    event_entity = raw_data.recordings[0].event_streams[0].event_entity[0]
+    print("Event entity 0 contains: %s events" % event_entity.count)
+    all_events = event_entity.get_events()
+    print((all_events[0])[0,:])
+    all_event_timestamps = event_entity.get_event_timestamps()
+    print(all_event_timestamps[0])
+    all_event_durations = event_entity.get_event_durations()
+    print(all_event_durations[0])
 
 print('McsPy Version: %s' % McsPy.version)
-test_channel_raw_data()
-test_frame_raw_data()
+#test_channel_raw_data()
+#test_frame_raw_data()
+test_event_raw_data()

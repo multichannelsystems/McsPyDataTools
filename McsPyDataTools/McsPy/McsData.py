@@ -1,4 +1,14 @@
-import sys
+"""
+    McsData
+    ~~~~~~~
+
+    Data classes to wrap and hide raw data handling of the HDF5 data files. 
+    It is based on the MCS-HDF5 definitions of the given compatible versions. 
+    
+    :copyright: (c) 2014 by Multi Channel Systems MCS GmbH
+    :license: see LICENSE for more details
+"""
+
 import h5py
 import datetime
 import math
@@ -9,6 +19,7 @@ import numpy as np
 from McsPy import ureg, Q_, supported_mcs_hdf5_versions
 
 # day -> number of clr ticks (100 ns)
+mcs_tick = 1 * ureg.us
 clr_tick = 100 * ureg.ns
 day_to_clr_time_tick = 24 * 60 * 60 * (10**7)
 
@@ -59,8 +70,9 @@ class RawData(object):
         self.date_in_clr_ticks = session_info['DateInTicks']
         self.date =  datetime.datetime.fromordinal(int(math.ceil(self.date_in_clr_ticks / day_to_clr_time_tick)) + 1)
         #self.file_guid = session_info['FileGUID'].rstrip()
-        self.file_guid = uuid.UUID(session_info['FileGUID'].rstrip()) 
-        self.mea_id = session_info['MeaID']
+        self.file_guid = uuid.UUID(session_info['FileGUID'].rstrip())
+        self.mea_layout = session_info['MeaLayout'].rstrip() 
+        self.mea_sn = session_info['MeaSN'].rstrip()
         self.mea_name = session_info['MeaName'].rstrip()
         self.program_name = session_info['ProgramName'].rstrip()
         self.program_version = session_info['ProgramVersion'].rstrip()
@@ -90,6 +102,7 @@ class Recording(object):
         self.__get_recording_info()
         self.__analog_streams = None
         self.__frame_streams = None
+        self.__event_streams = None
 
     def __get_recording_info(self):
         recording_info = {}
@@ -123,6 +136,16 @@ class Recording(object):
             if ((len(stream_name) == 2) and (stream_name[0] == 'Stream')):
                 self.__frame_streams[int(stream_name[1])] = FrameStream(value)
 
+    def __read_event_streams(self):
+        event_stream_folder = self.__recording_grp['EventStream']
+        if (len(event_stream_folder) > 0):
+            self.__event_streams = {}
+        for (name, value) in event_stream_folder.iteritems():
+            print(name,value)
+            stream_name = name.split('_')
+            if ((len(stream_name) == 2) and (stream_name[0] == 'Stream')):
+                self.__event_streams[int(stream_name[1])] = EventStream(value)
+
     @property
     def analog_streams(self):
         if (self.__analog_streams is None): 
@@ -136,8 +159,14 @@ class Recording(object):
         return self.__frame_streams
 
     @property
+    def event_streams(self):
+        if (self.__event_streams is None):
+            self.__read_event_streams()
+        return self.__event_streams
+
+    @property
     def duration_time(self):
-        dur_time = (self.duration - self.timestamp) * 100 * ureg.ns
+        dur_time = (self.duration - self.timestamp) * ureg.us
         return dur_time
 
 class Stream(object):
@@ -216,7 +245,7 @@ class AnalogStream(Stream):
                     time = np.append(time,time_range)
                 else:
                     time = time_range
-            return (time * clr_tick.to_base_units().magnitude, clr_tick.to_base_units().units)
+            return (time * mcs_tick.to_base_units().magnitude, mcs_tick.to_base_units().units)
 
     #def get_signal_in_range(self):
     #    signal = (self.channel_data[...] - self.channel_infos[0].get_field('ADZero')) * self.channel_infos[0].get_field('ConversionFactor') * (10**self.channel_infos[0].get_field('Exponent'))   
@@ -233,14 +262,8 @@ class Info(object):
          return self.info[name]
 
     @property
-    def sampling_frequency(self):
-        frequency = 1 / self.sampling_tick.to_base_units()
-        return frequency.to(ureg.Hz)
-
-    @property
-    def sampling_tick(self):
-        tick_time = self.info['Tick']  * clr_tick # clr tick is 100 ns
-        return tick_time
+    def group_id(self):
+        return self.info["GroupID"]
 
     @property
     def label(self):
@@ -250,11 +273,25 @@ class Info(object):
     def data_type(self):
         return self.info['RawDataType']
 
-
-class ChannelInfo(Info):
-    """Contains all meta data for one channel"""
+class InfoSampledData(Info):
+    """Base class of all info classes for sampled data"""
     def __init__(self, info):
         Info.__init__(self, info)
+
+    @property
+    def sampling_frequency(self):
+        frequency = 1 / self.sampling_tick.to_base_units()
+        return frequency.to(ureg.Hz)
+
+    @property
+    def sampling_tick(self):
+        tick_time = self.info['Tick']  * mcs_tick
+        return tick_time
+
+class ChannelInfo(InfoSampledData):
+    """Contains all meta data for one channel"""
+    def __init__(self, info):
+        InfoSampledData.__init__(self, info)
 
     @property
     def row_index(self):
@@ -301,7 +338,7 @@ class FrameEntity(object):
 
     def get_sensor_signal(self, sensor_x, sensor_y , idx_start, idx_end):
             if (sensor_x < 0 or self.data.shape[0] < sensor_x or sensor_y < 0 or self.data.shape[1] < sensor_y):
-                raise exception.IndexError
+                raise exceptions.IndexError
             if (idx_start < 0):
                 idx_start = 0
             if (idx_end > self.data.shape[2]):
@@ -315,7 +352,7 @@ class FrameEntity(object):
 
     def get_frame_timestamps(self, idx_start, idx_end):
         if (idx_start < 0 or self.data.shape[2] < idx_start or idx_end < idx_start or self.data.shape[2] < idx_end):
-                raise exception.IndexError
+                raise exceptions.IndexError
         start_ts = 0L
         tick = self.info.get_field('Tick')
         for ts_range in self.time_stamp_index.T:
@@ -332,7 +369,7 @@ class FrameEntity(object):
                 time = np.append(time,time_range)
             else:
                 time = time_range
-        return (time * clr_tick.to_base_units().magnitude, clr_tick.to_base_units().units)        
+        return (time * mcs_tick.to_base_units().magnitude, mcs_tick.to_base_units().units)        
         
 
 class Frame(object):
@@ -367,10 +404,10 @@ class Frame(object):
     def height(self):
         return self.__bottom - self.__top + 1
 
-class FrameEntityInfo(Info):
+class FrameEntityInfo(InfoSampledData):
     """Contains all meta data for one frame entity"""
     def __init__(self, info, conv_factor_matrix):
-        Info.__init__(self, info)
+        InfoSampledData.__init__(self, info)
         self.frame = Frame(info['FrameLeft'], info['FrameTop'], info['FrameRight'], info['FrameBottom'])
         self.reference_frame = Frame(info['ReferenceFrameLeft'], info['ReferenceFrameTop'], info['ReferenceFrameRight'], info['ReferenceFrameBottom'])
         self.conversion_factors = conv_factor_matrix
@@ -393,4 +430,112 @@ class FrameEntityInfo(Info):
     def adc_step_for_sensor(self, x, y):
         adc_sensor_step = self.conversion_factors[x,y] * self.adc_basic_step
         return adc_sensor_step
+
+class EventStream(Stream):
+    """Container class for one event stream with different entities"""
+    def __init__(self, stream_grp):
+        Stream.__init__(self, stream_grp)
+        self.__read_event_entities()
+
+    def  __read_event_entities(self):
+        for (name, value) in self.stream_grp.iteritems():
+            print name, value
+        # Read infos per frame 
+        event_infos = self.stream_grp['InfoEvent'][...]
+        self.event_entity = {}
+        for event_entity_info in event_infos:
+            event_entity_name = "EventEntity_" + str(event_entity_info['EventID'])
+            event_info = EventEntityInfo(event_entity_info)
+            self.event_entity[event_entity_info['EventID']] = EventEntity(self.stream_grp[event_entity_name], event_info)
+        
+class EventEntity(object):
+    """Event entity class"""
+    def __init__(self, event_data, event_info):
+        self.info = event_info
+        # Connect the data set 
+        self.data = event_data
+
+    @property
+    def count(self):
+        """Number of contained events"""
+        dim = self.data.shape 
+        return dim[1];
+
+    def __handle_indices(self, idx_start, idx_end):
+        """Check indices for consistency and set default values if nothing was provided"""
+        if idx_start == None:
+            idx_start = 0
+        if idx_end == None:
+            idx_end = self.count
+        if idx_start < 0 or self.data.shape[1] < idx_start or idx_end < idx_start or self.data.shape[1] < idx_end:
+                raise exceptions.IndexError
+        return (idx_start, idx_end)
+
+    def get_events(self, idx_start = None, idx_end = None):
+        """Get all n events of this entity of the given index range (idx_start <= idx < idx_end)
+        
+        :param idx_start: start index of the range (including), if nothing is given -> 0
+        :param idx_end: end index of the range (excluding, if nothing is given -> last index
+        :return: Tuple of (2 x n matrix of time stamp (1. row) and duration (2. row), Used unit of time)   
+        """
+        idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
+        events = self.data[...,idx_start:idx_end]
+        return (events * mcs_tick.to_base_units().magnitude, mcs_tick.to_base_units().units)
+
+    def get_event_timestamps(self, idx_start = None, idx_end = None):
+        """Get all n event time stamps of this entity of the given index range 
+        
+        :param idx_start: start index of the range, if nothing is given -> 0
+        :param idx_end: end index of the range, if nothing is given -> last index
+        :return: Tuple of (n-length array of time stamps, Used unit of time)   
+        """
+        idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
+        events = self.data[0, idx_start:idx_end]
+        return (events * mcs_tick.to_base_units().magnitude, mcs_tick.to_base_units().units)
+
+    def get_event_durations(self, idx_start = None, idx_end = None):
+        """Get all n event durations of this entity of the given index range 
+        
+        :param idx_start: start index of the range, if nothing is given -> 0
+        :param idx_end: end index of the range, if nothing is given -> last index
+        :return: Tuple of (n-length array of duration, Used unit of time)   
+        """
+        idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
+        events = self.data[1, idx_start:idx_end]
+        return (events * mcs_tick.to_base_units().magnitude, mcs_tick.to_base_units().units)
+
+class EventEntityInfo(Info):
+    """Contains all meta data for one event entity"""
+    def __init__(self, info):
+        """
+        Initializes an describing info object with an array that contains all descriptions of this event entity.
+
+        :param info: array of event entity descriptiors as represented by one row of the InfoEvent structure inside the HDF5 file
+        """
+        Info.__init__(self, info)
+        source_channel_ids = map(lambda x: int(x), info['SourceChannelIDs'].split(','))
+        source_channel_labels = map(lambda x: x.strip(), info['SourceChannelLabels'].split(','))
+        self.__source_channels = {}
+        for idx, id in enumerate(source_channel_ids):
+            self.__source_channels[id] = source_channel_labels[idx]
+            
+    @property
+    def id(self):
+        "Channel ID"
+        return self.info['EventID']
+
+    @property
+    def raw_data_bytes(self):
+        "Lenght of raw data in bytes"
+        return self.info['RawDataBytes']
+
+    @property
+    def source_channel_ids(self):
+        "ID's of all channels that were involved in the event generation." 
+        return self.__source_channels.keys()
+
+    @property
+    def source_channel_labels(self):
+        "Labels of the channels that were involved in the event generation."
+        return self.__source_channels;
 

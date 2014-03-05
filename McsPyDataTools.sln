@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "McsPyDataTools", "McsPyDataTools\McsPyDataTools.pyproj", "{E1540F78-8C38-418C-AE9A-2D6DB423086C}"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "HDF5PyExamples", "HDF5PyExamples\HDF5PyExamples.pyproj", "{D8EC2540-CE86-476C-9732-A172F917B5FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{53A9B4FF-1B96-4BFA-A609-24438172BC25}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
