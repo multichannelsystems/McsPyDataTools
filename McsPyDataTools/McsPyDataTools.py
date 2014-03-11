@@ -98,7 +98,25 @@ def test_event_raw_data():
     all_event_durations = event_entity.get_event_durations()
     print(all_event_durations[0])
 
+def test_segment_raw_data():
+    test_raw_data_file_path = ".\\McsPyTests\\TestData\\2014-02-27T08-30-03W8SpikeCutoutsAndTimestampsAndRawData.h5"
+    raw_data = McsData.RawData(test_raw_data_file_path)
+    first_segment_entity = raw_data.recordings[0].segment_streams[0].segment_entity[0]
+    print("Segment entity 0 contains: %s segments" % first_segment_entity.segment_sample_count)
+    signal = first_segment_entity.get_segment_in_range(0, flat = True)
+    signal_ts = first_segment_entity.get_segment_sample_timestamps(0, flat = True)
+    # convert time stamps to second:
+    factor = ureg.convert(1, str(signal_ts[1]), "second")
+    signal_ts_second = signal_ts[0] * factor
+    pl.figure(figsize=(20,12))
+    pl.plot(signal_ts_second, signal[0])
+    pl.xlabel('time (s)')
+    pl.ylabel('voltage (%s)' % signal[1])
+    pl.title('Sampled signal segments')
+    pl.show()
+
 print('McsPy Version: %s' % McsPy.version)
 #test_channel_raw_data()
 #test_frame_raw_data()
-test_event_raw_data()
+#test_event_raw_data()
+test_segment_raw_data()

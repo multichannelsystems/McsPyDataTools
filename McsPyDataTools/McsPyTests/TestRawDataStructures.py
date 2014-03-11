@@ -148,7 +148,7 @@ class Test_RawDataContainer(Test_RawData):
     def test_event_infos(self):
         first_event_entity = self.data.recordings[0].event_streams[0].event_entity[0]
         self.assertEqual(first_event_entity.info.id, 0, "ID is not as expected!")
-        self.assertEqual(first_event_entity.info.raw_data_bytes, 4, "ID is not as expected!")
+        self.assertEqual(first_event_entity.info.raw_data_bytes, 4, "RawDataBytes is not as expected!")
         self.assertEquals(first_event_entity.info.source_channel_ids, [0],"Source channel IDs are different!") 
         self.assertEquals(first_event_entity.info.source_channel_labels.values(), 
                           ["E1"],"Source channels label is different (was '%s' instead of '['E1']')!" % 
@@ -171,6 +171,61 @@ class Test_RawDataContainer(Test_RawData):
         self.assertRaises(exceptions.IndexError, first_event_entity.get_events, 412, 500)   
         self.assertRaises(exceptions.IndexError, first_event_entity.get_events, -1, 5) 
 
+    # Test segment streams:
+    def test_count_segment_streams(self):
+        self.assertEqual(len(self.data.recordings[0].segment_streams), 1, 'There should be only one segment stream inside the recording!')
+        self.assertEqual(len(self.data.recordings[0].segment_streams[0].segment_entity), 8, 'There should be 8 segment entities inside the stream!')
+
+    def test_segment_stream_attributes(self):
+        first_segment_stream = self.data.recordings[0].segment_streams[0]
+        self.assertEqual(first_segment_stream.stream_type, 'Segment', "Segment stream type was '%s' and not 'Segment'!" % first_segment_stream.stream_type)
+        self.assertEqual(first_segment_stream.data_subtype, 'Spike', "Segment stream data sub type was '%s' and not 'Spike' as expected!" % first_segment_stream.data_subtype)
+        self.assertEqual(first_segment_stream.label, '', "Segment label was '%s' and not '' as expected!" % first_segment_stream.label)
+        self.assertEqual(str(first_segment_stream.source_stream_guid), '3a1054d5-2c9f-4ddf-877b-282b86c1d5ab', 
+                         "Segment stream source GUID was '%s' and not '3a1054d5-2c9f-4ddf-877b-282b86c1d5ab' as expected!" % str(first_segment_stream.source_stream_guid))
+        self.assertEqual(str(first_segment_stream.stream_guid), '45a5873f-963a-4a48-a18e-2a9b0ff69005', 
+                         "Segment stream GUID was '%s' and not '45a5873f-963a-4a48-a18e-2a9b0ff69005' as expected!" % str(first_segment_stream.stream_guid))
+
+    def test_segment_infos(self):
+        fifth_segment_entity = self.data.recordings[0].segment_streams[0].segment_entity[4]
+        self.assertEqual(fifth_segment_entity.info.id, 4, "ID was '%s' and not '4' as expected!" % fifth_segment_entity.info.id)
+        self.assertEqual(fifth_segment_entity.info.group_id, 0, "Group ID was '%s' and not '0' as expected!" % fifth_segment_entity.info.group_id)
+        self.assertEqual(fifth_segment_entity.info.pre_interval.magnitude, 1000, "Pre-Interval was '%s' and not '1000' as expected!" % fifth_segment_entity.info.pre_interval.magnitude)
+        self.assertEqual(str(fifth_segment_entity.info.pre_interval.units), 'microsecond', "Pre-Interval unit was '%s' and not 'microsecond' as expected!" % str(fifth_segment_entity.info.pre_interval.units))
+        self.assertEqual(fifth_segment_entity.info.post_interval.magnitude, 2000, "Post-Interval was '%s' and not '2000' as expected!" % fifth_segment_entity.info.post_interval.magnitude)
+        self.assertEqual(str(fifth_segment_entity.info.post_interval.units), 'microsecond', "Post-Interval unit was '%s' and not 'microsecond' as expected!" % str(fifth_segment_entity.info.post_interval.units))
+        self.assertEqual(fifth_segment_entity.info.type, 'Cutout', "Type was '%s' and not 'Cutout' as expected!" % fifth_segment_entity.info.type)
+        self.assertEqual(fifth_segment_entity.info.count, 1, "Count of segments was '%s' and not '1' as expected!" % fifth_segment_entity.info.count)
+        self.assertEquals(fifth_segment_entity.info.source_channel_of_segment.keys(), [0], 
+                          "Source channel dataset index was different (was '%s' instead of '['0']')!" % fifth_segment_entity.info.source_channel_of_segment.keys()) 
+        self.assertEquals(fifth_segment_entity.info.source_channel_of_segment[0].channel_id, 4, 
+                          "Source channel ID was different (was '%s' instead of '4')!" % fifth_segment_entity.info.source_channel_of_segment[0].channel_id) 
+
+    def test_segment_data(self):
+        first_segment_entity = self.data.recordings[0].segment_streams[0].segment_entity[0]
+        self.assertEqual(first_segment_entity.segment_sample_count, 36, "Segment sample count was expected to be  but was %s!" % first_segment_entity.segment_sample_count)
+        signal = first_segment_entity.get_segment_in_range(0)
+        self.assertEqual(signal[0].shape, (61, 36), "Matrix of segment signal points was expected to be '(61,36)' but was '%s'!" % str(signal[0].shape))
+        self.assertEqual(str(signal[1]), 'volt', "Unit of segment signal was expected to be 'volt' but was '%s'!" % str(signal[1]))
+        signal_flat = first_segment_entity.get_segment_in_range(0, flat = True)
+        self.assertEqual(len(signal_flat[0]), 2196, "Vector ('flat = True') of segment signal points was expected to be '2196' but was '%s'!" % len(signal_flat[0]))
+        self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_in_range, segment_id = 0, flat = False, idx_start = 16, idx_end = 4)
+        self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_in_range, segment_id = 0, flat = False, idx_start = 40, idx_end = 49)
+        self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_in_range, segment_id = 0, flat = False, idx_start = -1, idx_end = 10)
+
+    def test_segment_data_timestamps(self):
+        first_segment_entity = self.data.recordings[0].segment_streams[0].segment_entity[0]
+        signal_ts = first_segment_entity.get_segment_sample_timestamps(0)
+        self.assertEqual(signal_ts[0].shape, (61, 36), "Matrix of segment time stamps was expected to be '(61,36)' but was '%s'!" % str(signal_ts[0].shape))
+        self.assertEqual(str(signal_ts[1]), 'microsecond', "Unit of time stamps was expected to be 'second' but was '%s'!" % str(signal_ts[1]))
+        ts_selected = [signal_ts[0][0,0], signal_ts[0][1,0], signal_ts[0][2,0], signal_ts[0][0,1], signal_ts[0][1,1], signal_ts[0][2,1]]
+        expected_ts = [1204050, 1204100, 1204150, 2099150, 2099200, 2099250]
+        self.assertEquals(ts_selected, expected_ts, "Time stamps were '%s' and not as expected '%s" % (ts_selected, expected_ts))
+        signal_flat_ts = first_segment_entity.get_segment_sample_timestamps(0, flat = True)
+        self.assertEqual(len(signal_flat_ts[0]), 2196, "Vector ('flat = True') of segment signal points was expected to be '2196' but was '%s'!" % len(signal_flat_ts[0]))
+        self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_sample_timestamps, segment_id = 0, flat = False, idx_start = 16, idx_end = 4)
+        self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_sample_timestamps, segment_id = 0, flat = False, idx_start = 40, idx_end = 49)
+        self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_sample_timestamps, segment_id = 0, flat = False, idx_start = -1, idx_end = 10)
 
 if __name__ == '__main__':
     unittest.main()

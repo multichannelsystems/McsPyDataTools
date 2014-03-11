@@ -103,6 +103,7 @@ class Recording(object):
         self.__analog_streams = None
         self.__frame_streams = None
         self.__event_streams = None
+        self.__segment_streams = None
 
     def __get_recording_info(self):
         recording_info = {}
@@ -146,6 +147,16 @@ class Recording(object):
             if ((len(stream_name) == 2) and (stream_name[0] == 'Stream')):
                 self.__event_streams[int(stream_name[1])] = EventStream(value)
 
+    def __read_segment_streams(self):
+        segment_stream_folder = self.__recording_grp['SegmentStream']
+        if len(segment_stream_folder) > 0:
+            self.__segment_streams = {}
+        for (name, value) in segment_stream_folder.iteritems():
+            print(name,value)
+            stream_name = name.split('_')
+            if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
+                self.__segment_streams[int(stream_name[1])] = SegmentStream(value)
+
     @property
     def analog_streams(self):
         if (self.__analog_streams is None): 
@@ -163,6 +174,12 @@ class Recording(object):
         if (self.__event_streams is None):
             self.__read_event_streams()
         return self.__event_streams
+
+    @property
+    def segment_streams(self):
+        if (self.__segment_streams is None):
+            self.__read_segment_streams()
+        return self.__segment_streams
 
     @property
     def duration_time(self):
@@ -292,6 +309,10 @@ class ChannelInfo(InfoSampledData):
     """Contains all meta data for one channel"""
     def __init__(self, info):
         InfoSampledData.__init__(self, info)
+
+    @property
+    def channel_id(self):
+        return self.info['ChannelID']
 
     @property
     def row_index(self):
@@ -440,7 +461,7 @@ class EventStream(Stream):
     def  __read_event_entities(self):
         for (name, value) in self.stream_grp.iteritems():
             print name, value
-        # Read infos per frame 
+        # Read infos per event entity 
         event_infos = self.stream_grp['InfoEvent'][...]
         self.event_entity = {}
         for event_entity_info in event_infos:
@@ -449,7 +470,9 @@ class EventStream(Stream):
             self.event_entity[event_entity_info['EventID']] = EventEntity(self.stream_grp[event_entity_name], event_info)
         
 class EventEntity(object):
-    """Event entity class"""
+    """
+    Event entity class
+    """
     def __init__(self, event_data, event_info):
         self.info = event_info
         # Connect the data set 
@@ -459,7 +482,7 @@ class EventEntity(object):
     def count(self):
         """Number of contained events"""
         dim = self.data.shape 
-        return dim[1];
+        return dim[1]
 
     def __handle_indices(self, idx_start, idx_end):
         """Check indices for consistency and set default values if nothing was provided"""
@@ -505,7 +528,9 @@ class EventEntity(object):
         return (events * mcs_tick.to_base_units().magnitude, mcs_tick.to_base_units().units)
 
 class EventEntityInfo(Info):
-    """Contains all meta data for one event entity"""
+    """
+    Contains all meta data for one event entity
+    """
     def __init__(self, info):
         """
         Initializes an describing info object with an array that contains all descriptions of this event entity.
@@ -521,7 +546,7 @@ class EventEntityInfo(Info):
             
     @property
     def id(self):
-        "Channel ID"
+        "Event ID"
         return self.info['EventID']
 
     @property
@@ -539,3 +564,173 @@ class EventEntityInfo(Info):
         "Labels of the channels that were involved in the event generation."
         return self.__source_channels;
 
+class SegmentStream(Stream):
+    """
+    Container class for one segment stream of different segment entities
+    """
+    def __init__(self, stream_grp):
+        Stream.__init__(self, stream_grp)
+        self.__read_segment_entities()
+
+    def  __read_segment_entities(self):
+        "Read and initialize all segment entities"
+        for (name, value) in self.stream_grp.iteritems():
+            print name, value
+        # Read infos per segment entity 
+        segment_infos = self.stream_grp['InfoSegment'][...]
+        self.segment_entity = {}
+        for segment_entity_info in segment_infos:
+            segment_entity_data_name = "SegmentData_" + str(segment_entity_info['SegmentID'])
+            segment_entity_ts_name = "SegmentData_ts_" + str(segment_entity_info['SegmentID'])
+            source_channel_infos = self.__get_source_channel_infos(self.stream_grp['SourceInfoChannel'][...])
+            segment_info = SegmentEntityInfo(segment_entity_info, source_channel_infos)
+            self.segment_entity[segment_entity_info['SegmentID']] = SegmentEntity(self.stream_grp[segment_entity_data_name], 
+                                                                                self.stream_grp[segment_entity_ts_name],
+                                                                                segment_info)
+
+    def __get_source_channel_infos(self, source_channel_infos):
+        "Create a dictionary of all present source channels"
+        source_channels = {}
+        for source_channel_info in source_channel_infos:
+            source_channels[source_channel_info['ChannelID']] = ChannelInfo(source_channel_info)
+        return source_channels
+
+class SegmentEntity(object):
+    """
+    Segment entity class
+    """
+    def __init__(self, segment_data, segment_ts, segment_info):
+        """
+        Initializes a segment entity.
+
+        :param segment_data: 2d-matrix (one segment) or 3d-cube (n segments) of segment data
+        :param segment_ts: time stamp vector for every segment (2d) or multi-segments (3d)
+        :param segment_info: segment info object that contains all meta data for this segment entity
+        :return: Segment entity
+        """
+        self.info = segment_info
+        # connect the data set 
+        self.data = segment_data
+        # connect the time stamp vector
+        self.data_ts = segment_ts
+        assert self.segment_sample_count == self.data_ts.shape[1], 'Time stamp index is not compatible with dataset!!!'
+
+    @property
+    def segment_sample_count(self):
+        "Number of contained samples of segments (2d) or multi-segments (3d)"
+        dim = self.data.shape 
+        if len(dim) == 3:
+            return dim[2]
+        else:
+            return dim[1]
+
+    @property
+    def segment_count(self):
+        "Number of segments that are sampled for one time point (2d) -> 1 and (3d) -> n"
+        dim = self.data.shape 
+        if len(dim) == 3:
+            return dim[1]
+        else:
+            return 1
+
+    def __handle_indices(self, idx_start, idx_end):
+        """Check indices for consistency and set default values if nothing was provided"""
+        sample_count = self.segment_sample_count
+        if idx_start == None:
+            idx_start = 0
+        if idx_end == None:
+            idx_end = sample_count
+        if idx_start < 0 or sample_count < idx_start or idx_end < idx_start or sample_count < idx_end:
+                raise exceptions.IndexError
+        return (idx_start, idx_end)
+
+    def get_segment_in_range(self, segment_id, flat = False, idx_start = None, idx_end = None):
+        """
+        Get the a/the segment signals in its measured range. 
+
+        :param segment_id: id resp. number of the segment (0 if only one segment is present or the index inside the multi-segment collection)
+        :param flat: true -> one-dimensional vector of the sequentially ordered segments, false -> k x n matrix of the n segments of k sample points  
+        :param idx_start: index of the first segment that should be returned (0 <= idx_start < idx_end <= count segments)
+        :param idx_end: index of the last segment that should be returned (0 <= idx_start < idx_end <= count segments)  
+        :return: Tuple of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample 
+        points depending on the value of *flat* and the unit of the values
+        """
+        if segment_id in self.info.source_channel_of_segment.keys():
+            idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
+            if self.segment_count == 1:
+                signal = self.data[..., idx_start : idx_end]
+            else:
+                signal = self.data[..., segment_id, idx_start : idx_end]
+            source_channel = self.info.source_channel_of_segment[segment_id]
+            scale = source_channel.adc_step.magnitude
+            signal_corrected =  (signal - source_channel.get_field('ADZero'))  * scale
+            if flat:
+                signal_corrected = np.reshape(signal_corrected, -1, 'F')
+            return (signal_corrected, source_channel.adc_step.units)
+
+    def get_segment_sample_timestamps(self, segment_id, flat = False, idx_start = None, idx_end = None):
+        """
+        Get the time stamps of the sample points of the measured segment. 
+
+        :param segment_id: id resp. number of the segment (0 if only one segment is present or the index inside the multi-segment collection)
+        :param flat: true -> one-dimensional vector of the sequentially ordered segment time stamps, false -> k x n matrix of the k time stamps of n segments  
+        :param idx_start: index of the first segment for that time stamps should be returned (0 <= idx_start < idx_end <= count segments)
+        :param idx_end: index of the last segment for that time stamps should be returned (0 <= idx_start < idx_end <= count segments)  
+        :return: Tuple of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample 
+        points depending on the value of *flat* and the unit of the values
+        """
+        if segment_id in self.info.source_channel_of_segment.keys():
+            idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
+            data_ts = self.data_ts[idx_start:idx_end]
+            source_channel = self.info.source_channel_of_segment[segment_id]
+            signal_ts = np.zeros((self.data.shape[0], data_ts.shape[1]), dtype = np.long)
+            segment_ts = np.zeros(self.data.shape[0], dtype = np.long) + source_channel.sampling_tick.magnitude
+            segment_ts[0] = 0
+            segment_ts = np.cumsum(segment_ts)
+            for i in range(data_ts.shape[1]):
+                col = data_ts[0,i] + segment_ts
+                signal_ts[:, i] = col
+            if flat:
+                signal_ts = np.reshape(signal_ts, -1, 'F')
+            return (signal_ts , source_channel.sampling_tick.units)
+
+class SegmentEntityInfo(Info):
+    """
+    Contains all meta data for one segment entity
+    """
+    def __init__(self, info, source_channel_infos):
+        """
+        Initializes an describing info object with an array that contains all descriptions of this segment entity.
+
+        :param info: array of segment entity descriptiors as represented by one row of the SegmentEvent structure inside the HDF5 file
+        :param source_channel_infos: dictionary of source channels from where the segements were taken 
+        """
+        Info.__init__(self, info)
+        source_channel_ids = map(lambda x: int(x), info['SourceChannelIDs'].split(','))
+        self.source_channel_of_segment = {}
+        for idx, id in enumerate(source_channel_ids):
+            self.source_channel_of_segment[idx] = source_channel_infos[id]
+            
+    @property
+    def id(self):
+        "Segment ID"
+        return self.info['SegmentID']
+
+    @property
+    def pre_interval(self):
+        "Interval [start of the segment <- defining event time stamp]"
+        return self.info['PreInterval'] * mcs_tick
+
+    @property
+    def post_interval(self):
+        "Interval [defining event time stamp -> end of the segment]"
+        return self.info['PostInterval'] * mcs_tick
+
+    @property
+    def type(self):
+        return self.info['SegmentType']
+
+    @property
+    def count(self):
+        "Count of segments inside the segment entity"
+        return len(self.source_channel_of_segment)
