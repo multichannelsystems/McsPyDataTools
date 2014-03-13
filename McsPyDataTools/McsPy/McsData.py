@@ -16,11 +16,12 @@ import uuid
 import exceptions
 import numpy as np
 
-from McsPy import ureg, Q_, supported_mcs_hdf5_versions
+from McsPy import *
 
-# day -> number of clr ticks (100 ns)
 mcs_tick = 1 * ureg.us
 clr_tick = 100 * ureg.ns
+
+# day -> number of clr ticks (100 ns)
 day_to_clr_time_tick = 24 * 60 * 60 * (10**7)
 
 
@@ -55,16 +56,21 @@ class RawData(object):
         return super(RawData, self).__str__()
 
     def __validate_mcs_hdf5_version(self):
-        "Check if the MCS-HDF5 version of the file is supported by this class"
+        "Check if the MCS-HDF5 protocol type and version of the file is supported by this class"
         root_grp = self.h5_file['/']
-        if ('McsHdf5Version' in root_grp.attrs):
-            self.mcs_hdf5_version = root_grp.attrs['McsHdf5Version']
-            if ((self.mcs_hdf5_version < supported_mcs_hdf5_versions[0]) or 
-                (supported_mcs_hdf5_versions[1] < self.mcs_hdf5_version)):
-                raise IOError('Given HDF5 file has version %s and supported are all versions from %s to %s' % 
-                              (self.mcs_hdf5_version, supported_mcs_hdf5_versions[0], supported_mcs_hdf5_versions[1]))    
+        if ('McsHdf5ProtocolType' in root_grp.attrs):
+            self.mcs_hdf5_protocol_type = root_grp.attrs['McsHdf5ProtocolType']
+            if (self.mcs_hdf5_protocol_type == McsHdf5Protocols.RAW_DATA[0]):
+                self.mcs_hdf5_protocol_type_version = root_grp.attrs['McsHdf5ProtocolVersion']
+                supported_versions = McsHdf5Protocols.RAW_DATA[1]
+                if ((self.mcs_hdf5_protocol_type_version < supported_versions[0]) or 
+                    (supported_versions[1] < self.mcs_hdf5_protocol_type_version)):
+                    raise IOError('Given HDF5 file has MCS-HDF5 RawData protocol version %s and supported are all versions from %s to %s' % 
+                                  (self.mcs_hdf5_protocol_type_version, supported_versions[0], supported_versions[1]))
+            else:
+                raise IOError("The root group of this HDF5 file has no 'McsHdf5ProtocolVersion' attribute -> so it could't be checked if the version is supported!")
         else:
-            raise IOError('The root group of this HDF5 file has no MCS-HDF5-Version attribute -> this file is not supported by McsPy!')
+            raise IOError("The root group of this HDF5 file has no 'McsHdf5ProtocolType attribute' -> this file is not supported by McsPy!")
 
     def __get_session_info(self):
         "Read all session metadata"

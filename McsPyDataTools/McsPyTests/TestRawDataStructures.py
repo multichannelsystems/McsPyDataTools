@@ -4,7 +4,7 @@ import datetime
 import exceptions
 import numpy as np
 
-from McsPy import ureg, Q_
+from McsPy import *
 
 test_raw_frame_data_file_path = ".\\TestData\\Sensors-10x100ms-10kHz.h5"
 
@@ -23,10 +23,16 @@ class Test_RawData(unittest.TestCase):
 class Test_RawDataContainer(Test_RawData):
     # Test MCS-HDF5 version
     def test_mcs_hdf5_version(self):
-        self.assertEqual(self.data.mcs_hdf5_version, 1, 'The MCS-HDF5-Version is different from the expected one!')
+        self.assertEqual(self.data.mcs_hdf5_protocol_type, McsHdf5Protocols.RAW_DATA[0], 
+                         "The MCS-HDF5 protocol type was '%s' and not '%s' as expected!" % (self.data.mcs_hdf5_protocol_type, McsHdf5Protocols.RAW_DATA[0]))
+        self.assertEqual(self.data.mcs_hdf5_protocol_type_version, 1, 
+                         "The MCS-HDF5 protocol version was '%s' and not '1' as expected!" % self.data.mcs_hdf5_protocol_type_version)
 
     def test_mcs_hdf5_version_frame(self):
-        self.assertEqual(self.raw_frame_data.mcs_hdf5_version, 1, 'The MCS-HDF5-Version is different from the expected one!')
+        self.assertEqual(self.data.mcs_hdf5_protocol_type, McsHdf5Protocols.RAW_DATA[0], 
+                         "The MCS-HDF5 protocol type was '%s' and not '%s' as expected!" % (self.data.mcs_hdf5_protocol_type, McsHdf5Protocols.RAW_DATA[0]))
+        self.assertEqual(self.data.mcs_hdf5_protocol_type_version, 1, 
+                         "The MCS-HDF5 protocol version was '%s' and not '1' as expected!" % self.data.mcs_hdf5_protocol_type_version)
 
     # Test session:
     def test_session_attributes(self):
