@@ -265,9 +265,28 @@ class Test_RawDataContainer(Test_RawData):
         signal_ts = first_segment_entity.get_segment_sample_timestamps(0)
         self.assertEqual(signal_ts[0].shape, (61, 36), "Matrix of segment time stamps was expected to be '(61,36)' but was '%s'!" % str(signal_ts[0].shape))
         self.assertEqual(str(signal_ts[1]), 'microsecond', "Unit of time stamps was expected to be 'microsecond' but was '%s'!" % str(signal_ts[1]))
-        ts_selected = [signal_ts[0][0,0], signal_ts[0][1,0], signal_ts[0][2,0], signal_ts[0][0,1], signal_ts[0][1,1], signal_ts[0][2,1]]
-        expected_ts = [1204050, 1204100, 1204150, 2099150, 2099200, 2099250]
-        self.assertEquals(ts_selected, expected_ts, "Time stamps were '%s' and not as expected '%s" % (ts_selected, expected_ts))
+        ts_selected = (signal_ts[0][:,0]).tolist()
+        expected_ts_first_segment = [1203050, 1203100, 1203150, 1203200, 1203250, 1203300, 1203350, 
+                                    1203400, 1203450, 1203500, 1203550, 1203600, 1203650, 1203700, 
+                                    1203750, 1203800, 1203850, 1203900, 1203950, 1204000, 1204050, 
+                                    1204100, 1204150, 1204200, 1204250, 1204300, 1204350, 1204400, 
+                                    1204450, 1204500, 1204550, 1204600, 1204650, 1204700, 1204750, 
+                                    1204800, 1204850, 1204900, 1204950, 1205000, 1205050, 1205100, 
+                                    1205150, 1205200, 1205250, 1205300, 1205350, 1205400, 1205450, 
+                                    1205500, 1205550, 1205600, 1205650, 1205700, 1205750, 1205800, 
+                                    1205850, 1205900, 1205950, 1206000, 1206050]
+        self.assertEquals(ts_selected, expected_ts_first_segment, "Time stamps for the first segment were '%s' and not as expected '%s" % (ts_selected, expected_ts_first_segment))
+        ts_selected = (signal_ts[0][:,2]).tolist()
+        expected_ts_third_segment = [2105800, 2105850, 2105900, 2105950, 2106000, 2106050, 2106100, 
+                                    2106150, 2106200, 2106250, 2106300, 2106350, 2106400, 2106450, 
+                                    2106500, 2106550, 2106600, 2106650, 2106700, 2106750, 2106800, 
+                                    2106850, 2106900, 2106950, 2107000, 2107050, 2107100, 2107150, 
+                                    2107200, 2107250, 2107300, 2107350, 2107400, 2107450, 2107500, 
+                                    2107550, 2107600, 2107650, 2107700, 2107750, 2107800, 2107850, 
+                                    2107900, 2107950, 2108000, 2108050, 2108100, 2108150, 2108200, 
+                                    2108250, 2108300, 2108350, 2108400, 2108450, 2108500, 2108550, 
+                                    2108600, 2108650, 2108700, 2108750, 2108800]
+        self.assertEquals(ts_selected, expected_ts_third_segment, "Time stamps for the third segment were '%s' and not as expected '%s" % (ts_selected, expected_ts_third_segment))
         signal_flat_ts = first_segment_entity.get_segment_sample_timestamps(0, flat = True)
         self.assertEqual(len(signal_flat_ts[0]), 2196, "Vector ('flat = True') of segment signal points was expected to be '2196' but was '%s'!" % len(signal_flat_ts[0]))
         self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_sample_timestamps, segment_id = 0, flat = False, idx_start = 16, idx_end = 4)

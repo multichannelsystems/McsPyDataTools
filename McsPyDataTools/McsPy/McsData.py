@@ -838,7 +838,7 @@ class SegmentEntity(object):
             segment_ts[0] = 0
             segment_ts = np.cumsum(segment_ts)
             for i in range(data_ts.shape[1]):
-                col = data_ts[0,i] + segment_ts
+                col = (data_ts[0,i] - self.info.pre_interval.magnitude) + segment_ts
                 signal_ts[:, i] = col
             if flat:
                 signal_ts = np.reshape(signal_ts, -1, 'F')
