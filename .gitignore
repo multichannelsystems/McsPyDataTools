@@ -13,7 +13,7 @@
 x64/
 build/
 bld/
-[Bb]in/
+#[Bb]in/
 [Oo]bj/
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
@@ -193,7 +193,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
-bin/
+#bin/
 build/
 develop-eggs/
 dist/
@@ -206,6 +206,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Installer logs
 pip-log.txt
@@ -239,4 +240,4 @@ docs/_build/
 # =========================
 # Ignore HDF5 data files
 # =========================
-*.h5
+#*.h5
