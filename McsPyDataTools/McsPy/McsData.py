@@ -17,6 +17,7 @@ import exceptions
 import numpy as np
 
 from McsPy import *
+from pint import UndefinedUnitError
 
 mcs_tick = 1 * ureg.us
 clr_tick = 100 * ureg.ns
@@ -123,6 +124,7 @@ class Recording(object):
         self.__frame_streams = None
         self.__event_streams = None
         self.__segment_streams = None
+        self.__timestamp_streams = None
 
     def __get_recording_info(self):
         "Read metadata for this recording"
@@ -181,6 +183,17 @@ class Recording(object):
             if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
                 self.__segment_streams[int(stream_name[1])] = SegmentStream(value)
 
+    def __read_timestamp_streams(self):
+        "Read all contained timestamp streams"
+        timestamp_stream_folder = self.__recording_grp['TimeStampStream']
+        if len(timestamp_stream_folder) > 0:
+            self.__timestamp_streams = {}
+        for (name, value) in timestamp_stream_folder.iteritems():
+            print(name,value)
+            stream_name = name.split('_')
+            if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
+                self.__timestamp_streams[int(stream_name[1])] = TimeStampStream(value)
+
     @property
     def analog_streams(self):
         "Access analog streams"
@@ -210,6 +223,13 @@ class Recording(object):
         return self.__segment_streams
 
     @property
+    def timestamp_streams(self):
+        "Access timestamp streams"
+        if (self.__timestamp_streams is None):
+            self.__read_timestamp_streams()
+        return self.__timestamp_streams
+
+    @property
     def duration_time(self):
         "Duration of the recording"
         dur_time = (self.duration - self.timestamp) * ureg.us
@@ -227,7 +247,6 @@ class Stream(object):
         """
         self.stream_grp = stream_grp
         self.__get_stream_info()
-        #self.__read_channels()
 
     def __get_stream_info(self):
         "Read all describing meta data common to each stream -> HDF5 folder attributes"
@@ -259,8 +278,8 @@ class AnalogStream(Stream):
         assert len(self.stream_grp) == 3
         for (name, value) in self.stream_grp.iteritems():
             print name, value
-        # Read time stamp index of channels:
-        self.time_stamp_index = self.stream_grp['ChannelDataTimeStamps'][...]
+        # Read timestamp index of channels:
+        self.timestamp_index = self.stream_grp['ChannelDataTimeStamps'][...]
         
         # Read infos per channel 
         ch_infos = self.stream_grp['InfoChannel'][...]
@@ -297,25 +316,25 @@ class AnalogStream(Stream):
 
     def get_channel_sample_timestamps(self, channel_id, idx_start, idx_end):
         """
-        Get the time stamps of the sampled values. 
+        Get the timestamps of the sampled values. 
 
         :param channel_id: ID of the channel
-        :param idx_start: index of the first signal time stamp that should be returned (0 <= idx_start < idx_end <= count samples)
-        :param idx_end: index of the last signal time stamp that should be returned (0 <= idx_start < idx_end <= count samples)  
-        :return: Tuple (vector of the time stamps, unit of the time stamps)
+        :param idx_start: index of the first signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples)
+        :param idx_end: index of the last signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples)  
+        :return: Tuple (vector of the timestamps, unit of the timestamps)
         """
         if (channel_id in self.channel_infos.keys()):
             start_ts = 0L
             channel = self.channel_infos[channel_id]
             tick = channel.get_field('Tick')
-            for ts_range in self.time_stamp_index:
+            for ts_range in self.timestamp_index:
                 if (idx_end < ts_range[1]): # nothing to do anymore ->
                     break 
                 if (ts_range[2] < idx_start): # start is behind the end of this range ->
                     continue
                 else:
                     idx_segment = idx_start - ts_range[1]
-                    start_ts = ts_range[0] + idx_segment * tick # time stamp of first index
+                    start_ts = ts_range[0] + idx_segment * tick # timestamp of first index
                 if (idx_end <= ts_range[2]):
                     time_range = start_ts + np.arange(0, (idx_end - ts_range[1] + 1) - idx_segment, 1) * tick
                 else:
@@ -455,7 +474,7 @@ class FrameEntity(object):
         """
         self.info = frame_info
         self.group = frame_entity_group
-        self.time_stamp_index = self.group['FrameDataTimeStamps'][...]
+        self.timestamp_index = self.group['FrameDataTimeStamps'][...]
         # Connect the data set 
         self.data = self.group['FrameData']
 
@@ -485,24 +504,24 @@ class FrameEntity(object):
 
     def get_frame_timestamps(self, idx_start, idx_end):
         """
-        Get the time stamps of the sampled frames. 
+        Get the timestamps of the sampled frames. 
 
         :param idx_start: index of the first sampled frame that should be returned (0 <= idx_start < idx_end <= count frames)
         :param idx_end: index of the last sampled frame that should be returned (0 <= idx_start < idx_end <= count frames)  
-        :return: Tuple (vector of the time stamps, unit of the time stamps)
+        :return: Tuple (vector of the timestamps, unit of the timestamps)
         """
         if (idx_start < 0 or self.data.shape[2] < idx_start or idx_end < idx_start or self.data.shape[2] < idx_end):
                 raise exceptions.IndexError
         start_ts = 0L
         tick = self.info.get_field('Tick')
-        for ts_range in self.time_stamp_index:
+        for ts_range in self.timestamp_index:
             if (idx_end < ts_range[1]): # nothing to do anymore ->
                 break 
             if (ts_range[2] < idx_start): # start is behind the end of this range ->
                 continue
             else:
                 idx_segment = idx_start - ts_range[1]
-                start_ts = ts_range[0] + idx_segment * tick # time stamp of first index
+                start_ts = ts_range[0] + idx_segment * tick # timestamp of first index
             if (idx_end <= ts_range[2]):
                 time_range = start_ts + np.arange(0, (idx_end - ts_range[1] + 1) - idx_segment, 1) * tick
             else:
@@ -649,18 +668,18 @@ class EventEntity(object):
         
         :param idx_start: start index of the range (including), if nothing is given -> 0
         :param idx_end: end index of the range (excluding, if nothing is given -> last index
-        :return: Tuple of (2 x n matrix of time stamp (1. row) and duration (2. row), Used unit of time)   
+        :return: Tuple of (2 x n matrix of timestamp (1. row) and duration (2. row), Used unit of time)   
         """
         idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
         events = self.data[...,idx_start:idx_end]
         return (events * mcs_tick.magnitude, mcs_tick.units)
 
     def get_event_timestamps(self, idx_start = None, idx_end = None):
-        """Get all n event time stamps of this entity of the given index range 
+        """Get all n event timestamps of this entity of the given index range 
         
         :param idx_start: start index of the range, if nothing is given -> 0
         :param idx_end: end index of the range, if nothing is given -> last index
-        :return: Tuple of (n-length array of time stamps, Used unit of time)   
+        :return: Tuple of (n-length array of timestamps, Used unit of time)   
         """
         idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
         events = self.data[0, idx_start:idx_end]
@@ -754,16 +773,16 @@ class SegmentEntity(object):
         Initializes a segment entity.
 
         :param segment_data: 2d-matrix (one segment) or 3d-cube (n segments) of segment data
-        :param segment_ts: time stamp vector for every segment (2d) or multi-segments (3d)
+        :param segment_ts: timestamp vector for every segment (2d) or multi-segments (3d)
         :param segment_info: segment info object that contains all meta data for this segment entity
         :return: Segment entity
         """
         self.info = segment_info
         # connect the data set 
         self.data = segment_data
-        # connect the time stamp vector
+        # connect the timestamp vector
         self.data_ts = segment_ts
-        assert self.segment_sample_count == self.data_ts.shape[1], 'Time stamp index is not compatible with dataset!!!'
+        assert self.segment_sample_count == self.data_ts.shape[1], 'Timestamp index is not compatible with dataset!!!'
 
     @property
     def segment_sample_count(self):
@@ -820,12 +839,12 @@ class SegmentEntity(object):
 
     def get_segment_sample_timestamps(self, segment_id, flat = False, idx_start = None, idx_end = None):
         """
-        Get the time stamps of the sample points of the measured segment. 
+        Get the timestamps of the sample points of the measured segment. 
 
         :param segment_id: id resp. number of the segment (0 if only one segment is present or the index inside the multi-segment collection)
-        :param flat: true -> one-dimensional vector of the sequentially ordered segment time stamps, false -> k x n matrix of the k time stamps of n segments  
-        :param idx_start: index of the first segment for that time stamps should be returned (0 <= idx_start < idx_end <= count segments)
-        :param idx_end: index of the last segment for that time stamps should be returned (0 <= idx_start < idx_end <= count segments)  
+        :param flat: true -> one-dimensional vector of the sequentially ordered segment timestamps, false -> k x n matrix of the k timestamps of n segments  
+        :param idx_start: index of the first segment for that timestamps should be returned (0 <= idx_start < idx_end <= count segments)
+        :param idx_end: index of the last segment for that timestamps should be returned (0 <= idx_start < idx_end <= count segments)  
         :return: Tuple (of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample 
         points depending on the value of *flat* , and the unit of the values)
         """
@@ -868,12 +887,12 @@ class SegmentEntityInfo(Info):
 
     @property
     def pre_interval(self):
-        "Interval [start of the segment <- defining event time stamp]"
+        "Interval [start of the segment <- defining event timestamp]"
         return self.info['PreInterval'] * mcs_tick
 
     @property
     def post_interval(self):
-        "Interval [defining event time stamp -> end of the segment]"
+        "Interval [defining event timestamp -> end of the segment]"
         return self.info['PostInterval'] * mcs_tick
 
     @property
@@ -884,3 +903,129 @@ class SegmentEntityInfo(Info):
     def count(self):
         "Count of segments inside the segment entity"
         return len(self.source_channel_of_segment)
+
+
+class TimeStampStream(Stream):
+    """
+    Container class for one timestamp stream with different entities
+    """
+    def __init__(self, stream_grp):
+        """
+        Initializes an timestamp stream object that contains all entities that belong to it.
+
+        :param stream_grp: folder of the HDF5 file that contains the data of this timestamp stream
+        """
+        Stream.__init__(self, stream_grp)
+        self.__read_timestamp_entities()
+
+    def  __read_timestamp_entities(self):
+        "Create all timestamp entities of this timestamp stream"
+        for (name, value) in self.stream_grp.iteritems():
+            print name, value
+        # Read infos per timestamp entity 
+        timestamp_infos = self.stream_grp['InfoTimeStamp'][...]
+        self.timestamp_entity = {}
+        for timestamp_entity_info in timestamp_infos:
+            timestamp_entity_name = "TimeStampEntity_" + str(timestamp_entity_info['TimeStampEntityID'])
+            timestamp_info = TimeStampEntityInfo(timestamp_entity_info)
+            self.timestamp_entity[timestamp_entity_info['TimeStampEntityID']] = TimeStampEntity(self.stream_grp[timestamp_entity_name], timestamp_info)
+        
+class TimeStampEntity(object):
+    """
+    Time-Stamp entity class
+    """
+    def __init__(self, timestamp_data, timestamp_info):
+        """
+        Initializes an timestamp entity object
+
+        :param timestamp_data: dataset of the HDF5 file that contains the data for this timestamp entity
+        :param timestamp_info: object of type TimeStampEntityInfo that contains the description of this entity 
+        """
+        self.info = timestamp_info
+        # Connect the data set 
+        self.data = timestamp_data
+
+    @property
+    def count(self):
+        """Number of contained timestamps"""
+        dim = self.data.shape 
+        return dim[1]
+
+    def __handle_indices(self, idx_start, idx_end):
+        """Check indices for consistency and set default values if nothing was provided"""
+        if idx_start == None:
+            idx_start = 0
+        if idx_end == None:
+            idx_end = self.count
+        if idx_start < 0 or self.data.shape[1] < idx_start or idx_end < idx_start or self.data.shape[1] < idx_end:
+                raise exceptions.IndexError
+        return (idx_start, idx_end)
+
+    def get_timestamps(self, idx_start = None, idx_end = None):
+        """Get all n time stamps of this entity of the given index range (idx_start <= idx < idx_end)
+        
+        :param idx_start: start index of the range (including), if nothing is given -> 0
+        :param idx_end: end index of the range (excluding, if nothing is given -> last index
+        :return: Tuple of (n-length array of timestamps, Used unit of time)    
+        """
+        idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
+        timestamps = self.data[idx_start:idx_end]
+        scale = self.info.measuring_unit
+        return (timestamps, scale)
+
+class TimeStampEntityInfo(Info):
+    """
+    Contains all meta data for one timestamp entity
+    """
+    def __init__(self, info):
+        """
+        Initializes an describing info object with an array that contains all descriptions of this timestamp entity.
+
+        :param info: array of event entity descriptiors as represented by one row of the InfoTimeStamp structure inside the HDF5 file
+        """
+        Info.__init__(self, info)
+        source_channel_ids = map(lambda x: int(x), info['SourceChannelIDs'].split(','))
+        source_channel_labels = map(lambda x: x.strip(), info['SourceChannelLabels'].split(','))
+        self.__source_channels = {}
+        for idx, id in enumerate(source_channel_ids):
+            self.__source_channels[id] = source_channel_labels[idx]
+            
+    @property
+    def id(self):
+        "Timestamp entity ID"
+        return self.info['TimeStampEntityID']
+
+    @property
+    def unit(self):
+        "Unit in which the timestamps are measured"
+        return self.info['Unit']
+
+    @property
+    def exponent(self):
+        "Exponent for the unit in which the timestamps are measured"
+        return int(self.info['Exponent'])
+
+    @property
+    def measuring_unit(self):
+        try:
+            provided_base_unit = ureg.parse_expression(self.unit);
+        except  UndefinedUnitError as unit_undefined:
+            print "Could not find unit \'%s\' in the Unit-Registry" % self.unit #unit_undefined.unit_names
+            return None
+        else:
+            return (10**self.exponent) * provided_base_unit;
+
+    @property
+    def data_type(self):
+        "DataType for the timestamps"
+        return 'Long'
+
+    @property
+    def source_channel_ids(self):
+        "ID's of all channels that were involved in the timestamp generation." 
+        return self.__source_channels.keys()
+
+    @property
+    def source_channel_labels(self):
+        "Labels of the channels that were involved in the timestamp generation."
+        return self.__source_channels;

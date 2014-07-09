@@ -15,7 +15,7 @@ Feature list
 * Provides structures to get the recorded raw ADC integer values and the meta data 
 of every stream
 
-* Provides methods to get the measured values and time stamps in the correct context
+* Provides methods to get the measured values and timestamps in the correct context
 of the recording (scale, physical unit, ... etc.) 
 
 :copyright: Copyright 2014 by Multi Channel Systems MCS GmbH, see AUTHORS.
