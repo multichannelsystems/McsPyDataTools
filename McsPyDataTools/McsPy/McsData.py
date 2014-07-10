@@ -388,7 +388,7 @@ class InfoSampledData(Info):
 
     @property
     def sampling_frequency(self):
-        "Get the used sampling frequency"
+        "Get the used sampling frequency in Hz"
         frequency = 1 / self.sampling_tick.to_base_units()
         return frequency.to(ureg.Hz)
 
