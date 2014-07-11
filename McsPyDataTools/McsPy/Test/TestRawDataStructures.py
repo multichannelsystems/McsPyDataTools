@@ -1,5 +1,5 @@
 import unittest
-import McsData
+import McsPy.McsData
 import datetime
 import exceptions
 import numpy as np
