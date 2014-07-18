@@ -61,9 +61,10 @@ class RawData(object):
         root_grp = self.h5_file['/']
         if ('McsHdf5ProtocolType' in root_grp.attrs):
             self.mcs_hdf5_protocol_type = root_grp.attrs['McsHdf5ProtocolType']
-            if (self.mcs_hdf5_protocol_type == McsHdf5Protocols.RAW_DATA[0]):
+            #if (McsHdf5Protocols.SUPPORTED_PROTOCOLS.has_key(self.mcs_hdf5_protocol_type)):
+            if (self.mcs_hdf5_protocol_type == "RawData"):
                 self.mcs_hdf5_protocol_type_version = root_grp.attrs['McsHdf5ProtocolVersion']
-                supported_versions = McsHdf5Protocols.RAW_DATA[1]
+                supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[self.mcs_hdf5_protocol_type]
                 if ((self.mcs_hdf5_protocol_type_version < supported_versions[0]) or 
                     (supported_versions[1] < self.mcs_hdf5_protocol_type_version)):
                     raise IOError('Given HDF5 file has MCS-HDF5 RawData protocol version %s and supported are all versions from %s to %s' % 
@@ -239,13 +240,17 @@ class Stream(object):
     """
     Base class for all stream types
     """
-    def __init__(self, stream_grp):
+    def __init__(self, stream_grp, info_type_name = None):
         """
         Initializes a stream object with its associated HDF5 folder
 
         :param stream_grp: folder of the HDF5 file that contains the data of this stream
+        :param info_type_name: name of the Info-Type as given in class McsHdf5Protocols (default None -> no version check is executed)
         """
         self.stream_grp = stream_grp
+        info_version = self.stream_grp.attrs["StreamInfoVersion"]
+        if (info_type_name != None):
+             McsHdf5Protocols.check_protocol_type_version(info_type_name, info_version)
         self.__get_stream_info()
 
     def __get_stream_info(self):
@@ -254,6 +259,7 @@ class Stream(object):
         for (name, value) in self.stream_grp.attrs.iteritems(): 
             #print(name, value)
             stream_info[name] = value
+        self.info_version = stream_info['StreamInfoVersion']
         self.data_subtype = stream_info['DataSubType'].rstrip()
         self.label = stream_info['Label'].rstrip()
         self.source_stream_guid = uuid.UUID(stream_info['SourceStreamGUID'].rstrip()) 
@@ -270,7 +276,8 @@ class AnalogStream(Stream):
 
         :param stream_grp: folder of the HDF5 file that contains the data of this analog stream
         """
-        Stream.__init__(self, stream_grp)
+        #McsHdf5Protocols.check_protocol_type_version("AnalogStreamInfoVersion", info_version)
+        Stream.__init__(self, stream_grp, "AnalogStreamInfoVersion")
         self.__read_channels()
 
     def __read_channels(self):
@@ -283,10 +290,11 @@ class AnalogStream(Stream):
         
         # Read infos per channel 
         ch_infos = self.stream_grp['InfoChannel'][...]
+        ch_info_version = self.stream_grp['InfoChannel'].attrs['InfoVersion']
         self.channel_infos = {}
         self.__map_row_to_channel_id = {}
         for channel_info in ch_infos:
-            self.channel_infos[channel_info['ChannelID']] = ChannelInfo(channel_info)
+            self.channel_infos[channel_info['ChannelID']] = ChannelInfo(ch_info_version, channel_info)
             self.__map_row_to_channel_id[channel_info['RowIndex']] = channel_info['ChannelID']
 
         # Connect the data set 
@@ -402,13 +410,16 @@ class ChannelInfo(InfoSampledData):
     """
     Contains all describing meta data for one sampled channel
     """
-    def __init__(self, info):
+    def __init__(self, info_version, info):
         """
         Initialize an info object for sampled channel data
 
+        :param info_version: number of the protocol version used by the following info structure
         :param info: array of info descriptors for this channel info object
         """
         InfoSampledData.__init__(self, info)
+        McsHdf5Protocols.check_protocol_type_version("InfoChannel", info_version)
+        self.__version = info_version
 
     @property
     def channel_id(self):
@@ -427,6 +438,11 @@ class ChannelInfo(InfoSampledData):
         # Should be tested that unit_name is a available in ureg (unit register)
         step = self.info['ConversionFactor'] * (10 ** self.info['Exponent']) * ureg[unit_name]
         return step
+    
+    @property
+    def version(self):
+        "Version number of the Type-Definition"
+        return self.__version
 
 class FrameStream(Stream):
     """
@@ -438,7 +454,7 @@ class FrameStream(Stream):
 
         :param stream_grp: folder of the HDF5 file that contains the data of this frame stream
         """
-        Stream.__init__(self, stream_grp)
+        Stream.__init__(self, stream_grp, "FrameStreamInfoVersion")
         self.__read_frame_entities()
 
     def __read_frame_entities(self):
@@ -448,11 +464,12 @@ class FrameStream(Stream):
             print name, value
         # Read infos per frame 
         fr_infos = self.stream_grp['InfoFrame'][...]
+        fr_info_version = self.stream_grp['InfoFrame'].attrs['InfoVersion']
         self.frame_entity = {}
         for frame_entity_info in fr_infos:
             frame_entity_group = "FrameDataEntity_" + str(frame_entity_info['FrameDataID'])
             conv_fact = self.__read_conversion_factor_matrix(frame_entity_group)
-            frame_info = FrameEntityInfo(frame_entity_info, conv_fact)
+            frame_info = FrameEntityInfo(fr_info_version, frame_entity_info, conv_fact)
             self.frame_entity[frame_entity_info['FrameID']] = FrameEntity(self.stream_grp[frame_entity_group], frame_info)
 
     def __read_conversion_factor_matrix(self, frame_entity_group):
@@ -572,14 +589,17 @@ class FrameEntityInfo(InfoSampledData):
     """
     Contains all describing meta data for one frame entity
     """
-    def __init__(self, info, conv_factor_matrix):
+    def __init__(self, info_version, info, conv_factor_matrix):
         """
         Initializes an describing info object that contains all descriptions of this frame entity.
 
+        :param info_version: number of the protocol version used by the following info structure
         :param info: array of frame entity descriptiors as represented by one row of the InfoFrame structure inside the HDF5 file
         :param conv_factor_matrix: matrix of conversion factor as represented by the ConversionFactors structure inside one FrameDataEntity folder of the HDF5 file
         """
         InfoSampledData.__init__(self, info)
+        McsHdf5Protocols.check_protocol_type_version("FrameEntityInfo", info_version)
+        self.__version = info_version
         self.frame = Frame(info['FrameLeft'], info['FrameTop'], info['FrameRight'], info['FrameBottom'])
         self.reference_frame = Frame(info['ReferenceFrameLeft'], info['ReferenceFrameTop'], info['ReferenceFrameRight'], info['ReferenceFrameBottom'])
         self.conversion_factors = conv_factor_matrix
@@ -607,6 +627,11 @@ class FrameEntityInfo(InfoSampledData):
         adc_sensor_step = self.conversion_factors[x,y] * self.adc_basic_step
         return adc_sensor_step
 
+    @property
+    def version(self):
+        "Version number of the Type-Definition"
+        return self.__version
+
 class EventStream(Stream):
     """
     Container class for one event stream with different entities
@@ -617,7 +642,7 @@ class EventStream(Stream):
 
         :param stream_grp: folder of the HDF5 file that contains the data of this event stream
         """
-        Stream.__init__(self, stream_grp)
+        Stream.__init__(self, stream_grp, "EventStreamInfoVersion")
         self.__read_event_entities()
 
     def  __read_event_entities(self):
@@ -626,10 +651,11 @@ class EventStream(Stream):
             print name, value
         # Read infos per event entity 
         event_infos = self.stream_grp['InfoEvent'][...]
+        event_entity_info_version = self.stream_grp['InfoEvent'].attrs['InfoVersion']
         self.event_entity = {}
         for event_entity_info in event_infos:
             event_entity_name = "EventEntity_" + str(event_entity_info['EventID'])
-            event_info = EventEntityInfo(event_entity_info)
+            event_info = EventEntityInfo(event_entity_info_version, event_entity_info)
             self.event_entity[event_entity_info['EventID']] = EventEntity(self.stream_grp[event_entity_name], event_info)
         
 class EventEntity(object):
@@ -700,13 +726,16 @@ class EventEntityInfo(Info):
     """
     Contains all meta data for one event entity
     """
-    def __init__(self, info):
+    def __init__(self, info_version, info):
         """
         Initializes an describing info object with an array that contains all descriptions of this event entity.
 
+        :param info_version: number of the protocol version used by the following info structure
         :param info: array of event entity descriptiors as represented by one row of the InfoEvent structure inside the HDF5 file
         """
         Info.__init__(self, info)
+        McsHdf5Protocols.check_protocol_type_version("EventEntityInfo", info_version)
+        self.__version = info_version
         source_channel_ids = map(lambda x: int(x), info['SourceChannelIDs'].split(','))
         source_channel_labels = map(lambda x: x.strip(), info['SourceChannelLabels'].split(','))
         self.__source_channels = {}
@@ -733,12 +762,17 @@ class EventEntityInfo(Info):
         "Labels of the channels that were involved in the event generation."
         return self.__source_channels;
 
+    @property
+    def version(self):
+        "Version number of the Type-Definition"
+        return self.__version
+
 class SegmentStream(Stream):
     """
     Container class for one segment stream of different segment entities
     """
     def __init__(self, stream_grp):
-        Stream.__init__(self, stream_grp)
+        Stream.__init__(self, stream_grp, "SegmentStreamInfoVersion")
         self.__read_segment_entities()
 
     def  __read_segment_entities(self):
@@ -747,21 +781,23 @@ class SegmentStream(Stream):
             print name, value
         # Read infos per segment entity 
         segment_infos = self.stream_grp['InfoSegment'][...]
+        segment_info_version = self.stream_grp['InfoSegment'].attrs['InfoVersion']
         self.segment_entity = {}
         for segment_entity_info in segment_infos:
             segment_entity_data_name = "SegmentData_" + str(segment_entity_info['SegmentID'])
             segment_entity_ts_name = "SegmentData_ts_" + str(segment_entity_info['SegmentID'])
-            source_channel_infos = self.__get_source_channel_infos(self.stream_grp['SourceInfoChannel'][...])
-            segment_info = SegmentEntityInfo(segment_entity_info, source_channel_infos)
+            ch_info_version = self.stream_grp['SourceInfoChannel'].attrs['InfoVersion']
+            source_channel_infos = self.__get_source_channel_infos(ch_info_version, self.stream_grp['SourceInfoChannel'][...])
+            segment_info = SegmentEntityInfo(segment_info_version, segment_entity_info, source_channel_infos)
             self.segment_entity[segment_entity_info['SegmentID']] = SegmentEntity(self.stream_grp[segment_entity_data_name], 
                                                                                 self.stream_grp[segment_entity_ts_name],
                                                                                 segment_info)
 
-    def __get_source_channel_infos(self, source_channel_infos):
+    def __get_source_channel_infos(self, ch_info_version, source_channel_infos):
         "Create a dictionary of all present source channels"
         source_channels = {}
         for source_channel_info in source_channel_infos:
-            source_channels[source_channel_info['ChannelID']] = ChannelInfo(source_channel_info)
+            source_channels[source_channel_info['ChannelID']] = ChannelInfo(ch_info_version, source_channel_info)
         return source_channels
 
 class SegmentEntity(object):
@@ -867,14 +903,17 @@ class SegmentEntityInfo(Info):
     """
     Contains all meta data for one segment entity
     """
-    def __init__(self, info, source_channel_infos):
+    def __init__(self, info_version, info, source_channel_infos):
         """
         Initializes an describing info object with an array that contains all descriptions of this segment entity.
 
+        :param info_version: number of the protocol version used by the following info structure
         :param info: array of segment entity descriptiors as represented by one row of the SegmentEvent structure inside the HDF5 file
         :param source_channel_infos: dictionary of source channels from where the segements were taken 
         """
         Info.__init__(self, info)
+        McsHdf5Protocols.check_protocol_type_version("SegmentEntityInfo", info_version)
+        self.__version = info_version
         source_channel_ids = map(lambda x: int(x), info['SourceChannelIDs'].split(','))
         self.source_channel_of_segment = {}
         for idx, id in enumerate(source_channel_ids):
@@ -904,6 +943,10 @@ class SegmentEntityInfo(Info):
         "Count of segments inside the segment entity"
         return len(self.source_channel_of_segment)
 
+    @property
+    def version(self):
+        "Version number of the Type-Definition"
+        return self.__version
 
 class TimeStampStream(Stream):
     """
@@ -915,7 +958,7 @@ class TimeStampStream(Stream):
 
         :param stream_grp: folder of the HDF5 file that contains the data of this timestamp stream
         """
-        Stream.__init__(self, stream_grp)
+        Stream.__init__(self, stream_grp, "TimeStampStreamInfoVersion")
         self.__read_timestamp_entities()
 
     def  __read_timestamp_entities(self):
@@ -924,10 +967,11 @@ class TimeStampStream(Stream):
             print name, value
         # Read infos per timestamp entity 
         timestamp_infos = self.stream_grp['InfoTimeStamp'][...]
+        timestamp_info_version = self.stream_grp['InfoTimeStamp'].attrs['InfoVersion']
         self.timestamp_entity = {}
         for timestamp_entity_info in timestamp_infos:
             timestamp_entity_name = "TimeStampEntity_" + str(timestamp_entity_info['TimeStampEntityID'])
-            timestamp_info = TimeStampEntityInfo(timestamp_entity_info)
+            timestamp_info = TimeStampEntityInfo(timestamp_info_version, timestamp_entity_info)
             self.timestamp_entity[timestamp_entity_info['TimeStampEntityID']] = TimeStampEntity(self.stream_grp[timestamp_entity_name], timestamp_info)
         
 class TimeStampEntity(object):
@@ -977,13 +1021,16 @@ class TimeStampEntityInfo(Info):
     """
     Contains all meta data for one timestamp entity
     """
-    def __init__(self, info):
+    def __init__(self, info_version, info):
         """
         Initializes an describing info object with an array that contains all descriptions of this timestamp entity.
 
+        :param info_version: number of the protocol version used by the following info structure
         :param info: array of event entity descriptiors as represented by one row of the InfoTimeStamp structure inside the HDF5 file
         """
         Info.__init__(self, info)
+        McsHdf5Protocols.check_protocol_type_version("TimeStampEntityInfo", info_version)
+        self.__version = info_version
         source_channel_ids = map(lambda x: int(x), info['SourceChannelIDs'].split(','))
         source_channel_labels = map(lambda x: x.strip(), info['SourceChannelLabels'].split(','))
         self.__source_channels = {}
@@ -1029,3 +1076,8 @@ class TimeStampEntityInfo(Info):
     def source_channel_labels(self):
         "Labels of the channels that were involved in the timestamp generation."
         return self.__source_channels;
+
+    @property
+    def version(self):
+        "Version number of the Type-Definition"
+        return self.__version

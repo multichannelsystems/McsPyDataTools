@@ -23,14 +23,14 @@ class Test_RawData(unittest.TestCase):
 class Test_RawDataContainer(Test_RawData):
     # Test MCS-HDF5 version
     def test_mcs_hdf5_version(self):
-        self.assertEqual(self.data.mcs_hdf5_protocol_type, McsHdf5Protocols.RAW_DATA[0], 
-                         "The MCS-HDF5 protocol type was '%s' and not '%s' as expected!" % (self.data.mcs_hdf5_protocol_type, McsHdf5Protocols.RAW_DATA[0]))
+        self.assertEqual(self.data.mcs_hdf5_protocol_type, "RawData", 
+                         "The MCS-HDF5 protocol type was '%s' and not '%s' as expected!" % (self.data.mcs_hdf5_protocol_type, "RawData"))
         self.assertEqual(self.data.mcs_hdf5_protocol_type_version, 1, 
                          "The MCS-HDF5 protocol version was '%s' and not '1' as expected!" % self.data.mcs_hdf5_protocol_type_version)
 
     def test_mcs_hdf5_version_frame(self):
-        self.assertEqual(self.data.mcs_hdf5_protocol_type, McsHdf5Protocols.RAW_DATA[0], 
-                         "The MCS-HDF5 protocol type was '%s' and not '%s' as expected!" % (self.data.mcs_hdf5_protocol_type, McsHdf5Protocols.RAW_DATA[0]))
+        self.assertEqual(self.data.mcs_hdf5_protocol_type,  "RawData", 
+                         "The MCS-HDF5 protocol type was '%s' and not '%s' as expected!" % (self.data.mcs_hdf5_protocol_type, "RawData"))
         self.assertEqual(self.data.mcs_hdf5_protocol_type_version, 1, 
                          "The MCS-HDF5 protocol version was '%s' and not '1' as expected!" % self.data.mcs_hdf5_protocol_type_version)
 
@@ -68,6 +68,7 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_analog_stream_attributes(self):
         first_analog_stream = self.data.recordings[0].analog_streams[0]
+        self.assertEqual(first_analog_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % first_analog_stream.info_version)
         self.assertEqual(first_analog_stream.data_subtype, 'Electrode', 'Analog stream data sub type is different!')
         self.assertEqual(first_analog_stream.label, 'Filter (1) Filter Data', 'Analog stream label is different!')
         self.assertEqual(str(first_analog_stream.source_stream_guid), '43f795b0-7881-408f-a840-0207bc8e203c', 'Analog stream source GUID is different!')
@@ -84,6 +85,7 @@ class Test_RawDataContainer(Test_RawData):
         channel_infos =  self.data.recordings[0].analog_streams[0].channel_infos
         self.assertEqual(len(channel_infos), 8, 'Number of channel info objects is different!')
         self.assertEqual(len(channel_infos[0].info), 16, 'Number of of components of an channel info object is different!')
+        self.assertEqual(channel_infos[0].version, 1, 'InfoChannel-Type version 1 expected but was %s' % channel_infos[0].version)
 
     def test_analog_stream_data(self):
         analog_stream =  self.data.recordings[0].analog_streams[0]
@@ -110,6 +112,7 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_frame_stream_attributes(self):
         first_frame_stream = self.raw_frame_data.recordings[0].frame_streams[0]
+        self.assertEqual(first_frame_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % first_frame_stream.info_version)
         self.assertEqual(first_frame_stream.data_subtype, 'Unknown', 'Frame stream data sub type is different!')
         self.assertEqual(first_frame_stream.label, '', 'Frame stream label is different!')
         self.assertEqual(str(first_frame_stream.source_stream_guid), '11bee63c-8714-4b2b-8cf9-228b1915f183', 'Frame stream source GUID is different!')
@@ -186,6 +189,7 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_event_stream_attributes(self):
         first_event_stream = self.data.recordings[0].event_streams[0]
+        self.assertEqual(first_event_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % first_event_stream.info_version)
         self.assertEqual(first_event_stream.data_subtype, 'DigitalPort', 'Event stream data sub type is different from expected \'DigitalPort\'!')
         self.assertEqual(first_event_stream.label, 'Digital Events 1', 'Event stream label is different!')
         self.assertEqual(str(first_event_stream.source_stream_guid), '0696bca6-7c30-4024-8e58-72da383aa248', 'Event stream source GUID is different!')
@@ -194,6 +198,7 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_event_infos(self):
         first_event_entity = self.data.recordings[0].event_streams[0].event_entity[0]
+        self.assertEqual(first_event_entity.info.version, 1, "EventEntityInfo-Version was %s and not \'1\' as expected!" % first_event_entity.info.version)
         self.assertEqual(first_event_entity.info.id, 0, "ID is not as expected!")
         self.assertEqual(first_event_entity.info.raw_data_bytes, 4, "RawDataBytes is not as expected!")
         self.assertEquals(first_event_entity.info.source_channel_ids, [8],"Source channel IDs are different!") 
@@ -225,6 +230,7 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_segment_stream_attributes(self):
         first_segment_stream = self.data.recordings[0].segment_streams[0]
+        self.assertEqual(first_segment_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % first_segment_stream.info_version)
         self.assertEqual(first_segment_stream.stream_type, 'Segment', "Segment stream type was '%s' and not 'Segment'!" % first_segment_stream.stream_type)
         self.assertEqual(first_segment_stream.data_subtype, 'Spike', "Segment stream data sub type was '%s' and not 'Spike' as expected!" % first_segment_stream.data_subtype)
         self.assertEqual(first_segment_stream.label, 'Spike Detector (1) Spike Data', "Segment label was '%s' and not '' as expected!" % first_segment_stream.label)
@@ -235,6 +241,7 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_segment_infos(self):
         fifth_segment_entity = self.data.recordings[0].segment_streams[0].segment_entity[4]
+        self.assertEqual(fifth_segment_entity.info.version, 1, "SegmentEntityInfo-Version was '%s' and not '1' as expected!" % fifth_segment_entity.info.version)
         self.assertEqual(fifth_segment_entity.info.id, 4, "ID was '%s' and not '4' as expected!" % fifth_segment_entity.info.id)
         self.assertEqual(fifth_segment_entity.info.group_id, 0, "Group ID was '%s' and not '0' as expected!" % fifth_segment_entity.info.group_id)
         self.assertEqual(fifth_segment_entity.info.pre_interval.magnitude, 1000, "Pre-Interval was '%s' and not '1000' as expected!" % fifth_segment_entity.info.pre_interval.magnitude)
@@ -285,6 +292,7 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_timestamp_stream_attributes(self):
          first_timestamp_stream = self.data.recordings[0].timestamp_streams[0]
+         self.assertEqual(first_timestamp_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % first_timestamp_stream.info_version)
          self.assertEqual(first_timestamp_stream.data_subtype, 'NeuralSpike', 'Timestamp stream data sub type is different from expected \'NeuralSpike\'!')
          self.assertEqual(first_timestamp_stream.label, 'Spike Detector (1) Spike Timestamps', 'Timestamp stream label is different!')
          self.assertEqual(str(first_timestamp_stream.source_stream_guid), 'a9d1ab04-2cf8-489c-a861-595e662fba4e', 'Timestamp stream source GUID is different!')
@@ -293,6 +301,7 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_timestamp_infos(self):
          first_timestamp_entity = self.data.recordings[0].timestamp_streams[0].timestamp_entity[0]
+         self.assertEqual(first_timestamp_entity.info.version, 1, "TimeStampEntityInfo-Version was '%s' and not '1' as expected!" % first_timestamp_entity.info.version)
          self.assertEqual(first_timestamp_entity.info.id, 0, "ID is not as expected!")
          self.assertEqual(first_timestamp_entity.info.group_id, 0, "Group ID is not as expected!")
          self.assertEqual(first_timestamp_entity.info.data_type, 'Long', "DataType is not as expected!")
