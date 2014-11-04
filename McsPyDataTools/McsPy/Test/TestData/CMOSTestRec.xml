@@ -1,0 +1,624 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CMOS-MEA-Control-Settings Version="1">
+    <Environment Version="1">
+        <FileID>MCS-CMOS-MEA</FileID>
+        <ProgramName>CMOS-MEA-Control</ProgramName>
+        <ProgramVersion>0.7.0.0</ProgramVersion>
+        <MeaName />
+        <MeaID>0</MeaID>
+        <DateTicks>635506934728348929</DateTicks>
+        <Date>11/4/2014 10:24:32 AM</Date>
+        <Guid>67ced1bf-c1a7-4a3d-9df3-2e56fd459cbd</Guid>
+    </Environment>
+    <SettingsDevice Version="1">
+        <Mode>McsDevice</Mode>
+        <DeviceName>Neurochip</DeviceName>
+        <VendorID>0x1E26</VendorID>
+        <ProductID>0xC5A0</ProductID>
+        <BCDDevice>0x0</BCDDevice>
+        <SerialNumber>xxxxA</SerialNumber>
+        <DriverVersion />
+        <ADCInputOffsetVoltage>102000</ADCInputOffsetVoltage>
+    </SettingsDevice>
+    <SettingsCMOSMea Version="1">
+        <Type>nMos32µ</Type>
+        <ChipName>nMos32µ</ChipName>
+        <SerialNumber>unknown</SerialNumber>
+        <Layout />
+        <GroundVoltage>0</GroundVoltage>
+        <VDDIVoltage>1799991</VDDIVoltage>
+        <VDD3IVoltage>3300018</VDD3IVoltage>
+        <SensorSourceDrainVoltage>0</SensorSourceDrainVoltage>
+        <SensorSourceGateVoltage>0</SensorSourceGateVoltage>
+        <SensorSourceBulkVoltage>0</SensorSourceBulkVoltage>
+        <BathVoltage>0</BathVoltage>
+        <GateVoltage>0</GateVoltage>
+    </SettingsCMOSMea>
+    <SettingsDataSource Version="1">
+        <DataSource>SensorChip</DataSource>
+        <DriverVersion />
+        <Tick>50</Tick>
+        <OutputStreams>
+            <InfoStreamFrame Version="1">
+                <Stream>4ec54ebf-8cd3-499c-8400-fd0dfce216ac</Stream>
+                <StreamType>Frame</StreamType>
+                <SourceStream>1c573106-8dad-4fbc-96cc-be80e676ad8a</SourceStream>
+                <DataSubType>CMosSensor</DataSubType>
+                <Label>Sensor Data</Label>
+                <Items Count="1">
+                    <InfoFrame Version="1">
+                        <ID>1</ID>
+                        <GroupID>1</GroupID>
+                        <Label>ROI 1</Label>
+                        <Tick>50</Tick>
+                        <UnitExponent>-9</UnitExponent>
+                        <UnitType>V</UnitType>
+                        <RawDataType>Short</RawDataType>
+                        <ADZero>0</ADZero>
+                        <HighPassFilterType />
+                        <HighPassFilterOrder>-1</HighPassFilterOrder>
+                        <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                        <LowPassFilterType />
+                        <LowPassFilterOrder>-1</LowPassFilterOrder>
+                        <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                        <Left>1</Left>
+                        <Top>1</Top>
+                        <Right>65</Right>
+                        <Bottom>65</Bottom>
+                        <RefLeft>1</RefLeft>
+                        <RefTop>1</RefTop>
+                        <RefRight>65</RefRight>
+                        <RefBottom>65</RefBottom>
+                        <SensorGains>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</SensorGains>
+                    </InfoFrame>
+                </Items>
+            </InfoStreamFrame>
+            <InfoStreamAnalog Version="1">
+                <Stream>ccf6ecf2-2893-4dc1-ac2a-4897da816433</Stream>
+                <StreamType>Analog</StreamType>
+                <SourceStream>2f67c672-6fac-4033-8bea-1c9b2ebf4ac3</SourceStream>
+                <DataSubType>Auxiliary</DataSubType>
+                <Label>Auxiliary Data</Label>
+                <Items Count="0" />
+            </InfoStreamAnalog>
+            <InfoStreamAnalog Version="1">
+                <Stream>2958d9d6-438a-455c-9b03-7b05a3550797</Stream>
+                <StreamType>Analog</StreamType>
+                <SourceStream>304bb1dd-3242-4847-998d-b1e61a516343</SourceStream>
+                <DataSubType>Digital</DataSubType>
+                <Label>Digital Data</Label>
+                <Items Count="0" />
+            </InfoStreamAnalog>
+            <InfoStreamAnalog Version="1">
+                <Stream>6c4ad497-0e1c-42b8-97b4-9c1dca987407</Stream>
+                <StreamType>Analog</StreamType>
+                <SourceStream>d425bc15-9758-46c6-afa2-3809b8bca462</SourceStream>
+                <DataSubType>Digital</DataSubType>
+                <Label>STG Sideband</Label>
+                <Items Count="4">
+                    <InfoChannel Version="1">
+                        <ID>1</ID>
+                        <GroupID>1</GroupID>
+                        <Label>Stimulator 1</Label>
+                        <Tick>50</Tick>
+                        <UnitExponent>1</UnitExponent>
+                        <UnitType>NoUnit</UnitType>
+                        <RawDataType>UInt</RawDataType>
+                        <ADZero>0</ADZero>
+                        <HighPassFilterType />
+                        <HighPassFilterOrder>-1</HighPassFilterOrder>
+                        <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                        <LowPassFilterType />
+                        <LowPassFilterOrder>-1</LowPassFilterOrder>
+                        <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                        <ConversionFactor>1</ConversionFactor>
+                    </InfoChannel>
+                    <InfoChannel Version="1">
+                        <ID>2</ID>
+                        <GroupID>1</GroupID>
+                        <Label>Stimulator 2</Label>
+                        <Tick>50</Tick>
+                        <UnitExponent>1</UnitExponent>
+                        <UnitType>NoUnit</UnitType>
+                        <RawDataType>UInt</RawDataType>
+                        <ADZero>0</ADZero>
+                        <HighPassFilterType />
+                        <HighPassFilterOrder>-1</HighPassFilterOrder>
+                        <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                        <LowPassFilterType />
+                        <LowPassFilterOrder>-1</LowPassFilterOrder>
+                        <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                        <ConversionFactor>1</ConversionFactor>
+                    </InfoChannel>
+                    <InfoChannel Version="1">
+                        <ID>3</ID>
+                        <GroupID>1</GroupID>
+                        <Label>Stimulator 3</Label>
+                        <Tick>50</Tick>
+                        <UnitExponent>1</UnitExponent>
+                        <UnitType>NoUnit</UnitType>
+                        <RawDataType>UInt</RawDataType>
+                        <ADZero>0</ADZero>
+                        <HighPassFilterType />
+                        <HighPassFilterOrder>-1</HighPassFilterOrder>
+                        <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                        <LowPassFilterType />
+                        <LowPassFilterOrder>-1</LowPassFilterOrder>
+                        <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                        <ConversionFactor>1</ConversionFactor>
+                    </InfoChannel>
+                    <InfoChannel Version="1">
+                        <ID>4</ID>
+                        <GroupID>1</GroupID>
+                        <Label>Stimulator 4</Label>
+                        <Tick>50</Tick>
+                        <UnitExponent>1</UnitExponent>
+                        <UnitType>NoUnit</UnitType>
+                        <RawDataType>UInt</RawDataType>
+                        <ADZero>0</ADZero>
+                        <HighPassFilterType />
+                        <HighPassFilterOrder>-1</HighPassFilterOrder>
+                        <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                        <LowPassFilterType />
+                        <LowPassFilterOrder>-1</LowPassFilterOrder>
+                        <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                        <ConversionFactor>1</ConversionFactor>
+                    </InfoChannel>
+                </Items>
+            </InfoStreamAnalog>
+            <InfoStreamAnalog Version="1">
+                <Stream>a35ab68c-eb40-41d8-b6de-7b3b584c18a1</Stream>
+                <StreamType>Analog</StreamType>
+                <SourceStream>2f67c672-6fac-4033-8bea-1c9b2ebf4ac3</SourceStream>
+                <DataSubType>Auxiliary</DataSubType>
+                <Label>Chip Temperature</Label>
+                <Items Count="1">
+                    <InfoChannel Version="1">
+                        <ID>1</ID>
+                        <GroupID>1</GroupID>
+                        <Label>Temperature Channel 1</Label>
+                        <Tick>50</Tick>
+                        <UnitExponent>-3</UnitExponent>
+                        <UnitType>K</UnitType>
+                        <RawDataType>Short</RawDataType>
+                        <ADZero>0</ADZero>
+                        <HighPassFilterType />
+                        <HighPassFilterOrder>-1</HighPassFilterOrder>
+                        <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                        <LowPassFilterType />
+                        <LowPassFilterOrder>-1</LowPassFilterOrder>
+                        <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                        <ConversionFactor>100</ConversionFactor>
+                    </InfoChannel>
+                </Items>
+            </InfoStreamAnalog>
+            <InfoStreamAnalog Version="1">
+                <Stream>387738eb-7b41-4bc7-b5cd-2d0382a4a74c</Stream>
+                <StreamType>Analog</StreamType>
+                <SourceStream>2f67c672-6fac-4033-8bea-1c9b2ebf4ac3</SourceStream>
+                <DataSubType>Auxiliary</DataSubType>
+                <Label>Sensor Current</Label>
+                <Items Count="2">
+                    <InfoChannel Version="1">
+                        <ID>2</ID>
+                        <GroupID>1</GroupID>
+                        <Label>Bath Current 2</Label>
+                        <Tick>50</Tick>
+                        <UnitExponent>-12</UnitExponent>
+                        <UnitType>A</UnitType>
+                        <RawDataType>Int</RawDataType>
+                        <ADZero>0</ADZero>
+                        <HighPassFilterType />
+                        <HighPassFilterOrder>-1</HighPassFilterOrder>
+                        <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                        <LowPassFilterType />
+                        <LowPassFilterOrder>-1</LowPassFilterOrder>
+                        <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                        <ConversionFactor>550000</ConversionFactor>
+                    </InfoChannel>
+                    <InfoChannel Version="1">
+                        <ID>1</ID>
+                        <GroupID>1</GroupID>
+                        <Label>Sensor Current 1</Label>
+                        <Tick>50</Tick>
+                        <UnitExponent>-12</UnitExponent>
+                        <UnitType>A</UnitType>
+                        <RawDataType>Int</RawDataType>
+                        <ADZero>0</ADZero>
+                        <HighPassFilterType />
+                        <HighPassFilterOrder>-1</HighPassFilterOrder>
+                        <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                        <LowPassFilterType />
+                        <LowPassFilterOrder>-1</LowPassFilterOrder>
+                        <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                        <ConversionFactor>560000</ConversionFactor>
+                    </InfoChannel>
+                </Items>
+            </InfoStreamAnalog>
+        </OutputStreams>
+    </SettingsDataSource>
+    <SettingsStimulator Version="1">
+        <Mode>McsDevice</Mode>
+        <Stimulators Count="4">
+            <SettingsStimulus Version="1">
+                <ID>1</ID>
+                <HWID>0</HWID>
+                <StimulusOnOffSidebandBit>0</StimulusOnOffSidebandBit>
+                <StimulationOnOffSidebandBit>1</StimulationOnOffSidebandBit>
+                <MarkerSidebandBit>2</MarkerSidebandBit>
+                <Tick>10</Tick>
+                <Range>3400000</Range>
+                <Resolution>105</Resolution>
+            </SettingsStimulus>
+            <SettingsStimulus Version="1">
+                <ID>2</ID>
+                <HWID>1</HWID>
+                <StimulusOnOffSidebandBit>0</StimulusOnOffSidebandBit>
+                <StimulationOnOffSidebandBit>1</StimulationOnOffSidebandBit>
+                <MarkerSidebandBit>2</MarkerSidebandBit>
+                <Tick>10</Tick>
+                <Range>3400000</Range>
+                <Resolution>105</Resolution>
+            </SettingsStimulus>
+            <SettingsStimulus Version="1">
+                <ID>3</ID>
+                <HWID>2</HWID>
+                <StimulusOnOffSidebandBit>0</StimulusOnOffSidebandBit>
+                <StimulationOnOffSidebandBit>1</StimulationOnOffSidebandBit>
+                <MarkerSidebandBit>2</MarkerSidebandBit>
+                <Tick>10</Tick>
+                <Range>3400000</Range>
+                <Resolution>105</Resolution>
+            </SettingsStimulus>
+            <SettingsStimulus Version="1">
+                <ID>4</ID>
+                <HWID>3</HWID>
+                <StimulusOnOffSidebandBit>0</StimulusOnOffSidebandBit>
+                <StimulationOnOffSidebandBit>1</StimulationOnOffSidebandBit>
+                <MarkerSidebandBit>2</MarkerSidebandBit>
+                <Tick>10</Tick>
+                <Range>3400000</Range>
+                <Resolution>105</Resolution>
+            </SettingsStimulus>
+        </Stimulators>
+    </SettingsStimulator>
+    <SettingsCalibration Version="1">
+        <StimulusPPAmplitude>3000</StimulusPPAmplitude>
+        <StimulusFrequency>70</StimulusFrequency>
+        <StimulusTick>10</StimulusTick>
+        <StimulusBaselineShift>1500</StimulusBaselineShift>
+        <StimulusPhase>270</StimulusPhase>
+        <RecordingTick>100</RecordingTick>
+        <MeasureDuration>100000</MeasureDuration>
+        <MeasureWaitStart>2000000</MeasureWaitStart>
+        <MeasureWaitStop>2000000</MeasureWaitStop>
+    </SettingsCalibration>
+    <SettingsActivityTool Version="1">
+        <ActivityType>MaxAmplitude</ActivityType>
+        <Extractor Count="3">
+            <SettingsActivityExtractor Version="1">
+                <ActivityType>MaxAmplitude</ActivityType>
+                <UpdateWindow>200000</UpdateWindow>
+                <AccumulateWindow>5000000</AccumulateWindow>
+                <MeasureStdDevWindow>200000</MeasureStdDevWindow>
+                <MeasureStdDevWindowOffset>0</MeasureStdDevWindowOffset>
+                <ActivityThresholdFactor>1.0</ActivityThresholdFactor>
+                <SpikeDetectionDeadTime>1000</SpikeDetectionDeadTime>
+            </SettingsActivityExtractor>
+            <SettingsActivityExtractor Version="1">
+                <ActivityType>MeanAmplitude</ActivityType>
+                <UpdateWindow>200000</UpdateWindow>
+                <AccumulateWindow>5000000</AccumulateWindow>
+                <MeasureStdDevWindow>200000</MeasureStdDevWindow>
+                <MeasureStdDevWindowOffset>0</MeasureStdDevWindowOffset>
+                <ActivityThresholdFactor>0.0</ActivityThresholdFactor>
+                <SpikeDetectionDeadTime>1000</SpikeDetectionDeadTime>
+            </SettingsActivityExtractor>
+            <SettingsActivityExtractor Version="1">
+                <ActivityType>SpikeCount</ActivityType>
+                <UpdateWindow>200000</UpdateWindow>
+                <AccumulateWindow>5000000</AccumulateWindow>
+                <MeasureStdDevWindow>200000</MeasureStdDevWindow>
+                <MeasureStdDevWindowOffset>0</MeasureStdDevWindowOffset>
+                <ActivityThresholdFactor>2.0</ActivityThresholdFactor>
+                <SpikeDetectionDeadTime>1000</SpikeDetectionDeadTime>
+            </SettingsActivityExtractor>
+        </Extractor>
+        <MapCreator Count="3">
+            <SettingsMapCreator Version="1">
+                <ActivityType>MaxAmplitude</ActivityType>
+                <SensorWidth>1</SensorWidth>
+                <SensorHeight>1</SensorHeight>
+                <Type>BlueRed</Type>
+                <Interpolation>NearestNeighbor</Interpolation>
+                <ColorCount>256</ColorCount>
+                <InvertMap>False</InvertMap>
+                <AutoMinMax>False</AutoMinMax>
+                <Min>-100000</Min>
+                <Max>100000</Max>
+            </SettingsMapCreator>
+            <SettingsMapCreator Version="1">
+                <ActivityType>MeanAmplitude</ActivityType>
+                <SensorWidth>1</SensorWidth>
+                <SensorHeight>1</SensorHeight>
+                <Type>BlueRed</Type>
+                <Interpolation>NearestNeighbor</Interpolation>
+                <ColorCount>256</ColorCount>
+                <InvertMap>False</InvertMap>
+                <AutoMinMax>False</AutoMinMax>
+                <Min>-100000</Min>
+                <Max>100000</Max>
+            </SettingsMapCreator>
+            <SettingsMapCreator Version="1">
+                <ActivityType>SpikeCount</ActivityType>
+                <SensorWidth>1</SensorWidth>
+                <SensorHeight>1</SensorHeight>
+                <Type>Red</Type>
+                <Interpolation>NearestNeighbor</Interpolation>
+                <ColorCount>256</ColorCount>
+                <InvertMap>False</InvertMap>
+                <AutoMinMax>False</AutoMinMax>
+                <Min>0</Min>
+                <Max>20</Max>
+            </SettingsMapCreator>
+        </MapCreator>
+    </SettingsActivityTool>
+    <SettingsRois Version="1">
+        <Rois Count="1">
+            <SettingsRoi Version="1">
+                <ID>1</ID>
+                <Enable>True</Enable>
+                <Top>48</Top>
+                <Left>23</Left>
+                <Width>4</Width>
+                <Height>4</Height>
+                <Color>-16777216</Color>
+                <Visible>True</Visible>
+                <ShowCrossHairLines>True</ShowCrossHairLines>
+                <PenWidth>2</PenWidth>
+            </SettingsRoi>
+        </Rois>
+    </SettingsRois>
+    <SettingsTraceTool Version="1">
+        <Rois Count="1">
+            <SettingsTraceView Version="1">
+                <SelectedZoomChID>1478</SelectedZoomChID>
+                <RoiID>1</RoiID>
+                <MeaTraceSettings Version="1">
+                    <YAxisUnit>V</YAxisUnit>
+                    <XAxisMin>0</XAxisMin>
+                    <XAxisMax>5000000</XAxisMax>
+                    <YAxisMin>-72</YAxisMin>
+                    <YAxisMax>72</YAxisMax>
+                </MeaTraceSettings>
+                <SettingsFastLine Version="1">
+                    <ID>1</ID>
+                    <SettingsTrace Count="1">
+                        <SettingsTrace Version="1">
+                            <ID>1478</ID>
+                            <Label />
+                            <ConversionFactor>1</ConversionFactor>
+                            <Color>-16777216</Color>
+                            <Width>1</Width>
+                        </SettingsTrace>
+                    </SettingsTrace>
+                    <SignalUnit>V</SignalUnit>
+                    <SignalUnitExponent>-9</SignalUnitExponent>
+                    <YAxesUnit>V</YAxesUnit>
+                    <YAxesUnitExponent>-9</YAxesUnitExponent>
+                    <SignalTimeUnit>s</SignalTimeUnit>
+                    <SignalTimeUnitExponent>-6</SignalTimeUnitExponent>
+                    <XAxesUnit>s</XAxesUnit>
+                    <XAxesUnitExponent>0</XAxesUnitExponent>
+                    <XAxesSpan>5000000</XAxesSpan>
+                    <YAxesMin>-100000</YAxesMin>
+                    <YAxesMax>100000</YAxesMax>
+                    <UpdateXAxes>True</UpdateXAxes>
+                </SettingsFastLine>
+            </SettingsTraceView>
+        </Rois>
+    </SettingsTraceTool>
+    <SettingsDigitalEventTool Version="1">
+        <DigitalBits>16</DigitalBits>
+        <SelectedChannels Count="1">
+            <ChID>1</ChID>
+        </SelectedChannels>
+        <InputStream Count="0" />
+        <OutputStream>
+            <InfoStreamEvent Version="1">
+                <Stream>83f8f868-2bfd-459d-a0a6-a109819635bd</Stream>
+                <StreamType>Event</StreamType>
+                <SourceStream>2958d9d6-438a-455c-9b03-7b05a3550797</SourceStream>
+                <DataSubType>DigitalPort</DataSubType>
+                <Label>Digital </Label>
+                <Items Count="0" />
+            </InfoStreamEvent>
+        </OutputStream>
+        <EventDefinitions Count="0" />
+    </SettingsDigitalEventTool>
+    <SettingsDigitalEventTool Version="1">
+        <DigitalBits>16</DigitalBits>
+        <SelectedChannels Count="0" />
+        <InputStream Count="4">
+            <InfoChannel Version="1">
+                <ID>1</ID>
+                <GroupID>1</GroupID>
+                <Label>Stimulator 1</Label>
+                <Tick>50</Tick>
+                <UnitExponent>1</UnitExponent>
+                <UnitType>NoUnit</UnitType>
+                <RawDataType>UInt</RawDataType>
+                <ADZero>0</ADZero>
+                <HighPassFilterType />
+                <HighPassFilterOrder>-1</HighPassFilterOrder>
+                <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                <LowPassFilterType />
+                <LowPassFilterOrder>-1</LowPassFilterOrder>
+                <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                <ConversionFactor>1</ConversionFactor>
+            </InfoChannel>
+            <InfoChannel Version="1">
+                <ID>2</ID>
+                <GroupID>1</GroupID>
+                <Label>Stimulator 2</Label>
+                <Tick>50</Tick>
+                <UnitExponent>1</UnitExponent>
+                <UnitType>NoUnit</UnitType>
+                <RawDataType>UInt</RawDataType>
+                <ADZero>0</ADZero>
+                <HighPassFilterType />
+                <HighPassFilterOrder>-1</HighPassFilterOrder>
+                <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                <LowPassFilterType />
+                <LowPassFilterOrder>-1</LowPassFilterOrder>
+                <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                <ConversionFactor>1</ConversionFactor>
+            </InfoChannel>
+            <InfoChannel Version="1">
+                <ID>3</ID>
+                <GroupID>1</GroupID>
+                <Label>Stimulator 3</Label>
+                <Tick>50</Tick>
+                <UnitExponent>1</UnitExponent>
+                <UnitType>NoUnit</UnitType>
+                <RawDataType>UInt</RawDataType>
+                <ADZero>0</ADZero>
+                <HighPassFilterType />
+                <HighPassFilterOrder>-1</HighPassFilterOrder>
+                <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                <LowPassFilterType />
+                <LowPassFilterOrder>-1</LowPassFilterOrder>
+                <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                <ConversionFactor>1</ConversionFactor>
+            </InfoChannel>
+            <InfoChannel Version="1">
+                <ID>4</ID>
+                <GroupID>1</GroupID>
+                <Label>Stimulator 4</Label>
+                <Tick>50</Tick>
+                <UnitExponent>1</UnitExponent>
+                <UnitType>NoUnit</UnitType>
+                <RawDataType>UInt</RawDataType>
+                <ADZero>0</ADZero>
+                <HighPassFilterType />
+                <HighPassFilterOrder>-1</HighPassFilterOrder>
+                <HighPassFilterCutOffFrequency>-1</HighPassFilterCutOffFrequency>
+                <LowPassFilterType />
+                <LowPassFilterOrder>-1</LowPassFilterOrder>
+                <LowPassFilterCutOffFrequency>-1</LowPassFilterCutOffFrequency>
+                <ConversionFactor>1</ConversionFactor>
+            </InfoChannel>
+        </InputStream>
+        <OutputStream>
+            <InfoStreamEvent Version="1">
+                <Stream>e91eb00e-c3c4-4ff8-a765-52a704b32f12</Stream>
+                <StreamType>Event</StreamType>
+                <SourceStream>6c4ad497-0e1c-42b8-97b4-9c1dca987407</SourceStream>
+                <DataSubType>StgSideband</DataSubType>
+                <Label>Digital </Label>
+                <Items Count="0" />
+            </InfoStreamEvent>
+        </OutputStream>
+        <EventDefinitions Count="0" />
+    </SettingsDigitalEventTool>
+    <SettingsStimulationTool Version="4">
+        <BlankingMode>All</BlankingMode>
+        <BlockUserInputWhileRecording>True</BlockUserInputWhileRecording>
+        <Stimulators Count="3">
+            <SettingsStimulator Version="3">
+                <StimulusID>1</StimulusID>
+                <StimulatorProtocol>Ramp</StimulatorProtocol>
+                <OutputMode>Voltage</OutputMode>
+                <Tick>10</Tick>
+                <Range>3400000</Range>
+                <Resolution>105</Resolution>
+                <AmplitudeFactor>0</AmplitudeFactor>
+                <Offset>0</Offset>
+                <Loop>False</Loop>
+                <MarkerPortID>-1</MarkerPortID>
+                <ArtefactSuppression>None</ArtefactSuppression>
+                <StartMode>Manual</StartMode>
+                <TriggerPortID>0</TriggerPortID>
+                <RetriggerAction>Ignore</RetriggerAction>
+                <Primitives Count="0" />
+                <Sites Count="0" />
+            </SettingsStimulator>
+            <SettingsStimulator Version="3">
+                <StimulusID>2</StimulusID>
+                <StimulatorProtocol>Ramp</StimulatorProtocol>
+                <OutputMode>Voltage</OutputMode>
+                <Tick>10</Tick>
+                <Range>3400000</Range>
+                <Resolution>105</Resolution>
+                <AmplitudeFactor>0</AmplitudeFactor>
+                <Offset>0</Offset>
+                <Loop>False</Loop>
+                <MarkerPortID>-1</MarkerPortID>
+                <ArtefactSuppression>None</ArtefactSuppression>
+                <StartMode>Manual</StartMode>
+                <TriggerPortID>0</TriggerPortID>
+                <RetriggerAction>Ignore</RetriggerAction>
+                <Primitives Count="0" />
+                <Sites Count="0" />
+            </SettingsStimulator>
+            <SettingsStimulator Version="3">
+                <StimulusID>3</StimulusID>
+                <StimulatorProtocol>Ramp</StimulatorProtocol>
+                <OutputMode>Voltage</OutputMode>
+                <Tick>10</Tick>
+                <Range>3400000</Range>
+                <Resolution>105</Resolution>
+                <AmplitudeFactor>0</AmplitudeFactor>
+                <Offset>0</Offset>
+                <Loop>False</Loop>
+                <MarkerPortID>-1</MarkerPortID>
+                <ArtefactSuppression>None</ArtefactSuppression>
+                <StartMode>Manual</StartMode>
+                <TriggerPortID>0</TriggerPortID>
+                <RetriggerAction>Ignore</RetriggerAction>
+                <Primitives Count="0" />
+                <Sites Count="0" />
+            </SettingsStimulator>
+        </Stimulators>
+    </SettingsStimulationTool>
+    <SettingsRecorder Version="1">
+        <DefaultFolder>D:\</DefaultFolder>
+        <DefaultFileName>Rec</DefaultFileName>
+        <AutoPrefix>DateTime</AutoPrefix>
+        <AutoSuffix>None</AutoSuffix>
+        <StartMode>Manual</StartMode>
+        <StopMode>Timer</StopMode>
+        <ReArmTimer>False</ReArmTimer>
+        <StartTimerDuration>0</StartTimerDuration>
+        <RecordTimerDuration>100000</RecordTimerDuration>
+        <PauseTimerDuration>1000000</PauseTimerDuration>
+        <ReArmEvent>False</ReArmEvent>
+        <StreamRecordModes Count="5">
+            <StreamRecordMode>
+                <StreamType>Analog</StreamType>
+                <DataSubType>Digital</DataSubType>
+                <RecordMode>Continuous</RecordMode>
+            </StreamRecordMode>
+            <StreamRecordMode>
+                <StreamType>Analog</StreamType>
+                <DataSubType>Auxiliary</DataSubType>
+                <RecordMode>Continuous</RecordMode>
+            </StreamRecordMode>
+            <StreamRecordMode>
+                <StreamType>Frame</StreamType>
+                <DataSubType>CMosSensor</DataSubType>
+                <RecordMode>Continuous</RecordMode>
+            </StreamRecordMode>
+            <StreamRecordMode>
+                <StreamType>Event</StreamType>
+                <DataSubType>DigitalPort</DataSubType>
+                <RecordMode>Continuous</RecordMode>
+            </StreamRecordMode>
+            <StreamRecordMode>
+                <StreamType>Event</StreamType>
+                <DataSubType>StgSideband</DataSubType>
+                <RecordMode>Continuous</RecordMode>
+            </StreamRecordMode>
+        </StreamRecordModes>
+    </SettingsRecorder>
+</CMOS-MEA-Control-Settings>
