@@ -8,27 +8,26 @@
     :license: see LICENSE for more details
 """
 
-
 import h5py
 import numpy
 
 class CMOSData(h5py.File):
-    """Wrapper for a HDF5 File containing CMOS Data
+    """
+    Wrapper for a HDF5 File containing CMOS Data
     """
     def __init__(self,path):
-        """Creates a CMOSData file and links it to a H5 File
+        """
+        Creates a CMOSData file and links it to a H5 File
         :param path: Path to a H5 File containing CMOS Data
         :type path: string 
         """
         super(CMOSData,self).__init__(path,mode='r')
-
-        McsHdf5Protocols.ch
-
-        # -- map data --
+        
+        # -- map raw data --
         self.raw_data= self['/Data/Recording_0/FrameStream/Stream_0/FrameDataEntity_0/FrameData']
         self.conv_factors= self['/Data/Recording_0/FrameStream/Stream_0/FrameDataEntity_0/ConversionFactors']
 
-        # - proxy -
+        # - map proxy data -
         self.conv_data = CMOSConvProxy(self)
 
         # -- map meta --
@@ -51,12 +50,31 @@ class CMOSData(h5py.File):
         for key,value in self['/Data'].attrs.items():
             self.meta[key]=value
 
+        # -- map events --
+        if("EventStream" in self["Data/Recording_0/"].keys()):
+            event_group=self["Data/Recording_0/EventStream/Stream_0/"]
+            event_info=self["Data/Recording_0/EventStream/Stream_0/InfoEvent"]
+
+            self.events={}
+            self.event_frames={}
+        
+            for key in event_group.keys():
+                if "EventEntity" in key:
+                    info=event_info["Label"][event_info["EventID"]==int(key.split("_")[1])][0]
+                    self.events[info]=event_group[key][0,0]
+                    self.event_frames[info]=event_group[key][0,0]/self.meta["Tick"]
+
+
+
 class CMOSConvProxy:
-    """Proxy that transparently converts raw data to calibrated data.
+    """
+    Private Class, should be embeded within a CMOSData Objekt.
+    A proxy that transparently converts raw data to calibrated data. 
     """
 
     def __init__(self,parent):
-        """Creates a new CMOSConvProxy
+        """
+        Creates a new CMOSConvProxy
         :param parent: Object that can provide raw_data and conv_factors
         :type parent: CMOSData
         """
@@ -64,7 +82,8 @@ class CMOSConvProxy:
         self.dtype=numpy.int32
 
     def __getitem__(self,slices):
-        """Sliced access to converted data
+        """
+        Sliced access to converted data
         :param slices: Data-slices to retrive
         :returns: converted data
         """
@@ -74,7 +93,33 @@ class CMOSConvProxy:
 
     @property
     def shape(self):
-        """Shape of the data
+        """
+        Shape of the data
         """
         return self._parent.raw_data.shape
 
+
+class CMOSSpikes(h5py.File):
+    """
+    Wrapper for a HDF5 File containing CMOS Spike Data
+    """
+    def __init__(self,path):
+        super(CMOSSpikeFile,self).__init__(path)
+        
+        if("data" in self.keys() and "spikes" in self['data'].keys()):
+        
+            self.spikes=np.core.records.fromarrays(self['data/spikes'][:,:], 
+                                                 names='time, col, row',
+                                                 formats = 'int64, int64, int64')
+            if("waveforms" in self['data'].keys()):
+                self.waveforms=self['data/waveforms'][:,:].transpose()
+                
+        else:
+            raise IOError(path+ " has no valid CMOSSpikeFile Structure")
+            
+            
+    def waveforms_by_location(col,row):
+        if(hasattr(self,"waveforms")):
+            return self.waveforms[(self.spikes['col']==col) and (self.spikes['row']==row)]
+        else:
+            return None
