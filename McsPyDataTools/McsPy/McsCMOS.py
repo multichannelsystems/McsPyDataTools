@@ -68,7 +68,7 @@ class CMOSData(h5py.File):
 
 class CMOSConvProxy:
     """
-    Private Class, should be embeded within a CMOSData Objekt.
+    Private Class, should be embedded within a CMOSData Object.
     A proxy that transparently converts raw data to calibrated data. 
     """
 
@@ -84,7 +84,7 @@ class CMOSConvProxy:
     def __getitem__(self,slices):
         """
         Sliced access to converted data
-        :param slices: Data-slices to retrive
+        :param slices: Data-slices to retrieve
         :returns: converted data
         """
         raw_data=self._parent.raw_data.__getitem__(slices)
@@ -101,25 +101,23 @@ class CMOSConvProxy:
 
 class CMOSSpikes(h5py.File):
     """
-    Wrapper for a HDF5 File containing CMOS Spike Data
+    Wrapper for a HDF5 File containing CMOS Spike Data.
+    Spike Information is accessible through the .spike Member,
+    Waveform Information (if available) through the .waveforms Member.
     """
     def __init__(self,path):
         super(CMOSSpikeFile,self).__init__(path)
-        
+
+        # -- Check for right structure --
         if("data" in self.keys() and "spikes" in self['data'].keys()):
-        
+            
+            # -- Map Spike-Data to RecordArray
             self.spikes=np.core.records.fromarrays(self['data/spikes'][:,:], 
                                                  names='time, col, row',
                                                  formats = 'int64, int64, int64')
+            # -- Map Waveforms to Array
             if("waveforms" in self['data'].keys()):
                 self.waveforms=self['data/waveforms'][:,:].transpose()
                 
         else:
             raise IOError(path+ " has no valid CMOSSpikeFile Structure")
-            
-            
-    def waveforms_by_location(col,row):
-        if(hasattr(self,"waveforms")):
-            return self.waveforms[(self.spikes['col']==col) and (self.spikes['row']==row)]
-        else:
-            return None

@@ -272,7 +272,7 @@ class AnalogStream(Stream):
     """
     def __init__(self, stream_grp):
         """
-        Initializes an analog stream object containing serveral analog channels
+        Initializes an analog stream object containing several analog channels
 
         :param stream_grp: folder of the HDF5 file that contains the data of this analog stream
         """
@@ -594,7 +594,7 @@ class FrameEntityInfo(InfoSampledData):
         Initializes an describing info object that contains all descriptions of this frame entity.
 
         :param info_version: number of the protocol version used by the following info structure
-        :param info: array of frame entity descriptiors as represented by one row of the InfoFrame structure inside the HDF5 file
+        :param info: array of frame entity descriptors as represented by one row of the InfoFrame structure inside the HDF5 file
         :param conv_factor_matrix: matrix of conversion factor as represented by the ConversionFactors structure inside one FrameDataEntity folder of the HDF5 file
         """
         InfoSampledData.__init__(self, info)
@@ -731,7 +731,7 @@ class EventEntityInfo(Info):
         Initializes an describing info object with an array that contains all descriptions of this event entity.
 
         :param info_version: number of the protocol version used by the following info structure
-        :param info: array of event entity descriptiors as represented by one row of the InfoEvent structure inside the HDF5 file
+        :param info: array of event entity descriptors as represented by one row of the InfoEvent structure inside the HDF5 file
         """
         Info.__init__(self, info)
         McsHdf5Protocols.check_protocol_type_version("EventEntityInfo", info_version)
@@ -908,8 +908,8 @@ class SegmentEntityInfo(Info):
         Initializes an describing info object with an array that contains all descriptions of this segment entity.
 
         :param info_version: number of the protocol version used by the following info structure
-        :param info: array of segment entity descriptiors as represented by one row of the SegmentEvent structure inside the HDF5 file
-        :param source_channel_infos: dictionary of source channels from where the segements were taken 
+        :param info: array of segment entity descriptors as represented by one row of the SegmentEvent structure inside the HDF5 file
+        :param source_channel_infos: dictionary of source channels from where the segments were taken 
         """
         Info.__init__(self, info)
         McsHdf5Protocols.check_protocol_type_version("SegmentEntityInfo", info_version)
@@ -1026,7 +1026,7 @@ class TimeStampEntityInfo(Info):
         Initializes an describing info object with an array that contains all descriptions of this timestamp entity.
 
         :param info_version: number of the protocol version used by the following info structure
-        :param info: array of event entity descriptiors as represented by one row of the InfoTimeStamp structure inside the HDF5 file
+        :param info: array of event entity descriptors as represented by one row of the InfoTimeStamp structure inside the HDF5 file
         """
         Info.__init__(self, info)
         McsHdf5Protocols.check_protocol_type_version("TimeStampEntityInfo", info_version)
