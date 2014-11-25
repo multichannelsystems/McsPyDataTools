@@ -46,7 +46,7 @@ class McsHdf5Protocols:
                 raise IOError('Given HDF5 file contains \'%s\' type of version %s and supported are only all versions from %s up to %s' % 
                                (protocol_type_name, version, supported_versions[0], supported_versions[1]))
         else:
-            raise IOError("The given HDF5 contains a type \'%s\' that is unknown in this implemenation!" % protocol_type_name)
+            raise IOError("The given HDF5 contains a type \'%s\' that is unknown in this implementation!" % protocol_type_name)
         return True
 
 from pint import UnitRegistry

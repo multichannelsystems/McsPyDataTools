@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name='McsPyDataTools',
-    version='0.1.0',
+    version='0.1.1',
     description='Handling data recorded and provided by MCS systems', 
     long_description=open('README').read(),
     keywords = 'HDF5 data electrophysiology MCS',
