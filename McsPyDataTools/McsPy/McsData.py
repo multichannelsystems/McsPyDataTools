@@ -25,6 +25,11 @@ clr_tick = 100 * ureg.ns
 # day -> number of clr ticks (100 ns)
 day_to_clr_time_tick = 24 * 60 * 60 * (10**7)
 
+verbose = True
+
+def dprint_name_value(n, v):
+    if verbose:
+        print(n, v)
 
 class RawData(object):
     """
@@ -85,8 +90,9 @@ class RawData(object):
         self.comment = session_info['Comment'].rstrip()
         self.clr_date = session_info['Date'].rstrip()
         self.date_in_clr_ticks = session_info['DateInTicks']
-        self.date =  datetime.datetime.fromordinal(int(math.ceil(self.date_in_clr_ticks / day_to_clr_time_tick)) + 1)
-        #self.file_guid = session_info['FileGUID'].rstrip()
+        # self.date =  datetime.datetime.fromordinal(int(math.ceil(self.date_in_clr_ticks / day_to_clr_time_tick)) + 1)
+        self.date = datetime.datetime(1, 1, 1) + datetime.timedelta(microseconds = int(self.date_in_clr_ticks)/10)  
+        # self.file_guid = session_info['FileGUID'].rstrip()
         self.file_guid = uuid.UUID(session_info['FileGUID'].rstrip())
         self.mea_layout = session_info['MeaLayout'].rstrip() 
         self.mea_sn = session_info['MeaSN'].rstrip()
@@ -101,7 +107,7 @@ class RawData(object):
         if (len(data_folder) > 0):
             self.__recordings = {}
         for (name, value) in data_folder.iteritems():
-            print(name,value)
+            dprint_name_value(name,value)
             recording_name = name.split('_')
             if ((len(recording_name) == 2) and (recording_name[0] == 'Recording')):
                 self.__recordings[int(recording_name[1])] = Recording(value)
@@ -146,7 +152,7 @@ class Recording(object):
         if (len(analog_stream_folder) > 0):
             self.__analog_streams = {}
         for (name, value) in analog_stream_folder.iteritems():
-            print(name,value)
+            dprint_name_value(name,value)
             stream_name = name.split('_')
             if ((len(stream_name) == 2) and (stream_name[0] == 'Stream')):
                 self.__analog_streams[int(stream_name[1])] = AnalogStream(value)
@@ -157,7 +163,7 @@ class Recording(object):
         if (len(frame_stream_folder) > 0):
             self.__frame_streams = {}
         for (name, value) in frame_stream_folder.iteritems():
-            print(name,value)
+            dprint_name_value(name,value)
             stream_name = name.split('_')
             if ((len(stream_name) == 2) and (stream_name[0] == 'Stream')):
                 self.__frame_streams[int(stream_name[1])] = FrameStream(value)
@@ -168,7 +174,7 @@ class Recording(object):
         if (len(event_stream_folder) > 0):
             self.__event_streams = {}
         for (name, value) in event_stream_folder.iteritems():
-            print(name,value)
+            dprint_name_value(name,value)
             stream_name = name.split('_')
             if ((len(stream_name) == 2) and (stream_name[0] == 'Stream')):
                 self.__event_streams[int(stream_name[1])] = EventStream(value)
@@ -179,7 +185,7 @@ class Recording(object):
         if len(segment_stream_folder) > 0:
             self.__segment_streams = {}
         for (name, value) in segment_stream_folder.iteritems():
-            print(name,value)
+            dprint_name_value(name,value)
             stream_name = name.split('_')
             if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
                 self.__segment_streams[int(stream_name[1])] = SegmentStream(value)
@@ -190,7 +196,7 @@ class Recording(object):
         if len(timestamp_stream_folder) > 0:
             self.__timestamp_streams = {}
         for (name, value) in timestamp_stream_folder.iteritems():
-            print(name,value)
+            dprint_name_value(name,value)
             stream_name = name.split('_')
             if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
                 self.__timestamp_streams[int(stream_name[1])] = TimeStampStream(value)
@@ -284,7 +290,7 @@ class AnalogStream(Stream):
         "Read all channels -> create Info structure and connect datasets"
         assert len(self.stream_grp) == 3
         for (name, value) in self.stream_grp.iteritems():
-            print name, value
+            dprint_name_value(name, value)
         # Read timestamp index of channels:
         self.timestamp_index = self.stream_grp['ChannelDataTimeStamps'][...]
         
@@ -461,7 +467,7 @@ class FrameStream(Stream):
         "Read all fream entities for this frame stream inside the associated frame entity folder"
         #assert len(self.stream_grp) == 3
         for (name, value) in self.stream_grp.iteritems():
-            print name, value
+            dprint_name_value(name, value)
         # Read infos per frame 
         fr_infos = self.stream_grp['InfoFrame'][...]
         fr_info_version = self.stream_grp['InfoFrame'].attrs['InfoVersion']
@@ -648,7 +654,7 @@ class EventStream(Stream):
     def  __read_event_entities(self):
         "Create all event entities of this event stream"
         for (name, value) in self.stream_grp.iteritems():
-            print name, value
+            dprint_name_value(name, value)
         # Read infos per event entity 
         event_infos = self.stream_grp['InfoEvent'][...]
         event_entity_info_version = self.stream_grp['InfoEvent'].attrs['InfoVersion']
@@ -778,7 +784,7 @@ class SegmentStream(Stream):
     def  __read_segment_entities(self):
         "Read and initialize all segment entities"
         for (name, value) in self.stream_grp.iteritems():
-            print name, value
+            dprint_name_value(name, value)
         # Read infos per segment entity 
         segment_infos = self.stream_grp['InfoSegment'][...]
         segment_info_version = self.stream_grp['InfoSegment'].attrs['InfoVersion']
@@ -964,7 +970,7 @@ class TimeStampStream(Stream):
     def  __read_timestamp_entities(self):
         "Create all timestamp entities of this timestamp stream"
         for (name, value) in self.stream_grp.iteritems():
-            print name, value
+            dprint_name_value(name, value)
         # Read infos per timestamp entity 
         timestamp_infos = self.stream_grp['InfoTimeStamp'][...]
         timestamp_info_version = self.stream_grp['InfoTimeStamp'].attrs['InfoVersion']
@@ -1057,7 +1063,7 @@ class TimeStampEntityInfo(Info):
         try:
             provided_base_unit = ureg.parse_expression(self.unit);
         except  UndefinedUnitError as unit_undefined:
-            print "Could not find unit \'%s\' in the Unit-Registry" % self.unit #unit_undefined.unit_names
+            print("Could not find unit \'%s\' in the Unit-Registry" % self.unit) #unit_undefined.unit_names
             return None
         else:
             return (10**self.exponent) * provided_base_unit;
