@@ -2,13 +2,14 @@ import unittest
 import McsPy.McsData
 import datetime
 import exceptions
+import os
 import numpy as np
 
 from McsPy import *
 
-test_raw_frame_data_file_path = ".\\TestData\\Sensors-10x100ms-10kHz.h5"
+test_raw_frame_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\Sensors-10x100ms-10kHz.h5')
 
-test_data_file_path = ".\\TestData\\2014-07-09T10-17-35W8 Standard all 500 Hz.h5"
+test_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\2014-07-09T10-17-35W8 Standard all 500 Hz.h5')
 
 #@unittest.skip("showing the principle structure of python unit tests")
 #class Test_TestRawDataStructures(unittest.TestCase):
@@ -39,7 +40,7 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(self.data.comment, '', 'Comment is different!')
         self.assertEqual(self.data.clr_date, 'Mittwoch, 9. Juli 2014', 'Clr-Date is different!')
         self.assertEqual(self.data.date_in_clr_ticks, 635404978551720981, 'Clr-Date-Ticks are different!')
-        self.assertEqual(self.data.date, datetime.datetime(2014,7,9), 'Date is different!');
+        self.assertEqual(self.data.date, datetime.datetime(2014, 7, 9, 10, 17, 35, 172098), 'Date is different!');
         self.assertEqual(str(self.data.file_guid), '700b3ec2-d406-4943-bcef-79d73f0ac4d3', 'FileGUID is different!')
         self.assertEqual(str(self.data.mea_layout), 'Linear8', 'Mea-Layout is different!')
         self.assertEqual(self.data.mea_sn, '', 'MeaSN is different!')
