@@ -179,7 +179,13 @@ Desktop.ini
 $RECYCLE.BIN/
 
 
+# =========================
+# PyCharm
+# =========================
 
+.idea/
+McsPytutorial/TestData/**
+*.bak
 
 # =========================
 # Python detritus
