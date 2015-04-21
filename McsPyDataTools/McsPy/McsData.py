@@ -5,7 +5,7 @@
     Data classes to wrap and hide raw data handling of the HDF5 data files. 
     It is based on the MCS-HDF5 definitions of the given compatible versions. 
     
-    :copyright: (c) 2014 by Multi Channel Systems MCS GmbH
+    :copyright: (c) 2015 by Multi Channel Systems MCS GmbH
     :license: see LICENSE for more details
 """
 
@@ -14,6 +14,7 @@ import datetime
 import math
 import uuid
 import exceptions
+import collections
 import numpy as np
 
 from McsPy import *
@@ -58,7 +59,6 @@ class RawData(object):
     #    self.h5_file.close()
 
     def __str__(self):
-        #return '[RawData: File Path %s]' % self.raw_data_path
         return super(RawData, self).__str__()
 
     def __validate_mcs_hdf5_version(self):
@@ -66,7 +66,6 @@ class RawData(object):
         root_grp = self.h5_file['/']
         if ('McsHdf5ProtocolType' in root_grp.attrs):
             self.mcs_hdf5_protocol_type = root_grp.attrs['McsHdf5ProtocolType']
-            #if (McsHdf5Protocols.SUPPORTED_PROTOCOLS.has_key(self.mcs_hdf5_protocol_type)):
             if (self.mcs_hdf5_protocol_type == "RawData"):
                 self.mcs_hdf5_protocol_type_version = root_grp.attrs['McsHdf5ProtocolVersion']
                 supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[self.mcs_hdf5_protocol_type]
@@ -137,7 +136,6 @@ class Recording(object):
         "Read metadata for this recording"
         recording_info = {}
         for (name, value) in self.__recording_grp.attrs.iteritems(): 
-            #print(name, value)
             recording_info[name] = value
         self.comment = recording_info['Comment'].rstrip()
         self.duration = recording_info['Duration']
@@ -256,14 +254,13 @@ class Stream(object):
         self.stream_grp = stream_grp
         info_version = self.stream_grp.attrs["StreamInfoVersion"]
         if (info_type_name != None):
-             McsHdf5Protocols.check_protocol_type_version(info_type_name, info_version)
+            McsHdf5Protocols.check_protocol_type_version(info_type_name, info_version)
         self.__get_stream_info()
 
     def __get_stream_info(self):
         "Read all describing meta data common to each stream -> HDF5 folder attributes"
         stream_info = {}
         for (name, value) in self.stream_grp.attrs.iteritems(): 
-            #print(name, value)
             stream_info[name] = value
         self.info_version = stream_info['StreamInfoVersion']
         self.data_subtype = stream_info['DataSubType'].rstrip()
@@ -325,7 +322,7 @@ class AnalogStream(Stream):
             signal = self.channel_data[self.channel_infos[channel_id].row_index, idx_start : idx_end]
             scale = self.channel_infos[channel_id].adc_step.magnitude
             #scale = self.channel_infos[channel_id].get_field('ConversionFactor') * (10**self.channel_infos[channel_id].get_field('Exponent'))
-            signal_corrected =  (signal - self.channel_infos[channel_id].get_field('ADZero'))  * scale
+            signal_corrected = (signal - self.channel_infos[channel_id].get_field('ADZero'))  * scale
             return (signal_corrected, self.channel_infos[channel_id].adc_step.units)
 
     def get_channel_sample_timestamps(self, channel_id, idx_start, idx_end):
@@ -522,7 +519,7 @@ class FrameEntity(object):
         sensor_signal = self.data[sensor_x, sensor_y, idx_start : idx_end]
         scale_factor = self.info.adc_step_for_sensor(sensor_x,sensor_y)
         scale = scale_factor.magnitude
-        sensor_signal_corrected =  (sensor_signal - self.info.get_field('ADZero'))  * scale
+        sensor_signal_corrected = (sensor_signal - self.info.get_field('ADZero'))  * scale
         return (sensor_signal_corrected, scale_factor.units)
 
     def get_frame_timestamps(self, idx_start, idx_end):
@@ -534,7 +531,7 @@ class FrameEntity(object):
         :return: Tuple (vector of the timestamps, unit of the timestamps)
         """
         if (idx_start < 0 or self.data.shape[2] < idx_start or idx_end < idx_start or self.data.shape[2] < idx_end):
-                raise exceptions.IndexError
+            raise exceptions.IndexError
         start_ts = 0L
         tick = self.info.get_field('Tick')
         for ts_range in self.timestamp_index:
@@ -692,7 +689,7 @@ class EventEntity(object):
         if idx_end == None:
             idx_end = self.count
         if idx_start < 0 or self.data.shape[1] < idx_start or idx_end < idx_start or self.data.shape[1] < idx_end:
-                raise exceptions.IndexError
+            raise exceptions.IndexError
         return (idx_start, idx_end)
 
     def get_events(self, idx_start = None, idx_end = None):
@@ -790,14 +787,23 @@ class SegmentStream(Stream):
         segment_info_version = self.stream_grp['InfoSegment'].attrs['InfoVersion']
         self.segment_entity = {}
         for segment_entity_info in segment_infos:
-            segment_entity_data_name = "SegmentData_" + str(segment_entity_info['SegmentID'])
-            segment_entity_ts_name = "SegmentData_ts_" + str(segment_entity_info['SegmentID'])
             ch_info_version = self.stream_grp['SourceInfoChannel'].attrs['InfoVersion']
             source_channel_infos = self.__get_source_channel_infos(ch_info_version, self.stream_grp['SourceInfoChannel'][...])
             segment_info = SegmentEntityInfo(segment_info_version, segment_entity_info, source_channel_infos)
-            self.segment_entity[segment_entity_info['SegmentID']] = SegmentEntity(self.stream_grp[segment_entity_data_name], 
-                                                                                self.stream_grp[segment_entity_ts_name],
-                                                                                segment_info)
+            if (self.data_subtype == "Average"):
+                segment_entity_data_name = "AverageData_" + str(segment_entity_info['SegmentID'])
+                segment_entity_average_annotation_name = "AverageData_Range_" + str(segment_entity_info['SegmentID'])
+                if (segment_entity_data_name in self.stream_grp):
+                    self.segment_entity[segment_entity_info['SegmentID']] = AverageSegmentEntity(self.stream_grp[segment_entity_data_name], 
+                                                                                    self.stream_grp[segment_entity_average_annotation_name],
+                                                                                    segment_info)
+            else:
+                segment_entity_data_name = "SegmentData_" + str(segment_entity_info['SegmentID'])
+                segment_entity_ts_name = "SegmentData_ts_" + str(segment_entity_info['SegmentID'])
+                if (segment_entity_data_name in self.stream_grp):
+                    self.segment_entity[segment_entity_info['SegmentID']] = SegmentEntity(self.stream_grp[segment_entity_data_name], 
+                                                                                    self.stream_grp[segment_entity_ts_name],
+                                                                                    segment_info)
 
     def __get_source_channel_infos(self, ch_info_version, source_channel_infos):
         "Create a dictionary of all present source channels"
@@ -852,7 +858,7 @@ class SegmentEntity(object):
         if idx_end == None:
             idx_end = sample_count
         if idx_start < 0 or sample_count < idx_start or idx_end < idx_start or sample_count < idx_end:
-                raise exceptions.IndexError
+            raise exceptions.IndexError
         return (idx_start, idx_end)
 
     def get_segment_in_range(self, segment_id, flat = False, idx_start = None, idx_end = None):
@@ -874,10 +880,109 @@ class SegmentEntity(object):
                 signal = self.data[..., segment_id, idx_start : idx_end]
             source_channel = self.info.source_channel_of_segment[segment_id]
             scale = source_channel.adc_step.magnitude
-            signal_corrected =  (signal - source_channel.get_field('ADZero'))  * scale
+            signal_corrected = (signal - source_channel.get_field('ADZero')) * scale
             if flat:
                 signal_corrected = np.reshape(signal_corrected, -1, 'F')
             return (signal_corrected, source_channel.adc_step.units)
+
+    def get_segment_sample_timestamps(self, segment_id, flat = False, idx_start = None, idx_end = None):
+        """
+        Get the timestamps of the sample points of the measured segment. 
+
+        :param segment_id: id resp. number of the segment (0 if only one segment is present or the index inside the multi-segment collection)
+        :param flat: true -> one-dimensional vector of the sequentially ordered segment timestamps, false -> k x n matrix of the k timestamps of n segments  
+        :param idx_start: index of the first segment for that timestamps should be returned (0 <= idx_start < idx_end <= count segments)
+        :param idx_end: index of the last segment for that timestamps should be returned (0 <= idx_start < idx_end <= count segments)  
+        :return: Tuple (of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample 
+        points depending on the value of *flat* , and the unit of the values)
+        """
+        if segment_id in self.info.source_channel_of_segment.keys():
+            idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
+            data_ts = self.data_ts[idx_start:idx_end]
+            source_channel = self.info.source_channel_of_segment[segment_id]
+            signal_ts = np.zeros((self.data.shape[0], data_ts.shape[1]), dtype = np.long)
+            segment_ts = np.zeros(self.data.shape[0], dtype = np.long) + source_channel.sampling_tick.magnitude
+            segment_ts[0] = 0
+            segment_ts = np.cumsum(segment_ts)
+            for i in range(data_ts.shape[1]):
+                col = (data_ts[0,i] - self.info.pre_interval.magnitude) + segment_ts
+                signal_ts[:, i] = col
+            if flat:
+                signal_ts = np.reshape(signal_ts, -1, 'F')
+            return (signal_ts , source_channel.sampling_tick.units)
+
+#AverageSegmentTuple = collections.namedtuple('AverageSegmentTuple', 'mean stddev measured_unit')
+AverageSegmentTuple = collections.namedtuple('AverageSegmentTuple', ['mean', 'std_dev', 'measured_unit'])
+
+class AverageSegmentEntity(object):
+    """
+    Contains a number of signal segments which are calcualted as averages of number of segments occured in a given time range. 
+    """
+    def __init__(self, segment_average_data, segment_average_annotation ,segment_info):
+        """
+        Initializes an average segment entity.
+
+        :param segment_data: 2d-matrix (one segment) or 3d-cube (n segments) of segment data
+        :param segment_ts: timestamp vector for every segment (2d) or multi-segments (3d)
+        :param segment_info: segment info object that contains all meta data for this segment entity
+        :return: Segment entity
+        """
+        self.info = segment_info
+        # connect the data set 
+        self.data = segment_average_data
+        # connect the timestamp vector
+        self.data_annotation = segment_average_annotation
+        assert self.number_of_averages == self.data_annotation.shape[1], 'Timestamp index is not compatible with dataset!!!'
+
+    @property
+    def number_of_averages(self):
+        "Number of average segments inside this average entity"
+        dim = self.data.shape
+        return dim[2]
+
+    @property
+    def sample_length(self):
+        "Number of sample points of an average segment"
+        dim = self.data.shape
+        return dim[1]
+
+    def get_time_range(self, average_segment_id = 0):
+        """
+        Get the time range for that the average segment was calculated
+        
+        :param average_segment_id: id resp. number of the average segment (by default the first segment is selected)  
+        """
+        return (self.data_annotation[0, average_segment_id], self.data_annotation[1, average_segment_id])
+   
+    def get_average_count(self, average_segment_id = 0):
+        """
+        Get the count of samples that were used to calculate the average
+        
+        :param average_segment_id: id resp. number of the average segment (by default the first segment is selected)  
+        """
+        return self.data_annotation[2, average_segment_id]
+
+    def get_average_segment_in_range(self, segment_id = 0):
+        """
+        Get the the average segment in its measured physical range. 
+
+        :param segment_id: id resp. number of the segment (by default the first segment is selected)
+        :return: Tuple (2 x k matrix with [0, ...] containing the mean and [1, ...] the standard deviation, and the unit of the values)
+        """
+        data_tuple = AverageSegmentTuple(mean = self.data[0,...,segment_id], stddev = self.data[1,...,segment_id], measured_unit = None)
+        return data_tuple
+        #if segment_id in self.info.source_channel_of_segment.keys():
+        #    idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
+        #    if self.segment_count == 1:
+        #        signal = self.data[..., idx_start : idx_end]
+        #    else:
+        #        signal = self.data[..., segment_id, idx_start : idx_end]
+        #    source_channel = self.info.source_channel_of_segment[segment_id]
+        #    scale = source_channel.adc_step.magnitude
+        #    signal_corrected =  (signal - source_channel.get_field('ADZero'))  * scale
+        #    if flat:
+        #        signal_corrected = np.reshape(signal_corrected, -1, 'F')
+        #    return (signal_corrected, source_channel.adc_step.units)
 
     def get_segment_sample_timestamps(self, segment_id, flat = False, idx_start = None, idx_end = None):
         """
@@ -1008,7 +1113,7 @@ class TimeStampEntity(object):
         if idx_end == None:
             idx_end = self.count
         if idx_start < 0 or self.data.shape[1] < idx_start or idx_end < idx_start or self.data.shape[1] < idx_end:
-                raise exceptions.IndexError
+            raise exceptions.IndexError
         return (idx_start, idx_end)
 
     def get_timestamps(self, idx_start = None, idx_end = None):
