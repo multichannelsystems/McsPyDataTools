@@ -360,6 +360,8 @@ class AnalogStream(Stream):
 class Info(object):
     """
     Base class of all info classes
+
+    Derived classes contain meta information for data structures and fields.
     """
     def __init__(self, info_data):
         self.info = {}
@@ -387,7 +389,7 @@ class Info(object):
 
 class InfoSampledData(Info):
     """
-    Base class of all info classes for sampled data
+    Base class of all info classes for evenly sampled data
     """
     def __init__(self, info):
         """
@@ -439,7 +441,7 @@ class ChannelInfo(InfoSampledData):
         "Size and unit of one ADC step for this channel"
         unit_name = self.info['Unit']
         # Should be tested that unit_name is a available in ureg (unit register)
-        step = self.info['ConversionFactor'] * (10 ** self.info['Exponent']) * ureg[unit_name]
+        step = self.info['ConversionFactor'] * (10 ** self.info['Exponent'].astype(np.float64)) * ureg[unit_name]
         return step
     
     @property
@@ -622,7 +624,7 @@ class FrameEntityInfo(InfoSampledData):
         "Returns the value of one basic ADC-Step"
         unit_name = self.info['Unit']
         # Should be tested that unit_name is a available in ureg (unit register)
-        basic_step = (10 ** self.info['Exponent']) * ureg[unit_name]
+        basic_step = (10 ** self.info['Exponent'].astype(np.float64)) * ureg[unit_name]
         return basic_step
 
     def adc_step_for_sensor(self, x, y):
@@ -911,21 +913,28 @@ class SegmentEntity(object):
                 signal_ts = np.reshape(signal_ts, -1, 'F')
             return (signal_ts , source_channel.sampling_tick.units)
 
-#AverageSegmentTuple = collections.namedtuple('AverageSegmentTuple', 'mean stddev measured_unit')
-AverageSegmentTuple = collections.namedtuple('AverageSegmentTuple', ['mean', 'std_dev', 'measured_unit'])
+
+AverageSegmentTuple = collections.namedtuple('AverageSegmentTuple', ['mean', 'std_dev', 'time_tick_unit', 'signal_unit'])
+"""
+Named tuple that describe one or more average segments
+:mean: mean signal values
+:std_dev: standard deviation of the signal value (it is 0 if there was only one sample segment)
+:samplint_interval: sampling interval with time unit
+:signal_unit: measured unit of the signal
+"""
 
 class AverageSegmentEntity(object):
     """
-    Contains a number of signal segments which are calcualted as averages of number of segments occured in a given time range. 
+    Contains a number of signal segments that are calcualted as averages of number of segments occured in a given time range. 
     """
     def __init__(self, segment_average_data, segment_average_annotation ,segment_info):
         """
-        Initializes an average segment entity.
+        Initializes an average segment entity
 
-        :param segment_data: 2d-matrix (one segment) or 3d-cube (n segments) of segment data
-        :param segment_ts: timestamp vector for every segment (2d) or multi-segments (3d)
+        :param segment_avarage_data: 2d-matrix (one average) or 3d-cube (n averages) of average segments
+        :param segment_annotation: annotation vector for every average segment
         :param segment_info: segment info object that contains all meta data for this segment entity
-        :return: Segment entity
+        :return: Average segment entity
         """
         self.info = segment_info
         # connect the data set 
@@ -945,70 +954,119 @@ class AverageSegmentEntity(object):
         "Number of sample points of an average segment"
         dim = self.data.shape
         return dim[1]
+    
+    def time_ranges(self):
+        """
+        List of time range tuples for all contained average segments
 
-    def get_time_range(self, average_segment_id = 0):
+        :return: List of tuple with start and end time point  
+        """
+        time_range_list = []
+        for idx in range(self.data_annotation.shape[-1]):
+            time_range_list.append((self.data_annotation[0, idx] * mcs_tick, self.data_annotation[1, idx] * mcs_tick))
+        return time_range_list
+
+    def time_range(self, average_segment_idx):
         """
         Get the time range for that the average segment was calculated
         
-        :param average_segment_id: id resp. number of the average segment (by default the first segment is selected)  
+        :param average_segment_idx: index resp. number of the average segment
+        :return: Tuple with start and end time point  
         """
-        return (self.data_annotation[0, average_segment_id], self.data_annotation[1, average_segment_id])
+        return (self.data_annotation[0, average_segment_idx] * mcs_tick, self.data_annotation[1, average_segment_idx] * mcs_tick)
    
-    def get_average_count(self, average_segment_id = 0):
+    def average_counts(self):
         """
-        Get the count of samples that were used to calculate the average
+        List of counts of samples for all contained average segments
         
-        :param average_segment_id: id resp. number of the average segment (by default the first segment is selected)  
+        :param average_segment_idx: id resp. number of the average segment
+        :return: sample count 
         """
-        return self.data_annotation[2, average_segment_id]
+        sample_count_list = []
+        for idx in range(self.data_annotation.shape[-1]):
+            sample_count_list.append(self.data_annotation[2, idx])
+        return sample_count_list
 
-    def get_average_segment_in_range(self, segment_id = 0):
+    def average_count(self, average_segment_idx):
         """
-        Get the the average segment in its measured physical range. 
+        Count of samples that were used to calculate the average
+        
+        :param average_segment_idx: id resp. number of the average segment
+        :return: sample count 
+        """
+        return self.data_annotation[2, average_segment_idx]
 
-        :param segment_id: id resp. number of the segment (by default the first segment is selected)
-        :return: Tuple (2 x k matrix with [0, ...] containing the mean and [1, ...] the standard deviation, and the unit of the values)
+    
+    def __calculate_shifted_and_scaled_average(self, mean_data, std_dev_data):
         """
-        data_tuple = AverageSegmentTuple(mean = self.data[0,...,segment_id], stddev = self.data[1,...,segment_id], measured_unit = None)
+        Shift and scale average segments appropriate 
+        """
+        assert len(self.info.source_channel_of_segment) == 1, "There should be only one source channel for one average segment entity!" 
+        source_channel = self.info.source_channel_of_segment[0] # take the first and only source channel
+        scale = source_channel.adc_step.magnitude
+        mean_shifted_and_scaled =  (mean_data - source_channel.get_field('ADZero'))  * scale
+        std_dev_scaled = std_dev_data * scale
+        data_tuple = AverageSegmentTuple(mean = mean_shifted_and_scaled, 
+                                         std_dev = std_dev_scaled, 
+                                         time_tick_unit = source_channel.sampling_tick,
+                                         signal_unit = source_channel.adc_step.units)
         return data_tuple
-        #if segment_id in self.info.source_channel_of_segment.keys():
-        #    idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
-        #    if self.segment_count == 1:
-        #        signal = self.data[..., idx_start : idx_end]
-        #    else:
-        #        signal = self.data[..., segment_id, idx_start : idx_end]
-        #    source_channel = self.info.source_channel_of_segment[segment_id]
-        #    scale = source_channel.adc_step.magnitude
-        #    signal_corrected =  (signal - source_channel.get_field('ADZero'))  * scale
-        #    if flat:
-        #        signal_corrected = np.reshape(signal_corrected, -1, 'F')
-        #    return (signal_corrected, source_channel.adc_step.units)
-
-    def get_segment_sample_timestamps(self, segment_id, flat = False, idx_start = None, idx_end = None):
+    
+    def get_scaled_average_segments(self):
         """
-        Get the timestamps of the sample points of the measured segment. 
+        Get all contained average segments in its measured physical range. 
 
-        :param segment_id: id resp. number of the segment (0 if only one segment is present or the index inside the multi-segment collection)
-        :param flat: true -> one-dimensional vector of the sequentially ordered segment timestamps, false -> k x n matrix of the k timestamps of n segments  
-        :param idx_start: index of the first segment for that timestamps should be returned (0 <= idx_start < idx_end <= count segments)
-        :param idx_end: index of the last segment for that timestamps should be returned (0 <= idx_start < idx_end <= count segments)  
-        :return: Tuple (of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample 
-        points depending on the value of *flat* , and the unit of the values)
+        :return: AverageSegmentTuple containing the k x n matrices for mean and standard deviation of all contained average segments n with the associated sampling and measuring information 
         """
-        if segment_id in self.info.source_channel_of_segment.keys():
-            idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
-            data_ts = self.data_ts[idx_start:idx_end]
-            source_channel = self.info.source_channel_of_segment[segment_id]
-            signal_ts = np.zeros((self.data.shape[0], data_ts.shape[1]), dtype = np.long)
-            segment_ts = np.zeros(self.data.shape[0], dtype = np.long) + source_channel.sampling_tick.magnitude
-            segment_ts[0] = 0
-            segment_ts = np.cumsum(segment_ts)
-            for i in range(data_ts.shape[1]):
-                col = (data_ts[0,i] - self.info.pre_interval.magnitude) + segment_ts
-                signal_ts[:, i] = col
-            if flat:
-                signal_ts = np.reshape(signal_ts, -1, 'F')
-            return (signal_ts , source_channel.sampling_tick.units)
+        mean = self.data[0,...]
+        std_dev = self.data[1,...]
+        return self.__calculate_scaled_average(mean, std_dev)
+
+    def get_scaled_average_segment(self, average_segment_idx):
+        """
+        Get the selected average segment in its measured physical range. 
+
+        :param segment_idx: index resp. number of the average segment
+        :return: AverageSegmentTuple containing the mean and standard deviation vector of the average segment with the associated sampling and measuring information
+        """
+        mean = self.data[0,...,average_segment_idx]
+        std_dev = self.data[1,...,average_segment_idx]
+        return self.__calculate_scaled_average(mean, std_dev)
+
+    def __calculate_shifted_average(self, mean_data, std_dev_data):
+        """
+        Shift average segments appropriate 
+        """
+        assert len(self.info.source_channel_of_segment) == 1, "There should be only one source channel for one average segment entity!" 
+        source_channel = self.info.source_channel_of_segment[0] # take the first and only source channel
+        mean = mean_data
+        mean_shifted =  mean - source_channel.get_field('ADZero')
+        data_tuple = AverageSegmentTuple(mean = mean_shifted, 
+                                         std_dev = std_dev_data, 
+                                         time_tick_unit = source_channel.sampling_tick,
+                                         signal_unit = source_channel.adc_step)
+        return data_tuple
+
+    def get_average_segments(self):
+        """
+        Get all contained average segments AD-offset in ADC values with its measuring conditions
+
+        :return: AverageSegmentTuple containing the mean and standard deviation vector of the average segment in ADC steps with sampling tick and ADC-Step definition
+        """
+        mean = self.data[0,...]
+        std_dev = self.data[1,...]
+        return self.__calculate_shifted_average(mean, std_dev)
+
+    def get_average_segment(self, average_segment_idx):
+        """
+        Get the AD-offset corrected average segment in ADC values with its measuring conditions
+
+        :param segment_id: id resp. number of the segment
+        :return: AverageSegmentTuple containing the k x n matrices for mean and standard deviation of all contained average segments in ADC steps with sampling tick and ADC-Step definition
+        """
+        mean = self.data[0,...,average_segment_idx]
+        std_dev = self.data[1,...,average_segment_idx]
+        return self.__calculate_shifted_average(mean, std_dev)
 
 class SegmentEntityInfo(Info):
     """
