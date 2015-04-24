@@ -34,7 +34,7 @@ def dprint_name_value(n, v):
 
 class RawData(object):
     """
-    This class holds all information of a complete MCS raw data file
+    This class holds the information of a complete MCS raw data file
     """
     def __init__(self, raw_data_path):
         """
