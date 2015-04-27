@@ -25,9 +25,13 @@
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="McsPy\McsCMOS.py"/>
-    <Compile Include="McsPy\Test\TestCMOS.py"/>
+    <Compile Include="McsPy\McsCMOS.py" />
+    <Compile Include="McsPy\Test\TestCMOS.py" />
     <Compile Include="McsPy\Test\TestRawDataStructures.py" />
     <Compile Include="McsPy\Test\__init__.py" />
     <Compile Include="McsPy\McsData.py" />
@@ -50,5 +54,6 @@
     <Content Include="MANIFEST.in" />
     <Content Include="README" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
 </Project>

@@ -2,13 +2,16 @@ import unittest
 import McsPy.McsData
 import datetime
 import exceptions
+import os
 import numpy as np
 
 from McsPy import *
 
-test_raw_frame_data_file_path = ".\\TestData\\Sensors-10x100ms-10kHz.h5"
+test_raw_frame_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\Sensors-10x100ms-10kHz.h5')
 
-test_data_file_path = ".\\TestData\\2014-07-09T10-17-35W8 Standard all 500 Hz.h5"
+test_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\2014-07-09T10-17-35W8 Standard all 500 Hz.h5')
+
+average_segment_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\20150402_00 Atrium_002.h5')
 
 #@unittest.skip("showing the principle structure of python unit tests")
 #class Test_TestRawDataStructures(unittest.TestCase):
@@ -19,6 +22,7 @@ class Test_RawData(unittest.TestCase):
     def setUp(self):
         self.data = McsData.RawData(test_data_file_path)
         self.raw_frame_data = McsData.RawData(test_raw_frame_data_file_path)
+        self.average_segments = McsData.RawData(average_segment_data_file_path)
 
 class Test_RawDataContainer(Test_RawData):
     # Test MCS-HDF5 version
@@ -39,7 +43,7 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(self.data.comment, '', 'Comment is different!')
         self.assertEqual(self.data.clr_date, 'Mittwoch, 9. Juli 2014', 'Clr-Date is different!')
         self.assertEqual(self.data.date_in_clr_ticks, 635404978551720981, 'Clr-Date-Ticks are different!')
-        self.assertEqual(self.data.date, datetime.datetime(2014,7,9), 'Date is different!');
+        self.assertEqual(self.data.date, datetime.datetime(2014, 7, 9, 10, 17, 35, 172098), 'Date is different!');
         self.assertEqual(str(self.data.file_guid), '700b3ec2-d406-4943-bcef-79d73f0ac4d3', 'FileGUID is different!')
         self.assertEqual(str(self.data.mea_layout), 'Linear8', 'Mea-Layout is different!')
         self.assertEqual(self.data.mea_sn, '', 'MeaSN is different!')
@@ -64,7 +68,7 @@ class Test_RawDataContainer(Test_RawData):
 
     # Test analog streams:
     def test_count_analog_streams(self):
-         self.assertEqual(len(self.data.recordings[0].analog_streams), 3, 'There should be only one analog stream inside the recording!')
+        self.assertEqual(len(self.data.recordings[0].analog_streams), 3, 'There should be only one analog stream inside the recording!')
 
     def test_analog_stream_attributes(self):
         first_analog_stream = self.data.recordings[0].analog_streams[0]
@@ -82,13 +86,13 @@ class Test_RawDataContainer(Test_RawData):
         timestamp_index = self.data.recordings[0].analog_streams[0].timestamp_index
         self.assertEqual(timestamp_index.shape, (1, 3), 'Shape of timestamp index is different!')
 
-        channel_infos =  self.data.recordings[0].analog_streams[0].channel_infos
+        channel_infos = self.data.recordings[0].analog_streams[0].channel_infos
         self.assertEqual(len(channel_infos), 8, 'Number of channel info objects is different!')
         self.assertEqual(len(channel_infos[0].info), 16, 'Number of of components of an channel info object is different!')
         self.assertEqual(channel_infos[0].version, 1, 'InfoChannel-Type version 1 expected but was %s' % channel_infos[0].version)
 
     def test_analog_stream_data(self):
-        analog_stream =  self.data.recordings[0].analog_streams[0]
+        analog_stream = self.data.recordings[0].analog_streams[0]
         signal = analog_stream.get_channel_in_range(0, 1569, 1584)
         sig = signal[0]
         scale = 381469 * 10**-9
@@ -98,7 +102,7 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(str(signal[1]), 'volt', "Unit of sampled values was expected to be 'volt' but was '%s'!" % str(signal[1]))
 
     def test_analog_stream_data_timestamps(self):
-        analog_stream =  self.data.recordings[0].analog_streams[0]
+        analog_stream = self.data.recordings[0].analog_streams[0]
         signal_ts = analog_stream.get_channel_sample_timestamps(6, 1996, 2000)
         sig_ts = signal_ts[0]
         expected_ts = [3992000, 3994000, 3996000, 3998000, 4000000]
@@ -107,8 +111,8 @@ class Test_RawDataContainer(Test_RawData):
 
     # Test frame streams:
     def test_count_frame_streams(self):
-         self.assertEqual(len(self.raw_frame_data.recordings[0].frame_streams), 1, 'There should be only one frame stream!')
-         self.assertEqual(len(self.raw_frame_data.recordings[0].frame_streams[0].frame_entity), 1, 'There should be only one frame entity inside the stream!')
+        self.assertEqual(len(self.raw_frame_data.recordings[0].frame_streams), 1, 'There should be only one frame stream!')
+        self.assertEqual(len(self.raw_frame_data.recordings[0].frame_streams[0].frame_entity), 1, 'There should be only one frame entity inside the stream!')
 
     def test_frame_stream_attributes(self):
         first_frame_stream = self.raw_frame_data.recordings[0].frame_streams[0]
@@ -128,7 +132,7 @@ class Test_RawDataContainer(Test_RawData):
                      'ReferenceFrameRight': 65, 'ReferenceFrameBottom': 65, 'LowPassFilterType': '', 'HighPassFilterOrder': -1, 
                      'ReferenceFrameLeft': 1, 'FrameBottom': 65, 'Unit': 'V'
         }
-        frame_info =  self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1].info
+        frame_info = self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1].info
         self.assertEqual(len(frame_info.info), 24, 'Number of of components of an channel info object is different!')
         info_key_diff = set(frame_info.info.keys()) - set(info_expected.keys())
         if not info_key_diff:
@@ -149,7 +153,7 @@ class Test_RawDataContainer(Test_RawData):
         self.assertRaises(exceptions.IndexError, frame_info.adc_step_for_sensor, 65,65)          
 
     def test_frame_data(self):
-        frame_entity =  self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1]
+        frame_entity = self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1]
         frame_data = frame_entity.data
         frame = frame_data[:,:,1]
         self.assertEqual(frame.shape, (65,65), "Second slice was '%s' and not '(65,65)' as expected!" % str(frame.shape))
@@ -161,7 +165,7 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEquals(len(sig), 1001, "Length of sensor signal was '%s' and not as expected '1001'" % len(sig))
 
     def test_frame_data_timestamps(self):
-        frame_entity =  self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1]
+        frame_entity = self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1]
         timestamps = frame_entity.get_frame_timestamps(0,2000)
         ts = timestamps[0]
         self.assertEqual(len(ts), 2001, "Number oftime stamps were '%s' and not as expected '2001'" % len(ts))
@@ -284,6 +288,19 @@ class Test_RawDataContainer(Test_RawData):
         self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_sample_timestamps, segment_id = 0, flat = False, idx_start = 40, idx_end = 49)
         self.assertRaises(exceptions.IndexError, first_segment_entity.get_segment_sample_timestamps, segment_id = 0, flat = False, idx_start = -1, idx_end = 10)
 
+    # Test average segment streams:
+    def test_average_segment_stream_counts(self):
+        self.assertEqual(len(self.average_segments.recordings[0].segment_streams), 1, 'There should be one segment streams inside the recording!')
+        self.assertEqual(self.average_segments.recordings[0].segment_streams[0].data_subtype, 'Average', "The data subtype of the first segment stream should be 'Average'!")
+        self.assertEqual(len(self.average_segments.recordings[0].segment_streams[0].segment_entity), 11, 'There should be 11 average segment entities inside the stream!')
+
+    def test_average_segment_data(self):
+        first_average_segment_entity = self.average_segments.recordings[0].segment_streams[0].segment_entity[18]
+        self.assertEqual(first_average_segment_entity.number_of_averages, 8, "Number of averages was expected to be '8' but was %s!" % first_average_segment_entity.number_of_averages)
+        signal = first_average_segment_entity
+        a = signal.get_scaled_average_segment(0)
+        len(a.std_dev)
+
     # Test timestamp streams:
     def test_count_timestamp_streams(self):
         self.assertEqual(len(self.data.recordings[0].timestamp_streams), 1, 'There should be only one timestamp stream inside the recording!')
@@ -291,26 +308,26 @@ class Test_RawDataContainer(Test_RawData):
                          'There should be 8 event entities inside the stream (found %s)!' % len(self.data.recordings[0].timestamp_streams[0].timestamp_entity))
 
     def test_timestamp_stream_attributes(self):
-         first_timestamp_stream = self.data.recordings[0].timestamp_streams[0]
-         self.assertEqual(first_timestamp_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % first_timestamp_stream.info_version)
-         self.assertEqual(first_timestamp_stream.data_subtype, 'NeuralSpike', 'Timestamp stream data sub type is different from expected \'NeuralSpike\'!')
-         self.assertEqual(first_timestamp_stream.label, 'Spike Detector (1) Spike Timestamps', 'Timestamp stream label is different!')
-         self.assertEqual(str(first_timestamp_stream.source_stream_guid), 'a9d1ab04-2cf8-489c-a861-595e662fba4e', 'Timestamp stream source GUID is different!')
-         self.assertEqual(str(first_timestamp_stream.stream_guid), 'b71fc432-be6a-4135-9d15-3c7c1a4b4ed6', 'TimeStamp stream GUID is different!')
-         self.assertEqual(first_timestamp_stream.stream_type, 'TimeStamp', 'Timestamp stream type is different!')
+        first_timestamp_stream = self.data.recordings[0].timestamp_streams[0]
+        self.assertEqual(first_timestamp_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % first_timestamp_stream.info_version)
+        self.assertEqual(first_timestamp_stream.data_subtype, 'NeuralSpike', 'Timestamp stream data sub type is different from expected \'NeuralSpike\'!')
+        self.assertEqual(first_timestamp_stream.label, 'Spike Detector (1) Spike Timestamps', 'Timestamp stream label is different!')
+        self.assertEqual(str(first_timestamp_stream.source_stream_guid), 'a9d1ab04-2cf8-489c-a861-595e662fba4e', 'Timestamp stream source GUID is different!')
+        self.assertEqual(str(first_timestamp_stream.stream_guid), 'b71fc432-be6a-4135-9d15-3c7c1a4b4ed6', 'TimeStamp stream GUID is different!')
+        self.assertEqual(first_timestamp_stream.stream_type, 'TimeStamp', 'Timestamp stream type is different!')
 
     def test_timestamp_infos(self):
-         first_timestamp_entity = self.data.recordings[0].timestamp_streams[0].timestamp_entity[0]
-         self.assertEqual(first_timestamp_entity.info.version, 1, "TimeStampEntityInfo-Version was '%s' and not '1' as expected!" % first_timestamp_entity.info.version)
-         self.assertEqual(first_timestamp_entity.info.id, 0, "ID is not as expected!")
-         self.assertEqual(first_timestamp_entity.info.group_id, 0, "Group ID is not as expected!")
-         self.assertEqual(first_timestamp_entity.info.data_type, 'Long', "DataType is not as expected!")
-         self.assertEqual(first_timestamp_entity.info.unit, 's', "Unit is not as expected (was %s instead of \'s\')!" % first_timestamp_entity.info.unit)
-         self.assertEqual(first_timestamp_entity.info.exponent, -6, "Exponent is not as expected (was %s instead of \'-6\')!" % first_timestamp_entity.info.exponent)
-         self.assertEqual(first_timestamp_entity.info.measuring_unit, 1 * ureg.us , 
+        first_timestamp_entity = self.data.recordings[0].timestamp_streams[0].timestamp_entity[0]
+        self.assertEqual(first_timestamp_entity.info.version, 1, "TimeStampEntityInfo-Version was '%s' and not '1' as expected!" % first_timestamp_entity.info.version)
+        self.assertEqual(first_timestamp_entity.info.id, 0, "ID is not as expected!")
+        self.assertEqual(first_timestamp_entity.info.group_id, 0, "Group ID is not as expected!")
+        self.assertEqual(first_timestamp_entity.info.data_type, 'Long', "DataType is not as expected!")
+        self.assertEqual(first_timestamp_entity.info.unit, 's', "Unit is not as expected (was %s instead of \'s\')!" % first_timestamp_entity.info.unit)
+        self.assertEqual(first_timestamp_entity.info.exponent, -6, "Exponent is not as expected (was %s instead of \'-6\')!" % first_timestamp_entity.info.exponent)
+        self.assertEqual(first_timestamp_entity.info.measuring_unit, 1 * ureg.us , 
                           "Exponent is not as expected (was %s instead of \'us\')!" % first_timestamp_entity.info.measuring_unit)
-         self.assertEquals(first_timestamp_entity.info.source_channel_ids, [0],"Source channel IDs are different!") 
-         self.assertEquals(first_timestamp_entity.info.source_channel_labels.values(), 
+        self.assertEquals(first_timestamp_entity.info.source_channel_ids, [0],"Source channel IDs are different!") 
+        self.assertEquals(first_timestamp_entity.info.source_channel_labels.values(), 
                            ["E1"],"Source channels label is different (was '%s' instead of '['E1']')!" % 
                            first_timestamp_entity.info.source_channel_labels.values())
 
