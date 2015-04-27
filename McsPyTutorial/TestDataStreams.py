@@ -142,6 +142,7 @@ def print_file_info(h5filename):
 #    print(raw_data.date)   
 
 def parse_arguments():
+    global parser
     parser = argparse.ArgumentParser(description="Get file and stream info from hdf5 files")
     parser.add_argument("-d", "--directory", help="directory where to look for hdf5 files")
     parser.add_argument("-f", "--file", help="filename")
@@ -162,16 +163,21 @@ def get_table_stream_info(recording):
     return info
 
 def get_table_row(f):
-    raw_data = McsPy.McsData.RawData(f)
-    row = []
-    row.append(os.path.basename(f))
-    row.append("{0}".format(raw_data.date))
-    recording = raw_data.recordings[0]
-    l = get_table_stream_info(recording)
-    for i in l:
-        row.append(i)
-    return row
-
+    try:
+        raw_data = McsPy.McsData.RawData(f)
+        row = []
+        row.append(os.path.basename(f))
+        d = datettime.str
+        # row.append("{0}".format(raw_data.date))
+        recording = raw_data.recordings[0]
+        l = get_table_stream_info(recording)
+        for i in l:
+            row.append(i)
+        return row
+    except IOError, e:
+        print("IOError")
+        print("Could not open " + f + "\n" + e.message)
+        exit(1)
 
 def print_dir_file_info(h5files):
     McsPy.McsData.verbose = False
@@ -187,12 +193,19 @@ def print_dir_file_info(h5files):
     print(tabulate(table, headers=table_header))
 
 
+def usage():
+    parser.print_help()
+
+
 def data_stream_info():
     args = parse_arguments()
     if args.directory != None:
         file_dir = get_directory(args)
     else:
         file_dir = ""
+        if args.file == None:
+            usage()
+            exit()
 
     if args.file != None:
         filepath = os.path.join(file_dir, args.file)
