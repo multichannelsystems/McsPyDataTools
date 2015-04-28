@@ -14,9 +14,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   tutorial
-   guide
+   .. tutorial
+   .. guide
    api
+   mcs_hdf5_protocol
 
 Indices and tables
 ==================

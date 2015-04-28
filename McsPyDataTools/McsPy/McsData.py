@@ -207,35 +207,35 @@ class Recording(object):
 
     @property
     def analog_streams(self):
-        "Access analog streams"
+        "Access all analog streams - collection of :class:`~McsPy.McsData.AnalogStream` objects"
         if self.__analog_streams is None:
             self.__read_analog_streams()
         return self.__analog_streams
 
     @property
     def frame_streams(self):
-        "Access frame streams"
+        "Access all frame streams - collection of :class:`~McsPy.McsData.FrameStream` objects"
         if self.__frame_streams is None:
             self.__read_frame_streams()
         return self.__frame_streams
 
     @property
     def event_streams(self):
-        "Access event streams"
+        "Access event streams - collection of :class:`~McsPy.McsData.EventStream` objects"
         if self.__event_streams is None:
             self.__read_event_streams()
         return self.__event_streams
 
     @property
     def segment_streams(self):
-        "Access segment streams"
+        "Access segment streams - - collection of :class:`~McsPy.McsData.SegementStream` objects"
         if self.__segment_streams is None:
             self.__read_segment_streams()
         return self.__segment_streams
 
     @property
     def timestamp_streams(self):
-        "Access timestamp streams"
+        "Access timestamp streams - collection of :class:`~McsPy.McsData.TimestampStream` objects"
         if self.__timestamp_streams is None:
             self.__read_timestamp_streams()
         return self.__timestamp_streams

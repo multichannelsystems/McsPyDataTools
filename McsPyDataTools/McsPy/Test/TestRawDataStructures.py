@@ -297,9 +297,6 @@ class Test_RawDataContainer(Test_RawData):
     def test_average_segment_data(self):
         first_average_segment_entity = self.average_segments.recordings[0].segment_streams[0].segment_entity[18]
         self.assertEqual(first_average_segment_entity.number_of_averages, 8, "Number of averages was expected to be '8' but was %s!" % first_average_segment_entity.number_of_averages)
-        signal = first_average_segment_entity
-        a = signal.get_scaled_average_segment(0)
-        len(a.std_dev)
 
     # Test timestamp streams:
     def test_count_timestamp_streams(self):
