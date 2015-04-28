@@ -277,7 +277,8 @@ class Stream(object):
 
 class AnalogStream(Stream):
     """
-    Container class for one analog stream of several channels
+    Container class for one analog stream of several channels.
+    Description for each channel is provided by a channel-associated object of :class:`~McsPy.McsData.ChannelInfo`
     """
     def __init__(self, stream_grp):
         """
@@ -491,7 +492,8 @@ class FrameStream(Stream):
 
 class FrameEntity(object):
     """
-    Frame entity
+    Contains the stream of a specific frame entity.
+    Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.FrameEntityInfo`
     """
     def __init__(self, frame_entity_group, frame_info):
         """
@@ -672,7 +674,8 @@ class EventStream(Stream):
 
 class EventEntity(object):
     """
-    Event entity class
+    Contains the event data of a specific entity.
+    Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.EventEntityInfo`
     """
     def __init__(self, event_data, event_info):
         """
@@ -827,7 +830,8 @@ class SegmentStream(Stream):
 
 class SegmentEntity(object):
     """
-    Segment entity class
+    Segment entity class,
+    Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.SegmentEntityInfo`
     """
     def __init__(self, segment_data, segment_ts, segment_info):
         """
@@ -882,8 +886,7 @@ class SegmentEntity(object):
         :param flat: true -> one-dimensional vector of the sequentially ordered segments, false -> k x n matrix of the n segments of k sample points
         :param idx_start: index of the first segment that should be returned (0 <= idx_start < idx_end <= count segments)
         :param idx_end: index of the last segment that should be returned (0 <= idx_start < idx_end <= count segments)
-        :return: Tuple (of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample
-        points depending on the value of *flat* , and the unit of the values)
+        :return: Tuple (of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample points depending on the value of *flat* , and the unit of the values)
         """
         if segment_id in self.info.source_channel_of_segment.keys():
             idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
@@ -906,8 +909,7 @@ class SegmentEntity(object):
         :param flat: true -> one-dimensional vector of the sequentially ordered segment timestamps, false -> k x n matrix of the k timestamps of n segments
         :param idx_start: index of the first segment for that timestamps should be returned (0 <= idx_start < idx_end <= count segments)
         :param idx_end: index of the last segment for that timestamps should be returned (0 <= idx_start < idx_end <= count segments)
-        :return: Tuple (of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample
-        points depending on the value of *flat* , and the unit of the values)
+        :return: Tuple (of a flat vector of the sequentially ordered segments or a k x n matrix of the n segments of k sample points depending on the value of *flat* , and the unit of the values)
         """
         if segment_id in self.info.source_channel_of_segment.keys():
             idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
@@ -927,16 +929,19 @@ class SegmentEntity(object):
 
 AverageSegmentTuple = collections.namedtuple('AverageSegmentTuple', ['mean', 'std_dev', 'time_tick_unit', 'signal_unit'])
 """
-Named tuple that describe one or more average segments
-:mean: mean signal values
-:std_dev: standard deviation of the signal value (it is 0 if there was only one sample segment)
-:samplint_interval: sampling interval with time unit
-:signal_unit: measured unit of the signal
+Named tuple that describe one or more average segments (mean, std_dev, time_tick_unit, signal_unit).
+
+.. note::
+    * :class:`~AverageSegmentTuple.mean` - mean signal values 
+    * :class:`~AverageSegmentTuple.std_dev` - standard deviation of the signal value (it is 0 if there was only one sample segment)
+    * :class:`~AverageSegmentTuple.time_tick_unit` - sampling interval with time unit
+    * :class:`~AverageSegmentTuple.signal_unit` - measured unit of the signal
 """
 
 class AverageSegmentEntity(object):
     """
     Contains a number of signal segments that are calcualted as averages of number of segments occured in a given time range.
+    Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.SegmentEntityInfo`
     """
     def __init__(self, segment_average_data, segment_average_annotation, segment_info):
         """
@@ -1027,7 +1032,7 @@ class AverageSegmentEntity(object):
         """
         Get all contained average segments in its measured physical range.
 
-        :return: AverageSegmentTuple containing the k x n matrices for mean and standard deviation of all contained average segments n with the associated sampling and measuring information
+        :return: :class:`~McsPy.McsData.AverageSegmentTuple` containing the k x n matrices for mean and standard deviation of all contained average segments n with the associated sampling and measuring information
         """
         mean = self.data[0, ...]
         std_dev = self.data[1, ...]
@@ -1038,7 +1043,7 @@ class AverageSegmentEntity(object):
         Get the selected average segment in its measured physical range.
 
         :param segment_idx: index resp. number of the average segment
-        :return: AverageSegmentTuple containing the mean and standard deviation vector of the average segment with the associated sampling and measuring information
+        :return: :class:`~McsPy.McsData.AverageSegmentTuple` containing the mean and standard deviation vector of the average segment with the associated sampling and measuring information
         """
         mean = self.data[0, ..., average_segment_idx]
         std_dev = self.data[1, ..., average_segment_idx]
@@ -1062,7 +1067,7 @@ class AverageSegmentEntity(object):
         """
         Get all contained average segments AD-offset in ADC values with its measuring conditions
 
-        :return: AverageSegmentTuple containing the mean and standard deviation vector of the average segment in ADC steps with sampling tick and ADC-Step definition
+        :return: :class:`~McsPy.McsData.AverageSegmentTuple` containing the mean and standard deviation vector of the average segment in ADC steps with sampling tick and ADC-Step definition
         """
         mean = self.data[0, ...]
         std_dev = self.data[1, ...]
@@ -1073,7 +1078,7 @@ class AverageSegmentEntity(object):
         Get the AD-offset corrected average segment in ADC values with its measuring conditions
 
         :param segment_id: id resp. number of the segment
-        :return: AverageSegmentTuple containing the k x n matrices for mean and standard deviation of all contained average segments in ADC steps with sampling tick and ADC-Step definition
+        :return: :class:`~McsPy.McsData.AverageSegmentTuple` containing the k x n matrices for mean and standard deviation of all contained average segments in ADC steps with sampling tick and ADC-Step definition
         """
         mean = self.data[0, ..., average_segment_idx]
         std_dev = self.data[1, ..., average_segment_idx]
@@ -1158,7 +1163,8 @@ class TimeStampStream(Stream):
 
 class TimeStampEntity(object):
     """
-    Time-Stamp entity class
+    Time-Stamp entity class,
+    Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.TimestampEntityInfo`
     """
     def __init__(self, timestamp_data, timestamp_info):
         """
