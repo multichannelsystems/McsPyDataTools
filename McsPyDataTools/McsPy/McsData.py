@@ -146,58 +146,64 @@ class Recording(object):
 
     def __read_analog_streams(self):
         "Read all contained analog streams"
-        analog_stream_folder = self.__recording_grp['AnalogStream']
-        if len(analog_stream_folder) > 0:
-            self.__analog_streams = {}
-        for (name, value) in analog_stream_folder.iteritems():
-            dprint_name_value(name, value)
-            stream_name = name.split('_')
-            if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
-                self.__analog_streams[int(stream_name[1])] = AnalogStream(value)
+        if 'AnalogStream' in self.__recording_grp:
+            analog_stream_folder = self.__recording_grp['AnalogStream']
+            if len(analog_stream_folder) > 0:
+                self.__analog_streams = {}
+            for (name, value) in analog_stream_folder.iteritems():
+                dprint_name_value(name, value)
+                stream_name = name.split('_')
+                if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
+                    self.__analog_streams[int(stream_name[1])] = AnalogStream(value)
 
     def __read_frame_streams(self):
         "Read all contained frame streams"
-        frame_stream_folder = self.__recording_grp['FrameStream']
-        if len(frame_stream_folder) > 0:
-            self.__frame_streams = {}
-        for (name, value) in frame_stream_folder.iteritems():
-            dprint_name_value(name, value)
-            stream_name = name.split('_')
-            if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
-                self.__frame_streams[int(stream_name[1])] = FrameStream(value)
+        if 'FrameStream' in self.__recording_grp:
+            frame_stream_folder = self.__recording_grp['FrameStream']
+            if len(frame_stream_folder) > 0:
+                self.__frame_streams = {}
+            for (name, value) in frame_stream_folder.iteritems():
+                dprint_name_value(name, value)
+                stream_name = name.split('_')
+                if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
+                    self.__frame_streams[int(stream_name[1])] = FrameStream(value)
 
     def __read_event_streams(self):
         "Read all contained event streams"
-        event_stream_folder = self.__recording_grp['EventStream']
-        if len(event_stream_folder) > 0:
-            self.__event_streams = {}
-        for (name, value) in event_stream_folder.iteritems():
-            dprint_name_value(name, value)
-            stream_name = name.split('_')
-            if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
-                self.__event_streams[int(stream_name[1])] = EventStream(value)
+        if 'EventStream' in self.__recording_grp:
+            event_stream_folder = self.__recording_grp['EventStream']
+            if len(event_stream_folder) > 0:
+                self.__event_streams = {}
+            for (name, value) in event_stream_folder.iteritems():
+                dprint_name_value(name, value)
+                stream_name = name.split('_')
+                if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
+                    index = int(stream_name[1])
+                    self.__event_streams[index] = EventStream(value)
 
     def __read_segment_streams(self):
         "Read all contained segment streams"
-        segment_stream_folder = self.__recording_grp['SegmentStream']
-        if len(segment_stream_folder) > 0:
-            self.__segment_streams = {}
-        for (name, value) in segment_stream_folder.iteritems():
-            dprint_name_value(name, value)
-            stream_name = name.split('_')
-            if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
-                self.__segment_streams[int(stream_name[1])] = SegmentStream(value)
+        if 'SegmentStream' in self.__recording_grp:
+            segment_stream_folder = self.__recording_grp['SegmentStream']
+            if len(segment_stream_folder) > 0:
+                self.__segment_streams = {}
+            for (name, value) in segment_stream_folder.iteritems():
+                dprint_name_value(name, value)
+                stream_name = name.split('_')
+                if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
+                    self.__segment_streams[int(stream_name[1])] = SegmentStream(value)
 
     def __read_timestamp_streams(self):
         "Read all contained timestamp streams"
-        timestamp_stream_folder = self.__recording_grp['TimeStampStream']
-        if len(timestamp_stream_folder) > 0:
-            self.__timestamp_streams = {}
-        for (name, value) in timestamp_stream_folder.iteritems():
-            dprint_name_value(name, value)
-            stream_name = name.split('_')
-            if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
-                self.__timestamp_streams[int(stream_name[1])] = TimeStampStream(value)
+        if 'TimeStampStream' in self.__recording_grp:
+            timestamp_stream_folder = self.__recording_grp['TimeStampStream']
+            if len(timestamp_stream_folder) > 0:
+                self.__timestamp_streams = {}
+            for (name, value) in timestamp_stream_folder.iteritems():
+                dprint_name_value(name, value)
+                stream_name = name.split('_')
+                if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
+                    self.__timestamp_streams[int(stream_name[1])] = TimeStampStream(value)
 
     @property
     def analog_streams(self):
@@ -661,7 +667,8 @@ class EventStream(Stream):
         for event_entity_info in event_infos:
             event_entity_name = "EventEntity_" + str(event_entity_info['EventID'])
             event_info = EventEntityInfo(event_entity_info_version, event_entity_info)
-            self.event_entity[event_entity_info['EventID']] = EventEntity(self.stream_grp[event_entity_name], event_info)
+            if event_entity_name in self.stream_grp:
+                self.event_entity[event_entity_info['EventID']] = EventEntity(self.stream_grp[event_entity_name], event_info)
 
 class EventEntity(object):
     """
@@ -741,8 +748,12 @@ class EventEntityInfo(Info):
         Info.__init__(self, info)
         McsHdf5Protocols.check_protocol_type_version("EventEntityInfo", info_version)
         self.__version = info_version
-        source_channel_ids = [int(x) for x in info['SourceChannelIDs'].split(',')]
-        source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].split(',')]
+        if info["SourceChannelIDs"] == "":
+            source_channel_ids = [-1]
+            source_channel_labels = ["N/A"]
+        else:
+            source_channel_ids = [int(x) for x in info['SourceChannelIDs'].split(',')]
+            source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].split(',')]
         self.__source_channels = {}
         for idx, channel_id in enumerate(source_channel_ids):
             self.__source_channels[channel_id] = source_channel_labels[idx]
@@ -1142,7 +1153,8 @@ class TimeStampStream(Stream):
         for timestamp_entity_info in timestamp_infos:
             timestamp_entity_name = "TimeStampEntity_" + str(timestamp_entity_info['TimeStampEntityID'])
             timestamp_info = TimeStampEntityInfo(timestamp_info_version, timestamp_entity_info)
-            self.timestamp_entity[timestamp_entity_info['TimeStampEntityID']] = TimeStampEntity(self.stream_grp[timestamp_entity_name], timestamp_info)
+            if timestamp_entity_name in self.stream_grp:
+                self.timestamp_entity[timestamp_entity_info['TimeStampEntityID']] = TimeStampEntity(self.stream_grp[timestamp_entity_name], timestamp_info)
 
 class TimeStampEntity(object):
     """
