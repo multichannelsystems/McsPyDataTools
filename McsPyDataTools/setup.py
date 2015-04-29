@@ -3,9 +3,30 @@ try:
 except ImportError:
     from distutils.core import setup
 
+import os
+import shutil
+#import McsPy
+
+def copy_html_docs():
+    """Copy previously rendered HTML docs to folder docs-html"""
+    if os.path.exists('docs/_build'):
+        if os.path.exists('docs-html'):
+            shutil.rmtree('docs-html')
+        try:
+            shutil.copytree('docs/_build/html', 'docs-html', ignore=ignore_patterns('_sources'))
+        except shutil.Error as e:
+            print('Build-Html folder not copied. Error %s occured' % e)
+        except shutil.Error as e:
+            print('Build-Html folder not copied. Error %s occured' % e)
+    else:
+        print('No current rendered HTML-Documentation available!')
+
+copy_html_docs()
+
 setup(
     name='McsPyDataTools',
-    version='0.1.1',
+    #version=McsPy.__version__,
+    version='0.2.0',
     description='Handling data recorded and provided by MCS systems', 
     long_description=open('README').read(),
     keywords = 'HDF5 data electrophysiology MCS',

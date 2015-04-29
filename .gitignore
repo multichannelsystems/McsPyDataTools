@@ -92,6 +92,7 @@ coverage.xml
 # Sphinx documentation
 #docs/_build/
 _build/
+docs-html
 
 # =========================
 # Ignore HDF5 data files

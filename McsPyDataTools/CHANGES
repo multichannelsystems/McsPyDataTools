@@ -1,6 +1,13 @@
 McsPyDataTools
 ==============
 
+Version 0.2 (2015-04-29)
+------------------------
+
+- support for average segments added
+- improved documentation (Sphinx-based)
+
+
 Version 0.1 (2014-03-27)
 ------------------------
 
