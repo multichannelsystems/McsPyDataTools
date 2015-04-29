@@ -13,7 +13,7 @@ def copy_html_docs():
         if os.path.exists('docs-html'):
             shutil.rmtree('docs-html')
         try:
-            shutil.copytree('docs/_build/html', 'docs-html', ignore=ignore_patterns('_sources'))
+            shutil.copytree('docs/_build/html', 'docs-html', ignore=shutil.ignore_patterns('_sources'))
         except shutil.Error as e:
             print('Build-Html folder not copied. Error %s occured' % e)
         except shutil.Error as e:
