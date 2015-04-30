@@ -30,6 +30,7 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="docs\conf.py" />
     <Compile Include="McsPy\McsCMOS.py" />
     <Compile Include="McsPy\Test\TestCMOS.py" />
     <Compile Include="McsPy\Test\TestRawDataStructures.py" />
@@ -41,6 +42,7 @@
     <Compile Include="setup.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="docs\images\" />
     <Folder Include="McsPy\" />
     <Folder Include="bin\" />
     <Folder Include="McsPy\Test\" />
@@ -50,6 +52,14 @@
   <ItemGroup>
     <Content Include="AUTHORS" />
     <Content Include="CHANGES" />
+    <Content Include="docs\api.rst" />
+    <Content Include="docs\guide.rst" />
+    <Content Include="docs\images\Hierarchy_short.png" />
+    <Content Include="docs\index.rst" />
+    <Content Include="docs\make.bat" />
+    <Content Include="docs\Makefile" />
+    <Content Include="docs\mcs_hdf5_protocol.rst" />
+    <Content Include="docs\tutorial.rst" />
     <Content Include="LICENSE" />
     <Content Include="MANIFEST.in" />
     <Content Include="README" />
