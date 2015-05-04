@@ -62,6 +62,7 @@
     <Content Include="docs\tutorial.rst" />
     <Content Include="LICENSE" />
     <Content Include="MANIFEST.in" />
+    <Content Include="McsPy\Test\TestData\README.md" />
     <Content Include="README" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
