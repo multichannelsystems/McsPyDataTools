@@ -34,8 +34,12 @@ setup(
     author_email='dietzsch@multichannelsystems.com',
     zip_safe=True,
     packages=['McsPy', 'McsPy.Test'],
+    # Provide test data as an accompynied separate archive! -> but create the folder and show README.md
+    #package_data ={
+    #    'McsPy.Test': ['TestData/*.h5']
+    #},
     package_data ={
-        'McsPy.Test': ['TestData/*.h5']
+        'McsPy.Test': ['TestData/README.md']
     },
     scripts=['bin/McsPyDataTools.py','bin/PlotExperimentData.py'],
     url='http://multichannelsystems.com',

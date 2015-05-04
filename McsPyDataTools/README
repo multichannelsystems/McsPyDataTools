@@ -18,5 +18,12 @@ of every stream
 * Provides methods to get the measured values and timestamps in the correct context
 of the recording (scale, physical unit, ... etc.) 
 
+Test file archive
+=================
+
+The McsPyDataTools package is accompanied by a separate archive that contains the 
+the raw data files used by the unit tests. The content of this test file archive must 
+be copied to the folder **...\McsPy\Test\TestData\** to be used by the unit tests.
+
 :copyright: Copyright 2014 by Multi Channel Systems MCS GmbH, see AUTHORS.
 :license: ..., see LICENSE for details.
