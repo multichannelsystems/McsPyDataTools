@@ -5,7 +5,7 @@
     McsPy is a Python module/package to read, handle and operate on HDF5-based raw data
     files converted from recordings of devices of the Multi Channel Systems MCS GmbH.
 
-    :copyright: (c) 2015 by Multi Channel Systems MCS GmbH
+    :copyright: (c) 2016 by Multi Channel Systems MCS GmbH
     :license: see LICENSE for more details
 """
 

@@ -4,7 +4,7 @@
 
     Wrapper and Helper to access MCS CMOS Data within H5 Files 
     
-    :copyright: (c) 2015 by Multi Channel Systems MCS GmbH
+    :copyright: (c) 2016 by Multi Channel Systems MCS GmbH
     :license: see LICENSE for more details
 """
 
@@ -106,7 +106,7 @@ class CMOSSpikes(h5py.File):
     Waveform Information (if available) through the .waveforms Member.
     """
     def __init__(self, path):
-        super(CMOSSpikeFile, self).__init__(path)
+        super(CMOSSpikes, self).__init__(path)
 
         # -- Check for right structure --
         if("data" in self.keys() and "spikes" in self['data'].keys()):

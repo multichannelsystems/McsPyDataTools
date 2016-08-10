@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'McsPyDataTools'
-copyright = u'2015, Multi Channel Systems MCS GmbH'
+copyright = u'2016, Multi Channel Systems MCS GmbH'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

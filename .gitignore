@@ -12,6 +12,7 @@ _UpgradeReport_Files/
 Backup*/
 UpgradeLog*.XML
 UpgradeLog*.htm
+.vs
 
 # =========================
 # Windows detritus
@@ -98,3 +99,8 @@ docs-html
 # Ignore HDF5 data files
 # =========================
 #*.h5
+
+#==========================
+# Jupyter Notebooks
+#==========================
+.ipynb_checkpoints

@@ -45,9 +45,9 @@ setup(
     url='http://multichannelsystems.com',
     license='LICENSE.txt',
     install_requires=[
-        "Pint >= 0.4.1",
-        "numpy >= 1.8.0",
-        "h5py >= 2.2.0"
+        "Pint >= 0.7.2",
+        "numpy >= 1.11.1",
+        "h5py >= 2.6.0"
     ],
     classifiers=[
         'Development Status :: 1 - Beta',

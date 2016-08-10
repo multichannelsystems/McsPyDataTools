@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{53A9B4FF-1B96-4BFA-A609-24438172BC25}"
 	ProjectSection(SolutionItems) = preProject
@@ -11,6 +11,8 @@ EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "McsPyDataTools", "McsPyDataTools\McsPyDataTools.pyproj", "{E1540F78-8C38-418C-AE9A-2D6DB423086C}"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "HDF5PyExamples", "HDF5PyExamples\HDF5PyExamples.pyproj", "{D8EC2540-CE86-476C-9732-A172F917B5FA}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "McsPyDataNotebooks", "McsPyDataNotebooks\McsPyDataNotebooks.pyproj", "{89C52854-1972-44DD-BED5-12FAB8C6FD00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,8 @@ Global
 		{D8EC2540-CE86-476C-9732-A172F917B5FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8EC2540-CE86-476C-9732-A172F917B5FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8EC2540-CE86-476C-9732-A172F917B5FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89C52854-1972-44DD-BED5-12FAB8C6FD00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89C52854-1972-44DD-BED5-12FAB8C6FD00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
