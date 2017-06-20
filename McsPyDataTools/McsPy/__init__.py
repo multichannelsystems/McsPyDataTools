@@ -10,7 +10,7 @@
 """
 
 #print("McsPy init!")
-version = 0.02
+version = "0.2.1"
 
 # Supported MCS-HDF5 protocol types and versions:
 class McsHdf5Protocols:

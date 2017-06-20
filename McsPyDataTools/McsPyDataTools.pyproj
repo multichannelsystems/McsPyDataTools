@@ -6,7 +6,7 @@
     <ProjectGuid>e1540f78-8c38-418c-ae9a-2d6db423086c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>bin\McsPyDataTools.py</StartupFile>
-    <SearchPath>.</SearchPath>
+    <SearchPath>.;McsPy</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>McsPyDataTools</Name>
@@ -16,6 +16,7 @@
     <InterpreterPath />
     <InterpreterArguments />
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda27-64</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,10 +28,12 @@
   </PropertyGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="docs\conf.py" />
+    <Compile Include="McsPy\DataStreamInfo.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="McsPy\McsCMOS.py" />
     <Compile Include="McsPy\Test\TestCMOS.py" />
     <Compile Include="McsPy\Test\TestRawDataStructures.py" />
@@ -65,6 +68,8 @@
     <Content Include="McsPy\Test\TestData\README.md" />
     <Content Include="README" />
   </ItemGroup>
-  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
+  <ItemGroup>
+    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda27-64" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
