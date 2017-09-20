@@ -26,7 +26,7 @@ copy_html_docs()
 setup(
     name='McsPyDataTools',
     #version=McsPy.__version__,
-    version='0.2.1',
+    version='0.2.2',
     description='Handling data recorded and provided by MCS systems', 
     long_description=open('README').read(),
     keywords = 'HDF5 data electrophysiology MCS',

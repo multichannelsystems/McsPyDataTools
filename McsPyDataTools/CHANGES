@@ -1,6 +1,12 @@
 McsPyDataTools
 ==============
 
+Version 0.2.2 (2017-09-19)
+------------------------
+
+- Bugfix Supported Protocol-Version for SegmentEntityInfo
+
+
 Version 0.2.1 (2016-08-12)
 ------------------------
 
