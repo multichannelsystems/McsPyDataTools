@@ -106,8 +106,9 @@ def test_channel_raw_data():
     show_image_plot(raw_data.recordings[0].analog_streams[1].channel_data[:, 0:10000], 1000)
     draw_channel_overlay_in_range(raw_data.recordings[0].analog_streams[0],
                                   raw_data.recordings[0].analog_streams[1], 
-                                  raw_data.recordings[0].analog_streams[1].channel_infos.keys()[0])
-    draw_channel_with_spectrogram(raw_data.recordings[0].analog_streams[1], raw_data.recordings[0].analog_streams[1].channel_infos.keys()[0])
+                                  list(raw_data.recordings[0].analog_streams[1].channel_infos.keys())[0])
+    draw_channel_with_spectrogram(raw_data.recordings[0].analog_streams[1], 
+                                  list(raw_data.recordings[0].analog_streams[1].channel_infos.keys())[0])
 
 def plotImage(arr) :
     fig  = pl.figure(figsize=(8,8), dpi=80, facecolor='w',edgecolor='w',frameon=True)
@@ -175,7 +176,7 @@ def test_timestamp_raw_data():
     timestamps = first_timestamp_entity.get_timestamps()
     draw_channel_overlay_in_range_with_events(raw_data.recordings[0].analog_streams[0],
                                               raw_data.recordings[0].analog_streams[1], 
-                                              raw_data.recordings[0].analog_streams[1].channel_infos.keys()[0],
+                                              list(raw_data.recordings[0].analog_streams[1].channel_infos.keys())[0],
                                               timestamps[0])
 
 

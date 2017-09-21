@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-import McsPy
-import McsPy.McsData
+#import McsPy
+#import McsPy.McsData
 import argparse
 import datetime
 from tabulate import tabulate
@@ -70,10 +70,10 @@ def get_number_of_streams(rec, stream_type):
         if stream_type == "timestamp":
             if rec.timestamp_streams != None:
                 num_streams = len(rec.timestamp_streams)
-    except KeyError, e:
+    except KeyError as e:
         print(e.message)
         num_streams = 0
-    except ValueError, e:
+    except ValueError as e:
         print(e.message)
         num_streams = 0
     return num_streams
@@ -233,7 +233,7 @@ def get_table_row(f):
             for i in l:
                 row.append(i)
         return row
-    except IOError, e:
+    except IOError as e:
         print("IOError")
         print("Could not open " + f + "\n" + e.message)
         exit(1)
@@ -279,3 +279,4 @@ def data_stream_info():
 
 if __name__ == "__main__":
     data_stream_info()
+

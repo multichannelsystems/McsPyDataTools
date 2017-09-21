@@ -10,7 +10,7 @@
 """
 
 #print("McsPy init!")
-version = "0.2.2"
+version = "0.2.3"
 
 # Supported MCS-HDF5 protocol types and versions:
 class McsHdf5Protocols:
@@ -40,7 +40,7 @@ class McsHdf5Protocols:
         :param version: version number that should be checked
         :returns: is true if the given protocol and version is supported
         """
-        if McsHdf5Protocols.SUPPORTED_PROTOCOLS.has_key(protocol_type_name):
+        if protocol_type_name in McsHdf5Protocols.SUPPORTED_PROTOCOLS:
             supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[protocol_type_name]
             if (version < supported_versions[0]) or (supported_versions[1] < version):
                 raise IOError('Given HDF5 file contains \'%s\' type of version %s and supported are only all versions from %s up to %s' % 

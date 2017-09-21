@@ -16,7 +16,7 @@
     <InterpreterPath />
     <InterpreterArguments />
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <InterpreterId>Global|ContinuumAnalytics|Anaconda27-64</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="docs\conf.py" />
-    <Compile Include="McsPy\DataStreamInfo.py">
+    <Compile Include="bin\DataStreamInfo.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="McsPy\McsCMOS.py" />
@@ -69,7 +69,8 @@
     <Content Include="README" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda27-64" />
+    <InterpreterReference Include="Global|PythonCore|2.7" />
+    <InterpreterReference Include="Global|PythonCore|3.6" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
