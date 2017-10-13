@@ -14,6 +14,10 @@ test_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\2014-07
 
 average_segment_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\20150402_00 Atrium_002.h5')
 
+acc_gyro_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\2017-10-11T13-39-47McsRecording_X981_AccGyro.h5')
+
+opto_stim_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\2017-10-11T13-39-47McsRecording_N113_OptoStim.h5')
+
 #@unittest.skip("showing the principle structure of python unit tests")
 #class Test_TestRawDataStructures(unittest.TestCase):
 #    def test_A(self):
@@ -24,6 +28,8 @@ class Test_RawData(unittest.TestCase):
         self.data = McsData.RawData(test_data_file_path)
         self.raw_frame_data = McsData.RawData(test_raw_frame_data_file_path)
         self.average_segments = McsData.RawData(average_segment_data_file_path)
+        self.acc_gyro = McsData.RawData(acc_gyro_data_file_path)
+        self.opto_stim = McsData.RawData(opto_stim_data_file_path)
 
 class Test_RawDataContainer(Test_RawData):
     # Test MCS-HDF5 version
@@ -38,6 +44,12 @@ class Test_RawDataContainer(Test_RawData):
                          "The MCS-HDF5 protocol type was '%s' and not '%s' as expected!" % (self.data.mcs_hdf5_protocol_type, "RawData"))
         self.assertEqual(self.data.mcs_hdf5_protocol_type_version, 1, 
                          "The MCS-HDF5 protocol version was '%s' and not '1' as expected!" % self.data.mcs_hdf5_protocol_type_version)
+
+    def test_mcs_hdf5_acc_gyro(self):
+        self.assertEqual(self.acc_gyro.mcs_hdf5_protocol_type,  "RawData", 
+                         "The MCS-HDF5 protocol type was '%s' and not '%s' as expected!" % (self.data.mcs_hdf5_protocol_type, "RawData"))
+        self.assertEqual(self.acc_gyro.mcs_hdf5_protocol_type_version, 3, 
+                         "The MCS-HDF5 protocol version was '%s' and not '3' as expected!" % self.data.mcs_hdf5_protocol_type_version)
 
     # Test session:
     def test_session_attributes(self):
@@ -339,6 +351,172 @@ class Test_RawDataContainer(Test_RawData):
                        13462000, 13472000, 13528000, 15548000, 15558000, 17634000, 
                        17644000, 17686000]
         self.assertEquals(timestamps[0][0].tolist(), expected_ts, "Timestamps of the first TS-Entity were '%s' and not as expected '%s" % (timestamps[0], expected_ts))
+
+    # Test Accelerometer stream:
+    def test_count_analog_streams_acc_gyro(self):
+        self.assertEqual(len(self.acc_gyro.recordings[0].analog_streams), 6, 'There should be 6 analog streams inside the recording!')
+
+    def test_acc_attributes(self):
+        acc_stream = self.acc_gyro.recordings[0].analog_streams[5]
+        self.assertEqual(acc_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % acc_stream.info_version)
+        self.assertEqual(acc_stream.data_subtype, 'Auxiliary', 'Auxiliary stream data sub type is different!')
+        self.assertEqual(acc_stream.label, 'Data Acquisition (1) Accelerometer Data1', 'Accelerometer stream label is different!')
+        self.assertEqual(str(acc_stream.source_stream_guid), '00000000-0000-0000-0000-000000000000', 'Accelerometer stream source GUID is different!')
+        self.assertEqual(str(acc_stream.stream_guid), 'f4517f0b-1896-4f06-803a-0efb84c2d9ef', 'Accelerometer stream GUID is different!')
+        self.assertEqual(acc_stream.stream_type, 'Analog', 'Accelerometer stream type is different!')
+    
+    def test_acc_stream(self):
+        acc_set = self.acc_gyro.recordings[0].analog_streams[5].channel_data
+        self.assertEqual(acc_set.shape, (3, 16400), 'Shape of acceleration dataset is different!')
+        
+        acc_timestamp_index = self.acc_gyro.recordings[0].analog_streams[5].timestamp_index
+        self.assertEqual(acc_timestamp_index.shape, (1, 3), 'Shape of the acceleration timestamp index is different!')
+
+    def test_acc_channel_infos(self):
+        acc_channel_infos = self.acc_gyro.recordings[0].analog_streams[5].channel_infos
+        self.assertEqual(len(acc_channel_infos), 3, 'Number of acceleration channel info objects is different from 3!')
+        acc_channel = acc_channel_infos[160]
+        self.assertEqual(len(acc_channel.info), 17, 'Number of of components of an acceleration channel info object is different!')
+        self.assertEqual(acc_channel.version, 1, 'Acceleration InfoChannel-Type version 1 expected but was %s' % acc_channel.version)
+        #self.assertEqual(acc_channel.info['Unit'], "g", 'Unit of the acceleration channel info object is not g!')
+        self.assertEqual(acc_channel.channel_id, 160, "ID is not as expected!")
+        self.assertEqual(acc_channel.group_id, 1, "Group ID is not as expected!")
+        self.assertEqual(acc_channel.data_type, 'Int', "DataType is not as expected!")
+        self.assertEqual(acc_channel.info['Unit'], 'g', "Unit is not as expected (was %s instead of \'g\')!" % acc_channel.info['Unit'])
+        self.assertEqual(acc_channel.info['Exponent'], -12, "Exponent is not as expected (was %s instead of \'-12\')!" % acc_channel.info['Exponent'])
+        self.assertEqual(acc_channel.info['Label'], 'X981 Accelerometer Data 0', 'Label is not as expected!!!')
+        self.assertEqual(acc_channel.adc_step.units, ureg.standard_gravity, "ADC step unit was %s and is not \'standard_gravity\' as expected!" % acc_channel.adc_step.units)
+        self.assertEqual(acc_channel.adc_step.magnitude, 0.000244140625, "ADC magnitude is not as expected!!!")
+
+    # Test Gyroscope stream:
+    def test_gyro_attributes(self):
+        gyro_stream = self.acc_gyro.recordings[0].analog_streams[4]
+        self.assertEqual(gyro_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % gyro_stream.info_version)
+        self.assertEqual(gyro_stream.data_subtype, 'Auxiliary', 'Auxiliary stream data sub type is different!')
+        self.assertEqual(gyro_stream.label, 'Data Acquisition (1) Gyroscope Data1', 'Gyroscope stream label is different!')
+        self.assertEqual(str(gyro_stream.source_stream_guid), '00000000-0000-0000-0000-000000000000', 'Gyroscope stream source GUID is different!')
+        self.assertEqual(str(gyro_stream.stream_guid), 'fdcba7a1-2c8a-453d-ae7c-29e26fbfe065', 'Gyroscope stream GUID is different!')
+        self.assertEqual(gyro_stream.stream_type, 'Analog', 'Gyroscope stream type is different!')
+
+    def test_gyro_stream(self):
+        gyro_set = self.acc_gyro.recordings[0].analog_streams[4].channel_data
+        self.assertEqual(gyro_set.shape, (3, 16400), 'Shape of gyroscope dataset is different!')
+        
+        gyro_timestamp_index = self.acc_gyro.recordings[0].analog_streams[4].timestamp_index
+        self.assertEqual(gyro_timestamp_index.shape, (1, 3), 'Shape of the gyroscope timestamp index is different!')
+
+    def test_gyro_channel_infos(self):
+        gyro_channel_infos = self.acc_gyro.recordings[0].analog_streams[4].channel_infos
+        self.assertEqual(len(gyro_channel_infos), 3, 'Number of gyroscope channel info objects is different from 3!')
+        gyro_channel = gyro_channel_infos[150]
+        self.assertEqual(len(gyro_channel.info), 17, 'Number of of components of a gyroscope channel info object is different!')
+        self.assertEqual(gyro_channel.version, 1, 'Gyroscope InfoChannel-Type version 1 expected but was %s' % gyro_channel.version)
+        self.assertEqual(gyro_channel.channel_id, 150, "ID is not as expected!")
+        self.assertEqual(gyro_channel.group_id, 1, "Group ID is not as expected!")
+        self.assertEqual(gyro_channel.data_type, 'Int', "DataType is not as expected!")
+        self.assertEqual(gyro_channel.info['Unit'], 'DegreePerSecond', "Unit is not as expected (was %s instead of \'DegreePerSecond\')!" % gyro_channel.info['Unit'])
+        self.assertEqual(gyro_channel.info['Exponent'], -11, "Exponent is not as expected (was %s instead of \'-11\')!" % gyro_channel.info['Exponent'])
+        self.assertEqual(gyro_channel.info['Label'], 'X981 Gyroscope Data 2', 'Label is not as expected!!!')
+        self.assertEqual(gyro_channel.adc_step.units, ureg.degree / ureg.second, "ADC step unit was %s and is not \'degree / second\' as expected!" % gyro_channel.adc_step.units)
+        self.assertEqual(gyro_channel.adc_step.magnitude, 0.06103515624999999, "ADC magnitude is not as expected!!!")
+
+    # Test Quality Sideband stream
+    def test_quality_attributes(self):
+        quality_stream = self.acc_gyro.recordings[0].analog_streams[0]
+        self.assertEqual(quality_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % quality_stream.info_version)
+        self.assertEqual(quality_stream.data_subtype, 'Digital', 'Quality stream data sub type is different!')
+        self.assertEqual(quality_stream.label, 'Data Acquisition (1) Quality Sideband Data1', 'Quality stream label is different!')
+        self.assertEqual(str(quality_stream.source_stream_guid), '00000000-0000-0000-0000-000000000000', 'Quality stream source GUID is different!')
+        self.assertEqual(str(quality_stream.stream_guid), '390939ec-871a-4f0f-98b9-5f2b4d7c39f5', 'Quality stream GUID is different!')
+        self.assertEqual(quality_stream.stream_type, 'Analog', 'Quality stream type is different!')
+
+    def test_qualtity_stream(self):
+        quality_set = self.acc_gyro.recordings[0].analog_streams[0].channel_data
+        self.assertEqual(quality_set.shape, (1, 16400), 'Shape of quality dataset is different!')
+        
+        quality_timestamp_index = self.acc_gyro.recordings[0].analog_streams[0].timestamp_index
+        self.assertEqual(quality_timestamp_index.shape, (1, 3), 'Shape of the quality timestamp index is different!')
+
+    def test_quality_channel_infos(self):
+        quality_channel_info = self.acc_gyro.recordings[0].analog_streams[0].channel_infos
+        self.assertEqual(len(quality_channel_info), 1, 'Number of quality channel info objects is different from 1!')
+        quality_channel = quality_channel_info[142]
+        self.assertEqual(len(quality_channel.info), 17, 'Number of of components of a quality channel info object is different!')
+        self.assertEqual(quality_channel.version, 1, 'Quality InfoChannel-Type version 1 expected but was %s' % quality_channel.version)
+        self.assertEqual(quality_channel.channel_id, 142, "ID is not as expected!")
+        self.assertEqual(quality_channel.group_id, 1, "Group ID is not as expected!")
+        self.assertEqual(quality_channel.data_type, 'Int', "DataType is not as expected!")
+        self.assertEqual(quality_channel.info['Unit'], 'NoUnit', "Unit is not as expected (was %s instead of \'NoUnit\')!" % quality_channel.info['Unit'])
+        self.assertEqual(quality_channel.info['Exponent'], 0, "Exponent is not as expected (was %s instead of \'0\')!" % quality_channel.info['Exponent'])
+        self.assertEqual(quality_channel.info['Label'], 'X981 Quality Data 0', 'Label is not as expected!!!')
+        self.assertEqual(quality_channel.adc_step.units, ureg.NoUnit, "ADC step unit was %s and is not \'NoUnit\' as expected!" % quality_channel.adc_step.units)
+        self.assertEqual(quality_channel.adc_step.magnitude, 1.0, "ADC step magnitude is not as expected!!!")
+
+    # Test Digital stream
+    def test_digital_attributes(self):
+        digital_stream = self.acc_gyro.recordings[0].analog_streams[3]
+        self.assertEqual(digital_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % digital_stream.info_version)
+        self.assertEqual(digital_stream.data_subtype, 'Digital', 'Digital stream data sub type is different!')
+        self.assertEqual(digital_stream.label, 'Data Acquisition (1) Digital Data1', 'Digital stream label is different!')
+        self.assertEqual(str(digital_stream.source_stream_guid), '00000000-0000-0000-0000-000000000000', 'Digital stream source GUID is different!')
+        self.assertEqual(str(digital_stream.stream_guid), '4380617d-832b-4e3f-a9e6-f8c424426349', 'Digital stream GUID is different!')
+        self.assertEqual(digital_stream.stream_type, 'Analog', 'Digital stream type is different!')
+    
+    def test_digital_stream(self):
+        digital_set = self.acc_gyro.recordings[0].analog_streams[3].channel_data
+        self.assertEqual(digital_set.shape, (1, 16200), 'Shape of quality dataset is different!')
+        
+        digital_timestamp_index = self.acc_gyro.recordings[0].analog_streams[3].timestamp_index
+        self.assertEqual(digital_timestamp_index.shape, (1, 3), 'Shape of the quality timestamp index is different!')
+
+    def test_digital_channel_infos(self):
+        digital_channel_info = self.acc_gyro.recordings[0].analog_streams[3].channel_infos
+        self.assertEqual(len(digital_channel_info), 1, 'Number of digital channel info objects is different from 1!')
+        digital_channel = digital_channel_info[136]
+        self.assertEqual(len(digital_channel.info), 17, 'Number of of components of a quality channel info object is different!')
+        self.assertEqual(digital_channel.version, 1, 'Digital InfoChannel-Type version 1 expected but was %s' % digital_channel.version)
+        self.assertEqual(digital_channel.channel_id, 136, "ID is not as expected!")
+        self.assertEqual(digital_channel.group_id, 0, "Group ID is not as expected!")
+        self.assertEqual(digital_channel.data_type, 'Int', "DataType is not as expected!")
+        self.assertEqual(digital_channel.info['Unit'], 'NoUnit', "Unit is not as expected (was %s instead of \'NoUnit\')!" % digital_channel.info['Unit'])
+        self.assertEqual(digital_channel.info['Exponent'], 0, "Exponent is not as expected (was %s instead of \'0\')!" % digital_channel.info['Exponent'])
+        self.assertEqual(digital_channel.info['Label'], '1', 'Label is not as expected!!!')
+        self.assertEqual(digital_channel.adc_step.units, ureg.NoUnit, "ADC step unit was %s and is not \'NoUnit\' as expected!" % digital_channel.adc_step.units)
+        self.assertEqual(digital_channel.adc_step.magnitude, 1.0, "ADC step magnitude is not as expected!!!")
+
+    # Test Opto-Stim
+    def test_count_analog_streams_opto_stim(self):
+        self.assertEqual(len(self.opto_stim.recordings[0].analog_streams), 5, 'There should be 5 analog streams inside the recording!')
+
+    def test_opto_stim_attributes(self):
+        opto_stim_stream = self.opto_stim.recordings[0].analog_streams[1]
+        self.assertEqual(opto_stim_stream.info_version, 1, "Version of the Stream-Info was %s and not as expected 1!" % opto_stim_stream.info_version)
+        self.assertEqual(opto_stim_stream.data_subtype, 'Auxiliary', 'Auxiliary stream data sub type is different!')
+        self.assertEqual(opto_stim_stream.label, 'Data Acquisition (1) Optical Stimulation Current1', 'Opto-Stim stream label is different!')
+        self.assertEqual(str(opto_stim_stream.source_stream_guid), '00000000-0000-0000-0000-000000000000', 'Opto-Stim stream source GUID is different!')
+        self.assertEqual(str(opto_stim_stream.stream_guid), 'ebe64a09-71ea-4db5-a290-7d188901fb14', 'Opto-Stim stream GUID is different!')
+        self.assertEqual(opto_stim_stream.stream_type, 'Analog', 'Opto-Stim stream type is different!')
+    
+    def test_opto_stim_stream(self):
+        opto_stim_set = self.opto_stim.recordings[0].analog_streams[1].channel_data
+        self.assertEqual(opto_stim_set.shape, (2, 16200), 'Shape of acceleration dataset is different!')
+        
+        opto_stim_timestamp_index = self.opto_stim.recordings[0].analog_streams[1].timestamp_index
+        self.assertEqual(opto_stim_timestamp_index.shape, (1, 3), 'Shape of the acceleration timestamp index is different!')
+
+    def test_opto_stim_channel_infos(self):
+        opto_stim_channel_infos = self.opto_stim.recordings[0].analog_streams[1].channel_infos
+        self.assertEqual(len(opto_stim_channel_infos), 2, 'Number of Opto-Stim channel info objects is different from 2!')
+        opto_stim_channel = opto_stim_channel_infos[169]
+        self.assertEqual(len(opto_stim_channel.info), 17, 'Number of of components of an acceleration channel info object is different!')
+        self.assertEqual(opto_stim_channel.version, 1, 'Opto-Stim InfoChannel-Type version 1 expected but was %s' % opto_stim_channel.version)
+        self.assertEqual(opto_stim_channel.channel_id, 169, "ID is not as expected!")
+        self.assertEqual(opto_stim_channel.group_id, 0, "Group ID is not as expected!")
+        self.assertEqual(opto_stim_channel.info['Unit'], 'A', "Unit is not as expected (was %s instead of \'A\')!" % opto_stim_channel.info['Unit'])
+        self.assertEqual(opto_stim_channel.info['Exponent'], -3, "Exponent is not as expected (was %s instead of \'-3\')!" % opto_stim_channel.info['Exponent'])
+        self.assertEqual(opto_stim_channel.info['Label'], 'N113 Opto Stim Current Data 0', 'Label is not as expected!!!')
+        self.assertEqual(opto_stim_channel.adc_step.units, ureg.ampere, "ADC step unit was %s and is not \'Ampere\' as expected!" % opto_stim_channel.adc_step.units)
+        self.assertEqual(opto_stim_channel.adc_step.magnitude, 0.001, "ADC step magnitude is not as expected!!!")
 
 if __name__ == '__main__':
     unittest.main()

@@ -459,8 +459,14 @@ class ChannelInfo(InfoSampledData):
     def adc_step(self):
         "Size and unit of one ADC step for this channel"
         unit_name = self.info['Unit']
+        if unit_name == 'g': # Acceleration stream
+            unit = ureg['standard_gravity']
+        elif unit_name == 'DegreePerSecond': # Gyroscope stream
+            unit = ureg.degree / ureg.second
+        else:
+            unit = ureg[unit_name]
         # Should be tested that unit_name is a available in ureg (unit register)
-        step = self.info['ConversionFactor'] * (10 ** self.info['Exponent'].astype(np.float64)) * ureg[unit_name]
+        step = self.info['ConversionFactor'] * (10 ** self.info['Exponent'].astype(np.float64)) * unit
         return step
 
     @property

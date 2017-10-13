@@ -52,3 +52,5 @@ class McsHdf5Protocols:
 from pint import UnitRegistry
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
+ureg.define('NoUnit = [quantity]')
+

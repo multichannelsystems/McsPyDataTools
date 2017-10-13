@@ -5,6 +5,7 @@ Version 0.2.3 (2017-__-__)
 ------------------------
 
 - Migrated to Python 3
+- Analog streams with Acceleration, Gyroscope and OptoStim data supported 
 
 
 Version 0.2.2 (2017-09-19)

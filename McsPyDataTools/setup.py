@@ -7,6 +7,24 @@ import os
 import shutil
 #import McsPy
 
+# Utility methods
+
+def get_current_version():
+    """Get current version from McsPy.__init__"""
+    version = "0"
+    try:
+        f = open("./McsPy/__init__.py", "r")
+        try:
+            for line in f:
+                if line.startswith("version"):
+                    version = line.split()[2][1:-1]
+                    break
+        finally:
+            f.close()
+    except:
+        version = "0"
+    return version
+
 def copy_html_docs():
     """Copy previously rendered HTML docs to folder docs-html"""
     if os.path.exists('docs/_build'):
@@ -40,7 +58,7 @@ copy_pdf_docs()
 setup(
     name='McsPyDataTools',
     #version=McsPy.__version__,
-    version='0.2.3',
+    version= get_current_version(),
     description='Handling data recorded and provided by MCS systems', 
     long_description=open('README').read(),
     keywords = 'HDF5 data electrophysiology MCS',
@@ -62,7 +80,7 @@ setup(
         "Pint >= 0.7.2",
         "numpy >= 1.11.1",
         "h5py >= 2.6.0",
-        "tablulate >= 0.7.7"
+        "tabulate >= 0.7.7"
     ],
     classifiers=[
         'Development Status :: 1 - Beta',
