@@ -210,7 +210,7 @@ class Recording(object):
                 stream_name = name.split('_')
                 if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
                     self.__timestamp_streams[int(stream_name[1])] = TimeStampStream(value)
-
+    
     @property
     def analog_streams(self):
         "Access all analog streams - collection of :class:`~McsPy.McsData.AnalogStream` objects"
@@ -283,6 +283,8 @@ class Stream(object):
         self.source_stream_guid = uuid.UUID(stream_info['SourceStreamGUID'].rstrip())
         self.stream_guid = uuid.UUID(stream_info['StreamGUID'].rstrip())
         self.stream_type = stream_info['StreamType'].rstrip()
+    
+    Stream_Types = ["analog", "event", "segment", "timestamp", "frame"]
 
 class AnalogStream(Stream):
     """

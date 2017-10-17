@@ -34,6 +34,9 @@
     <Compile Include="bin\DataStreamInfo.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="McsPy\functions_info.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="McsPy\McsCMOS.py" />
     <Compile Include="McsPy\Test\TestCMOS.py" />
     <Compile Include="McsPy\Test\TestRawDataStructures.py" />

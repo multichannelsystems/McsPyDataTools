@@ -71,10 +71,10 @@ def get_number_of_streams(rec, stream_type):
             if rec.timestamp_streams != None:
                 num_streams = len(rec.timestamp_streams)
     except KeyError as e:
-        print(e.message)
+        print(e)
         num_streams = 0
     except ValueError as e:
-        print(e.message)
+        print(e)
         num_streams = 0
     return num_streams
 
@@ -235,7 +235,7 @@ def get_table_row(f):
         return row
     except IOError as e:
         print("IOError")
-        print("Could not open " + f + "\n" + e.message)
+        print("Could not open " + f + "\n" + e)
         exit(1)
 
 def print_dir_file_info(h5files):
@@ -268,13 +268,13 @@ def data_stream_info():
         filepath = os.path.join(file_dir, args.file)
         print_file_info2(filepath)
     elif file_dir != "":
-        files = os.listdir(unicode(file_dir))
-        only_files = [ f for f in files if os.path.isfile(os.path.join(unicode(file_dir), f)) ]
+        files = os.listdir(str(file_dir))
+        only_files = [ f for f in files if os.path.isfile(os.path.join(str(file_dir), f)) ]
 
         if len(only_files) == 0:
             print("no files found in " + file_dir)
         else:
-            only_files = [os.path.join(unicode(file_dir), f) for f in only_files]
+            only_files = [os.path.join(str(file_dir), f) for f in only_files]
             print_dir_file_info(only_files)
 
 if __name__ == "__main__":
