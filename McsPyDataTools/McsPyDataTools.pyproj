@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e1540f78-8c38-418c-ae9a-2d6db423086c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>bin\McsPyDataTools.py</StartupFile>
+    <StartupFile>bin\InertialAnalysis_6DoF-IMU.py</StartupFile>
     <SearchPath>.;McsPy</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -16,7 +16,7 @@
     <InterpreterPath />
     <InterpreterArguments />
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
+    <InterpreterId>Global|VisualStudio|Kinematics</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,6 +30,9 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="bin\InertialAnalysis_6DoF-IMU.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="docs\conf.py" />
     <Compile Include="bin\DataStreamInfo.py">
       <SubType>Code</SubType>
@@ -74,6 +77,7 @@
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|2.7" />
     <InterpreterReference Include="Global|PythonCore|3.6" />
+    <InterpreterReference Include="Global|VisualStudio|Kinematics" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

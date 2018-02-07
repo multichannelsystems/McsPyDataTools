@@ -27,6 +27,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="IMU_Notebook.ipynb" />
     <Content Include="McsPyDataNotebook.ipynb" />
   </ItemGroup>
   <ItemGroup>
