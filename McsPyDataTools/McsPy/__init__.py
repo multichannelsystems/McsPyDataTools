@@ -12,11 +12,11 @@
 #print("McsPy init!")
 version = "0.2.3"
 
-__all__ = ["CMOSData", "CMOSConvProxy", "RawData", "Recording", "Stream", "AnalogStream", 
-           "Info", "InfoSampledData", "ChannelInfo", "FrameStream", "FrameEntity", "Frame", 
-           "FrameEntityInfo", "EventStream", "EventEntity", "EventEntityInfo", "SegmentStream", 
-           "SegmentEntity", "AverageSegmentTuple", "AverageSegmentEntity", "SegmentEntityInfo",
-           "TimeStampStream", "TimeStampEntity", "TimeStampEntityInfo"]
+#__all__ = ["CMOSData", "CMOSConvProxy", "RawData", "Recording", "Stream", "AnalogStream", 
+#           "Info", "InfoSampledData", "ChannelInfo", "FrameStream", "FrameEntity", "Frame", 
+#           "FrameEntityInfo", "EventStream", "EventEntity", "EventEntityInfo", "SegmentStream", 
+#           "SegmentEntity", "AverageSegmentTuple", "AverageSegmentEntity", "SegmentEntityInfo",
+#           "TimeStampStream", "TimeStampEntity", "TimeStampEntityInfo"]
 
 # Supported MCS-HDF5 protocol types and versions:
 class McsHdf5Protocols:
