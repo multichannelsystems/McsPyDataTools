@@ -26,10 +26,10 @@ opto_stim_data_file_path = os.path.join(os.path.dirname(__file__), 'TestData\\20
 class Test_RawData(unittest.TestCase):
     def setUp(self):
         self.data = McsData.RawData(test_data_file_path)
-        self.raw_frame_data = McsData.RawData(test_raw_frame_data_file_path)
-        self.average_segments = McsData.RawData(average_segment_data_file_path)
-        self.acc_gyro = McsData.RawData(acc_gyro_data_file_path)
-        self.opto_stim = McsData.RawData(opto_stim_data_file_path)
+        #self.raw_frame_data = McsData.RawData(test_raw_frame_data_file_path)
+        #self.average_segments = McsData.RawData(average_segment_data_file_path)
+        #self.acc_gyro = McsData.RawData(acc_gyro_data_file_path)
+        #self.opto_stim = McsData.RawData(opto_stim_data_file_path)
 
 class Test_RawDataContainer(Test_RawData):
     # Test MCS-HDF5 version

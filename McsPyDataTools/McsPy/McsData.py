@@ -38,7 +38,7 @@ class RawData(object):
     """
     def __init__(self, raw_data_path):
         """
-        Crates and initializes a RawData object that provides access to the content of the given MCS-HDF5 file
+        Creates and initializes a RawData object that provides access to the content of the given MCS-HDF5 file
 
         :param raw_data_path: path to a HDF5 file that contains raw data encoded in a supported MCS-HDF5 format version
         """
