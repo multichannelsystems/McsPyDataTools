@@ -13,7 +13,7 @@
     <OutputPath>.</OutputPath>
     <Name>McsPyDataNotebooks</Name>
     <RootNamespace>McsPyDataNotebooks</RootNamespace>
-    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda36-64</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,14 +28,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="IMU_Notebook.ipynb" />
+    <Content Include="McsPyData-TutorialCMOSMEA.ipynb" />
     <Content Include="McsPyDataNotebook.ipynb" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataStreamInfo.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|2.7" />
-    <InterpreterReference Include="Global|PythonCore|3.6" />
+    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
   </ItemGroup>
   <!-- Uncomment the CoreCompile target to enable the Build command in
        Visual Studio and specify your pre- and post-build commands in

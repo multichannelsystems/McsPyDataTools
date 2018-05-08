@@ -104,3 +104,8 @@ docs-html
 # Jupyter Notebooks
 #==========================
 .ipynb_checkpoints
+
+#==========================
+# mypy
+#==========================
+.mypy_cache/

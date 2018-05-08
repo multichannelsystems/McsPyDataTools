@@ -4,7 +4,7 @@
 
     Wrapper and Helper to access MCS CMOS Data within H5 Files 
     
-    :copyright: (c) 2017 by Multi Channel Systems MCS GmbH
+    :copyright: (c) 2018 by Multi Channel Systems MCS GmbH
     :license: see LICENSE for more details
 """
 

@@ -5,7 +5,7 @@
     Data classes to wrap and hide raw data handling of the HDF5 data files.
     It is based on the MCS-HDF5 definitions of the given compatible versions.
 
-    :copyright: (c) 2017 by Multi Channel Systems MCS GmbH
+    :copyright: (c) 2018 by Multi Channel Systems MCS GmbH
     :license: see LICENSE for more details
 """
 

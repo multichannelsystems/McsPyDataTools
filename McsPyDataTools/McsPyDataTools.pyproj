@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e1540f78-8c38-418c-ae9a-2d6db423086c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>McsPy\Test\TestCmosMeaDataStructures.py</StartupFile>
+    <StartupFile>bin\McsPyDataTools.py</StartupFile>
     <SearchPath>.;McsPy</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -16,7 +16,8 @@
     <InterpreterPath />
     <InterpreterArguments />
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda36-64</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,7 +44,7 @@
     <Compile Include="McsPy\__init__.py" />
     <Compile Include="McsPy\McsCMOS.py" />
     <Compile Include="McsPy\McsData.py" />
-    <Compile Include="McsPy\McsCMOSMEA.py" >
+    <Compile Include="McsPy\McsCMOSMEA.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="McsPy\Test\__init__.py" />
@@ -79,8 +80,7 @@
     <Content Include="README" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|2.7" />
-    <InterpreterReference Include="Global|PythonCore|3.6" />
+    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

@@ -1,12 +1,12 @@
 McsPyDataTools
 ==============
 
-Version 0.2.3 (2017-__-__)
+Version 0.3.0 (2018-__-__)
 ------------------------
-
 - Migrated to Python 3
 - Analog streams with Acceleration, Gyroscope and OptoStim data supported 
-
+- New native HDF5-based CMOS-MEA format supported
+- Jupyter notebooks added and extended to demonstrate usage patterns
 
 Version 0.2.2 (2017-09-19)
 ------------------------
