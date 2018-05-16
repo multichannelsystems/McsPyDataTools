@@ -50,6 +50,8 @@ __pycache__/
 
 # Distribution / packaging
 #bin/
+env/
+venv/
 build/
 develop-eggs/
 dist/
