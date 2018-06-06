@@ -2,7 +2,7 @@
 #
 #_________________________________________________________________
 #
-# (c) 2017 by Multi Channel Systems MCS GmbH
+# (c) 2018 by Multi Channel Systems MCS GmbH
 # All rights reserved
 #    
 #_________________________________________________________________
@@ -16,7 +16,7 @@ __all__ = ['print_header_info']
 import os
 import McsPy
 import McsPy.McsData
-import argparse
+#import argparse
 import datetime
 from tabulate import tabulate
 from McsPy.McsData import *
@@ -207,27 +207,4 @@ def print_dir_file_info(file_dir):
             else:
                 only_files = [os.path.join(str(file_dir), f) for f in only_h5_files]
                 print_short_file_infos(only_files)
-                #print_short_file_infos(['.\\McsPy\\Test\\TestData\\20150402_00 Atrium_002.h5'])
-
-#def data_stream_info():
-#    args = parse_arguments()
-#    if args.directory != None:
-#        file_dir = get_directory(args)
-#    else:
-#        file_dir = ""
-#        if args.file == None:
-#            usage()
-#            exit()
-
-#    if args.file != None:
-#        filepath = os.path.join(file_dir, args.file)
-#        print_file_info2(filepath)
-#    elif file_dir != "":
-#        files = os.listdir(str(file_dir))
-#        only_files = [ f for f in files if os.path.isfile(os.path.join(str(file_dir), f)) ]
-
-#        if len(only_files) == 0:
-#            print("no files found in " + file_dir)
-#        else:
-#            only_files = [os.path.join(str(file_dir), f) for f in only_files]
-#            print_dir_file_info(only_files)
+                #print_short_file_infos(['.\\McsPy\\tests\\TestData\\20150402_00 Atrium_002.h5'])

@@ -65,22 +65,22 @@ setup(
     author='J. Dietzsch, Multi Channel Systems MCS GmbH',
     author_email='dietzsch@multichannelsystems.com',
     zip_safe=True,
-    packages=['McsPy', 'McsPy.Test'],
+    packages=['McsPy', 'McsPy.tests'],
     # Provide test data as an accompynied separate archive! -> but create the folder and show README.md
     #package_data ={
-    #    'McsPy.Test': ['TestData/*.h5']
+    #    'McsPy.tests': ['TestData/*.h5']
     #},
     package_data ={
-        'McsPy.Test': ['TestData/README.md']
+        'McsPy.tests': ['TestData/README.md']
     },
     scripts=['bin/McsPyDataTools.py','bin/PlotExperimentData.py', 'bin/DataStreamInfo.py'],
     url='http://multichannelsystems.com',
     license='LICENSE.txt',
     install_requires=[
-        "Pint >= 0.7.2",
-        "numpy >= 1.11.1",
-        "h5py >= 2.6.0",
-        "tabulate >= 0.7.7"
+        "Pint >= 0.8.1",
+        "numpy >= 1.14.3",
+        "h5py >= 2.8.0",
+        "tabulate >= 0.8.2"
     ],
     classifiers=[
         'Development Status :: 1 - Beta',
@@ -88,14 +88,12 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Topic :: Scientific/Engineering',
+        'Operating System :: Unix',
+        'Operating System :: POSIX :: Linux',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
-        #'Programming Language :: Python :: 2.6',
-        #'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.0',
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ]

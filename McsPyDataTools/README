@@ -29,5 +29,5 @@ The McsPyDataTools package is accompanied by a separate archive that contains th
 the raw data files used by the unit tests. The content of this test file archive must 
 be copied to the folder **...\McsPy\Test\TestData\** to be used by the unit tests.
 
-:copyright: Copyright 2016 by Multi Channel Systems MCS GmbH, see AUTHORS.
+:copyright: Copyright 2018 by Multi Channel Systems MCS GmbH, see AUTHORS.
 :license: ..., see LICENSE for details.

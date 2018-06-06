@@ -280,6 +280,6 @@ def data_stream_info():
 if __name__ == "__main__":
     #data_stream_info()
     filepath = os.path.join(r"d:\Programming\McsDataManagement\McsPyDataTools\McsPyDataTools\McsPy\Test\TestData", r"2017-10-11T13-39-47McsRecording_N113_OptoStim.h5")
-    #filepath = os.path.join(r"d:\Programming\McsDataManagement\McsPyDataTools\McsPyDataTools\McsPy\Test\TestData", r"2017-10-11T13-39-47McsRecording_X981_AccGyro.h5")
+    #filepath = os.path.join(r"d:\Programming\McsDataManagement\McsPyDataTools\McsPyDataTools\McsPy\tests\TestData", r"2017-10-11T13-39-47McsRecording_X981_AccGyro.h5")
     print_file_info(filepath)
     print_file_info2(filepath)

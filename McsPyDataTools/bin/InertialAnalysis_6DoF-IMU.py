@@ -22,10 +22,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import McsPy.functions_info as fi
 
-#fi.print_dir_file_info(r"../McsPyDataTools/McsPy/Test/TestData")
+#fi.print_dir_file_info(r"../McsPyDataTools/McsPy/tests/TestData")
 
 
-acc_gyro_raw_data_file_path = "../McsPyDataTools/McsPy/Test/TestData/2017-10-11T13-39-47McsRecording_X981_AccGyro.h5"
+acc_gyro_raw_data_file_path = "../McsPyDataTools/McsPy/tests/TestData/2017-10-11T13-39-47McsRecording_X981_AccGyro.h5"
 #fi.print_file_info(acc_gyro_raw_data_file_path)
 
 

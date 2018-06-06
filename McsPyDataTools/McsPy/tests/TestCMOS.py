@@ -3,7 +3,7 @@ import McsPy.McsCMOS
 import os
 import numpy
 
-FILENAME = os.path.join(os.path.dirname(__file__), 'TestData\\CMOSTestRec.h5')
+FILENAME = os.path.join(os.path.dirname(__file__), 'TestData', 'CMOSTestRec.h5')
 
 class TestMcsCMOS(unittest.TestCase):
 
