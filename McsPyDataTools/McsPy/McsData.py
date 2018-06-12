@@ -5,15 +5,15 @@
     Data classes to wrap and hide raw data handling of the HDF5 data files.
     It is based on the MCS-HDF5 definitions of the given compatible versions.
 
-    :copyright: (c) 2016 by Multi Channel Systems MCS GmbH
+    :copyright: (c) 2018 by Multi Channel Systems MCS GmbH
     :license: see LICENSE for more details
 """
 
 import h5py
+from builtins import IndexError
 import datetime
 import math
 import uuid
-import exceptions
 import collections
 import numpy as np
 
@@ -38,7 +38,7 @@ class RawData(object):
     """
     def __init__(self, raw_data_path):
         """
-        Crates and initializes a RawData object that provides access to the content of the given MCS-HDF5 file
+        Creates and initializes a RawData object that provides access to the content of the given MCS-HDF5 file
 
         :param raw_data_path: path to a HDF5 file that contains raw data encoded in a supported MCS-HDF5 format version
         """
@@ -65,7 +65,7 @@ class RawData(object):
         "Check if the MCS-HDF5 protocol type and version of the file is supported by this class"
         root_grp = self.h5_file['/']
         if 'McsHdf5ProtocolType' in root_grp.attrs:
-            self.mcs_hdf5_protocol_type = root_grp.attrs['McsHdf5ProtocolType']
+            self.mcs_hdf5_protocol_type = root_grp.attrs['McsHdf5ProtocolType'].decode('UTF-8')
             if self.mcs_hdf5_protocol_type == "RawData":
                 self.mcs_hdf5_protocol_type_version = root_grp.attrs['McsHdf5ProtocolVersion']
                 supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[self.mcs_hdf5_protocol_type]
@@ -80,12 +80,15 @@ class RawData(object):
 
     def __get_session_info(self):
         "Read all session metadata"
-        data_attrs = self.h5_file['Data'].attrs.iteritems()
+        data_attrs = self.h5_file['Data'].attrs.items()
         session_attributes = data_attrs
         session_info = {}
         for (name, value) in session_attributes:
             #print(name, value)
-            session_info[name] = value #.rstrip()
+            if hasattr(value, "decode"):
+                session_info[name] = value.decode('utf-8')
+            else:
+                session_info[name] = value
         self.comment = session_info['Comment'].rstrip()
         self.clr_date = session_info['Date'].rstrip()
         self.date_in_clr_ticks = session_info['DateInTicks']
@@ -105,7 +108,7 @@ class RawData(object):
         data_folder = self.h5_file['Data']
         if len(data_folder) > 0:
             self.__recordings = {}
-        for (name, value) in data_folder.iteritems():
+        for (name, value) in data_folder.items():
             dprint_name_value(name, value)
             recording_name = name.split('_')
             if (len(recording_name) == 2) and (recording_name[0] == 'Recording'):
@@ -135,8 +138,11 @@ class Recording(object):
     def __get_recording_info(self):
         "Read metadata for this recording"
         recording_info = {}
-        for (name, value) in self.__recording_grp.attrs.iteritems():
-            recording_info[name] = value
+        for (name, value) in self.__recording_grp.attrs.items():
+            if hasattr(value, "decode"):
+                recording_info[name] = value.decode('UTF-8')
+            else:
+                recording_info[name] = value
         self.comment = recording_info['Comment'].rstrip()
         self.duration = recording_info['Duration']
         self.label = recording_info['Label'].rstrip()
@@ -150,7 +156,7 @@ class Recording(object):
             analog_stream_folder = self.__recording_grp['AnalogStream']
             if len(analog_stream_folder) > 0:
                 self.__analog_streams = {}
-            for (name, value) in analog_stream_folder.iteritems():
+            for (name, value) in analog_stream_folder.items():
                 dprint_name_value(name, value)
                 stream_name = name.split('_')
                 if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
@@ -162,7 +168,7 @@ class Recording(object):
             frame_stream_folder = self.__recording_grp['FrameStream']
             if len(frame_stream_folder) > 0:
                 self.__frame_streams = {}
-            for (name, value) in frame_stream_folder.iteritems():
+            for (name, value) in frame_stream_folder.items():
                 dprint_name_value(name, value)
                 stream_name = name.split('_')
                 if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
@@ -174,7 +180,7 @@ class Recording(object):
             event_stream_folder = self.__recording_grp['EventStream']
             if len(event_stream_folder) > 0:
                 self.__event_streams = {}
-            for (name, value) in event_stream_folder.iteritems():
+            for (name, value) in event_stream_folder.items():
                 dprint_name_value(name, value)
                 stream_name = name.split('_')
                 if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
@@ -187,7 +193,7 @@ class Recording(object):
             segment_stream_folder = self.__recording_grp['SegmentStream']
             if len(segment_stream_folder) > 0:
                 self.__segment_streams = {}
-            for (name, value) in segment_stream_folder.iteritems():
+            for (name, value) in segment_stream_folder.items():
                 dprint_name_value(name, value)
                 stream_name = name.split('_')
                 if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
@@ -199,12 +205,12 @@ class Recording(object):
             timestamp_stream_folder = self.__recording_grp['TimeStampStream']
             if len(timestamp_stream_folder) > 0:
                 self.__timestamp_streams = {}
-            for (name, value) in timestamp_stream_folder.iteritems():
+            for (name, value) in timestamp_stream_folder.items():
                 dprint_name_value(name, value)
                 stream_name = name.split('_')
                 if (len(stream_name) == 2) and (stream_name[0] == 'Stream'):
                     self.__timestamp_streams[int(stream_name[1])] = TimeStampStream(value)
-
+    
     @property
     def analog_streams(self):
         "Access all analog streams - collection of :class:`~McsPy.McsData.AnalogStream` objects"
@@ -266,14 +272,19 @@ class Stream(object):
     def __get_stream_info(self):
         "Read all describing meta data common to each stream -> HDF5 folder attributes"
         stream_info = {}
-        for (name, value) in self.stream_grp.attrs.iteritems():
-            stream_info[name] = value
+        for (name, value) in self.stream_grp.attrs.items():
+            if hasattr(value, "decode"):
+                stream_info[name] = value.decode('UTF-8')
+            else:
+                stream_info[name] = value
         self.info_version = stream_info['StreamInfoVersion']
         self.data_subtype = stream_info['DataSubType'].rstrip()
         self.label = stream_info['Label'].rstrip()
         self.source_stream_guid = uuid.UUID(stream_info['SourceStreamGUID'].rstrip())
         self.stream_guid = uuid.UUID(stream_info['StreamGUID'].rstrip())
         self.stream_type = stream_info['StreamType'].rstrip()
+    
+    Stream_Types = ["analog", "event", "segment", "timestamp", "frame"]
 
 class AnalogStream(Stream):
     """
@@ -293,7 +304,7 @@ class AnalogStream(Stream):
     def __read_channels(self):
         "Read all channels -> create Info structure and connect datasets"
         assert len(self.stream_grp) == 3
-        for (name, value) in self.stream_grp.iteritems():
+        for (name, value) in self.stream_grp.items():
             dprint_name_value(name, value)
         # Read timestamp index of channels:
         self.timestamp_index = self.stream_grp['ChannelDataTimeStamps'][...]
@@ -342,7 +353,7 @@ class AnalogStream(Stream):
         :return: Tuple (vector of the timestamps, unit of the timestamps)
         """
         if channel_id in self.channel_infos.keys():
-            start_ts = 0L
+            start_ts = 0
             channel = self.channel_infos[channel_id]
             tick = channel.get_field('Tick')
             for ts_range in self.timestamp_index:
@@ -373,7 +384,10 @@ class Info(object):
     def __init__(self, info_data):
         self.info = {}
         for name in info_data.dtype.names:
-            self.info[name] = info_data[name]
+            if hasattr(info_data[name], "decode"):
+                self.info[name] = info_data[name].decode('UTF-8')
+            else:
+                self.info[name] = info_data[name]
 
     def get_field(self, name):
         "Get the field with that name -> access to the raw info array"
@@ -447,8 +461,14 @@ class ChannelInfo(InfoSampledData):
     def adc_step(self):
         "Size and unit of one ADC step for this channel"
         unit_name = self.info['Unit']
+        if unit_name == 'g': # Acceleration stream
+            unit = ureg['standard_gravity']
+        elif unit_name == 'DegreePerSecond': # Gyroscope stream
+            unit = ureg.degree / ureg.second
+        else:
+            unit = ureg[unit_name]
         # Should be tested that unit_name is a available in ureg (unit register)
-        step = self.info['ConversionFactor'] * (10 ** self.info['Exponent'].astype(np.float64)) * ureg[unit_name]
+        step = self.info['ConversionFactor'] * (10 ** self.info['Exponent'].astype(np.float64)) * unit
         return step
 
     @property
@@ -472,7 +492,7 @@ class FrameStream(Stream):
     def __read_frame_entities(self):
         "Read all fream entities for this frame stream inside the associated frame entity folder"
         #assert len(self.stream_grp) == 3
-        for (name, value) in self.stream_grp.iteritems():
+        for (name, value) in self.stream_grp.items():
             dprint_name_value(name, value)
         # Read infos per frame
         fr_infos = self.stream_grp['InfoFrame'][...]
@@ -519,7 +539,7 @@ class FrameEntity(object):
         :return: Tuple (vector of the signal, unit of the values)
         """
         if sensor_x < 0 or self.data.shape[0] < sensor_x or sensor_y < 0 or self.data.shape[1] < sensor_y:
-            raise exceptions.IndexError
+            raise IndexError
         if idx_start < 0:
             idx_start = 0
         if idx_end > self.data.shape[2]:
@@ -541,8 +561,8 @@ class FrameEntity(object):
         :return: Tuple (vector of the timestamps, unit of the timestamps)
         """
         if idx_start < 0 or self.data.shape[2] < idx_start or idx_end < idx_start or self.data.shape[2] < idx_end:
-            raise exceptions.IndexError
-        start_ts = 0L
+            raise IndexError
+        start_ts = 0
         tick = self.info.get_field('Tick')
         for ts_range in self.timestamp_index:
             if idx_end < ts_range[1]: # nothing to do anymore ->
@@ -660,7 +680,7 @@ class EventStream(Stream):
 
     def  __read_event_entities(self):
         "Create all event entities of this event stream"
-        for (name, value) in self.stream_grp.iteritems():
+        for (name, value) in self.stream_grp.items():
             dprint_name_value(name, value)
         # Read infos per event entity
         event_infos = self.stream_grp['InfoEvent'][...]
@@ -701,7 +721,7 @@ class EventEntity(object):
         if idx_end == None:
             idx_end = self.count
         if idx_start < 0 or self.data.shape[1] < idx_start or idx_end < idx_start or self.data.shape[1] < idx_end:
-            raise exceptions.IndexError
+            raise IndexError
         return (idx_start, idx_end)
 
     def get_events(self, idx_start=None, idx_end=None):
@@ -755,8 +775,8 @@ class EventEntityInfo(Info):
             source_channel_ids = [-1]
             source_channel_labels = ["N/A"]
         else:
-            source_channel_ids = [int(x) for x in info['SourceChannelIDs'].split(',')]
-            source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].split(',')]
+            source_channel_ids = [int(x) for x in info['SourceChannelIDs'].decode('utf-8').split(',')]
+            source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].decode('utf-8').split(',')]
         self.__source_channels = {}
         for idx, channel_id in enumerate(source_channel_ids):
             self.__source_channels[channel_id] = source_channel_labels[idx]
@@ -774,7 +794,7 @@ class EventEntityInfo(Info):
     @property
     def source_channel_ids(self):
         "ID's of all channels that were involved in the event generation."
-        return self.__source_channels.keys()
+        return list(self.__source_channels.keys())
 
     @property
     def source_channel_labels(self):
@@ -796,7 +816,7 @@ class SegmentStream(Stream):
 
     def  __read_segment_entities(self):
         "Read and initialize all segment entities"
-        for (name, value) in self.stream_grp.iteritems():
+        for (name, value) in self.stream_grp.items():
             dprint_name_value(name, value)
         # Read infos per segment entity
         segment_infos = self.stream_grp['InfoSegment'][...]
@@ -875,7 +895,7 @@ class SegmentEntity(object):
         if idx_end == None:
             idx_end = sample_count
         if idx_start < 0 or sample_count < idx_start or idx_end < idx_start or sample_count < idx_end:
-            raise exceptions.IndexError
+            raise IndexError
         return (idx_start, idx_end)
 
     def get_segment_in_range(self, segment_id, flat=False, idx_start=None, idx_end=None):
@@ -1099,7 +1119,7 @@ class SegmentEntityInfo(Info):
         Info.__init__(self, info)
         McsHdf5Protocols.check_protocol_type_version("SegmentEntityInfo", info_version)
         self.__version = info_version
-        source_channel_ids = [int(x) for x in info['SourceChannelIDs'].split(',')]
+        source_channel_ids = [int(x) for x in info['SourceChannelIDs'].decode('utf-8').split(',')]
         self.source_channel_of_segment = {}
         for idx, channel_id in enumerate(source_channel_ids):
             self.source_channel_of_segment[idx] = source_channel_infos[channel_id]
@@ -1149,7 +1169,7 @@ class TimeStampStream(Stream):
 
     def  __read_timestamp_entities(self):
         "Create all timestamp entities of this timestamp stream"
-        for (name, value) in self.stream_grp.iteritems():
+        for (name, value) in self.stream_grp.items():
             dprint_name_value(name, value)
         # Read infos per timestamp entity
         timestamp_infos = self.stream_grp['InfoTimeStamp'][...]
@@ -1190,7 +1210,7 @@ class TimeStampEntity(object):
         if idx_end == None:
             idx_end = self.count
         if idx_start < 0 or self.data.shape[1] < idx_start or idx_end < idx_start or self.data.shape[1] < idx_end:
-            raise exceptions.IndexError
+            raise IndexError
         return (idx_start, idx_end)
 
     def get_timestamps(self, idx_start=None, idx_end=None):
@@ -1219,8 +1239,8 @@ class TimeStampEntityInfo(Info):
         Info.__init__(self, info)
         McsHdf5Protocols.check_protocol_type_version("TimeStampEntityInfo", info_version)
         self.__version = info_version
-        source_channel_ids = [int(x) for x in info['SourceChannelIDs'].split(',')]
-        source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].split(',')]
+        source_channel_ids = [int(x) for x in info['SourceChannelIDs'].decode('utf-8').split(',')]
+        source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].decode('utf-8').split(',')]
         self.__source_channels = {}
         for idx, channel_id in enumerate(source_channel_ids):
             self.__source_channels[channel_id] = source_channel_labels[idx]
@@ -1246,7 +1266,7 @@ class TimeStampEntityInfo(Info):
         try:
             provided_base_unit = ureg.parse_expression(self.unit)
         except  UndefinedUnitError as unit_undefined:
-            print "Could not find unit \'%s\' in the Unit-Registry" % self.unit #unit_undefined.unit_names
+            print ("Could not find unit \'%s\' in the Unit-Registry" % self.unit) #unit_undefined.unit_names
             return None
         else:
             return (10**self.exponent) * provided_base_unit
@@ -1259,7 +1279,7 @@ class TimeStampEntityInfo(Info):
     @property
     def source_channel_ids(self):
         "ID's of all channels that were involved in the timestamp generation."
-        return self.__source_channels.keys()
+        return list(self.__source_channels.keys())
 
     @property
     def source_channel_labels(self):

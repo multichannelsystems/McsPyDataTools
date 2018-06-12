@@ -16,7 +16,8 @@
     <InterpreterPath />
     <InterpreterArguments />
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <InterpreterId>Global|ContinuumAnalytics|Anaconda27-64</InterpreterId>
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda36-64</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,16 +31,26 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="docs\conf.py" />
-    <Compile Include="McsPy\DataStreamInfo.py">
+    <Compile Include="bin\InertialAnalysis_6DoF-IMU.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="McsPy\McsCMOS.py" />
-    <Compile Include="McsPy\Test\TestCMOS.py" />
-    <Compile Include="McsPy\Test\TestRawDataStructures.py" />
-    <Compile Include="McsPy\Test\__init__.py" />
-    <Compile Include="McsPy\McsData.py" />
+    <Compile Include="docs\conf.py" />
+    <Compile Include="bin\DataStreamInfo.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="McsPy\functions_info.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="McsPy\__init__.py" />
+    <Compile Include="McsPy\McsCMOS.py" />
+    <Compile Include="McsPy\McsData.py" />
+    <Compile Include="McsPy\McsCMOSMEA.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="McsPy\Test\__init__.py" />
+    <Compile Include="McsPy\Test\TestCMOS.py" />
+    <Compile Include="McsPy\Test\TestCmosMeaDataStructures.py" />
+    <Compile Include="McsPy\Test\TestRawDataStructures.py" />
     <Compile Include="bin\McsPyDataTools.py" />
     <Compile Include="bin\PlotExperimentData.py" />
     <Compile Include="setup.py" />
@@ -69,7 +80,7 @@
     <Content Include="README" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda27-64" />
+    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

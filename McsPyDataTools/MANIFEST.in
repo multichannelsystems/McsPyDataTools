@@ -1,5 +1,6 @@
 include README AUTHORS CHANGES LICENSE
 recursive-include docs *
 recursive-include docs-html *
+recursive-include docs-pdf *
 prune docs/_build
 global-exclude *.pyc *~ *__pycache__* *.pyo

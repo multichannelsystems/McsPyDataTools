@@ -4,7 +4,7 @@
 
     Wrapper and Helper to access MCS CMOS Data within H5 Files 
     
-    :copyright: (c) 2016 by Multi Channel Systems MCS GmbH
+    :copyright: (c) 2018 by Multi Channel Systems MCS GmbH
     :license: see LICENSE for more details
 """
 
@@ -37,18 +37,27 @@ class CMOSData(h5py.File):
         info_frame= self['/Data/Recording_0/FrameStream/Stream_0/InfoFrame']
         
         for key in info_frame.dtype.names:
-            self.meta[key]=info_frame[key][0]
+            if hasattr(info_frame[key][0], "decode"):
+                self.meta[key]=info_frame[key][0].decode('utf-8')
+            else:
+                self.meta[key]=info_frame[key][0]
 
         if("Tick" in self.meta):
             self.meta["FrameRate"] = 10.0**6/self.meta["Tick"]
         
         # - from File
         for key, value in self.attrs.items():
-            self.meta[key]= value
+            if hasattr(value, "decode"):
+                self.meta[key]= value.decode('utf-8')
+            else:
+                self.meta[key]= value
 
         # - from Data Group
         for key, value in self['/Data'].attrs.items():
-            self.meta[key]= value
+            if hasattr(value, "decode"):
+                self.meta[key]= value.decode('utf-8')
+            else:
+                self.meta[key]= value
 
         # -- map events --
         if("EventStream" in self["Data/Recording_0/"].keys()):

@@ -50,6 +50,8 @@ __pycache__/
 
 # Distribution / packaging
 #bin/
+env/
+venv/
 build/
 develop-eggs/
 dist/
@@ -104,3 +106,8 @@ docs-html
 # Jupyter Notebooks
 #==========================
 .ipynb_checkpoints
+
+#==========================
+# mypy
+#==========================
+.mypy_cache/

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-#import McsPy
-#import McsPy.McsData
+import McsPy
+import McsPy.McsData
 import argparse
 import datetime
 from tabulate import tabulate
@@ -16,26 +16,26 @@ from tabulate import tabulate
 
 
 def print_analog_channel_info(streams):
-    x = streams.iteritems()
+    x = streams.items()
     for id, s in x:
         print(s.label)
         print("channels: {}".format(len(s.channel_infos)))
 
 
 def print_event_channel_info(streams):
-    x = streams.iteritems()
+    x = streams.items()
     for id, s in x:
         print(s.label)
 
 
 def print_segment_channel_info(streams):
-    x = streams.iteritems()
+    x = streams.items()
     for id, s in x:
         print(s.label)
 
 
 def print_timestamp_channel_info(streams):
-    x = streams.iteritems()
+    x = streams.items()
     for id, s in x:
         print(s.label)
 
@@ -70,11 +70,11 @@ def get_number_of_streams(rec, stream_type):
         if stream_type == "timestamp":
             if rec.timestamp_streams != None:
                 num_streams = len(rec.timestamp_streams)
-    except KeyError, e:
-        print(e.message)
+    except KeyError as e:
+        print(e)
         num_streams = 0
-    except ValueError, e:
-        print(e.message)
+    except ValueError as e:
+        print(e)
         num_streams = 0
     return num_streams
 
@@ -100,7 +100,7 @@ def get_streams_of_type(rec, stream_type):
 
 def get_info_rows(streams):
     rows = []
-    x = streams.iteritems()
+    x = streams.items()
     for id, s in x:
         row = []
         row.append(s.stream_type)
@@ -233,9 +233,9 @@ def get_table_row(f):
             for i in l:
                 row.append(i)
         return row
-    except IOError, e:
+    except IOError as e:
         print("IOError")
-        print("Could not open " + f + "\n" + e.message)
+        print("Could not open " + f + "\n" + e)
         exit(1)
 
 def print_dir_file_info(h5files):
@@ -268,15 +268,18 @@ def data_stream_info():
         filepath = os.path.join(file_dir, args.file)
         print_file_info2(filepath)
     elif file_dir != "":
-        files = os.listdir(unicode(file_dir))
-        only_files = [ f for f in files if os.path.isfile(os.path.join(unicode(file_dir), f)) ]
+        files = os.listdir(str(file_dir))
+        only_files = [ f for f in files if os.path.isfile(os.path.join(str(file_dir), f)) ]
 
         if len(only_files) == 0:
             print("no files found in " + file_dir)
         else:
-            only_files = [os.path.join(unicode(file_dir), f) for f in only_files]
+            only_files = [os.path.join(str(file_dir), f) for f in only_files]
             print_dir_file_info(only_files)
 
 if __name__ == "__main__":
-    data_stream_info()
-
+    #data_stream_info()
+    filepath = os.path.join(r"d:\Programming\McsDataManagement\McsPyDataTools\McsPyDataTools\McsPy\Test\TestData", r"2017-10-11T13-39-47McsRecording_N113_OptoStim.h5")
+    #filepath = os.path.join(r"d:\Programming\McsDataManagement\McsPyDataTools\McsPyDataTools\McsPy\tests\TestData", r"2017-10-11T13-39-47McsRecording_X981_AccGyro.h5")
+    print_file_info(filepath)
+    print_file_info2(filepath)
