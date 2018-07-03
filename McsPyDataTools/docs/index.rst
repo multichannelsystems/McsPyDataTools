@@ -13,11 +13,15 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
+   :caption: Handle MCS HDF5-Data in Python
 
    .. tutorial
    .. guide
    api
    mcs_hdf5_protocol
+
+   authors
+   history
 
 Indices and tables
 ==================
@@ -25,4 +29,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

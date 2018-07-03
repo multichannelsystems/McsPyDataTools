@@ -60,7 +60,7 @@ setup(
     #version=McsPy.__version__,
     version= get_current_version(),
     description='Handling data recorded and provided by MCS systems', 
-    long_description=open('README').read(),
+    long_description=open('README.rst').read(),
     keywords = 'HDF5 data electrophysiology MCS',
     author='J. Dietzsch, Multi Channel Systems MCS GmbH',
     author_email='dietzsch@multichannelsystems.com',
