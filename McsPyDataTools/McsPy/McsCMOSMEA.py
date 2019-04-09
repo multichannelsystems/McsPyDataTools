@@ -17,11 +17,13 @@ import math
 import uuid
 import collections
 import numpy as np
+import pandas as pd
 from numpy import rec
 import itertools
 from numbers import Number
 from inspect import signature
 import re
+from typing import *
 
 from McsPy import *
 from pint import UndefinedUnitError
@@ -46,17 +48,17 @@ class DictProperty_for_Classes(object):
     class _proxy(object):
 
         def __init__(self, obj, fget, fset, fdel):
-            self._obj  = obj 
+            self._obj = obj
             self._fget = fget
             self._fset = fset
             self._fdel = fdel
 
-        def __getitem__(self,key):
+        def __getitem__(self, key):
             if self._fset is None:
                 raise TypeError("Cannot read item.")
             return self._fget(self._obj, key)
 
-        def __setitem__(self,key,value):
+        def __setitem__(self, key, value):
             if self._fset is None:
                 raise TypeError("Cannot set item.")
             self._fset(self._obj, key, value)
@@ -76,7 +78,9 @@ class DictProperty_for_Classes(object):
             return self
         return self._proxy(obj, self._fget, self._fset, self._fdel)
 
+
 class _property(object):
+
 
     class _proxy(object):
 
@@ -111,6 +115,7 @@ class _property(object):
             return self
         return self._proxy(obj, self._fget, self._fset, self._fdel)
 
+
 class _list_property(object):
     """
     Creates helper class which is a list subclass. It is used to hand lists of streams to the McsPy user.
@@ -121,12 +126,11 @@ class _list_property(object):
     class McsProxy(collections.UserList):
 
         def __init__(self, initlist=None, obj=None, fget=None, fset=None, fdel=None):
-        #def __init__(self, obj, fget, fset, fdel):
             """
             ATTENTION! The collections.UserList documentation requires the init method of collections.UserList subclasses to accept zero or one argument!
             """
             super().__init__(initlist)
-            self._obj  = obj 
+            self._obj = obj
             self._fget = fget
             self._fset = fset
             self._fdel = fdel
@@ -181,6 +185,7 @@ class _list_property(object):
 
     def __str__(self):
         return self.McsProxy(self._content, obj=self._owner_instance).__str__()
+
 
 class McsHDF5(object):
     """
@@ -286,7 +291,7 @@ class McsGroup(h5py.Group, McsHDF5):
             for child in h5py_group_object:
                 mcs_instanceid      = h5py_group_object[child].attrs['ID.InstanceID'].decode('UTF-8')
                 mcs_typeid          = h5py_group_object[child].attrs['ID.TypeID'].decode('UTF-8').rstrip()
-                mcspy_child_name   = self.hdf5_to_mcspy(child)
+                mcspy_child_name    = self.hdf5_to_mcspy(child)
                 if isinstance(self._h5py_object[child], h5py.Dataset):
                     self._child_inventory.append(McsGroup.IDSetDataset(h5py=child,
                                                                        mcs_instanceid=mcs_instanceid,
@@ -342,7 +347,7 @@ class McsGroup(h5py.Group, McsHDF5):
         """
         if not isinstance(id, str):
             return False
-        return next( (set for set in self._child_inventory if id in set[0:3]) , False)
+        return next((set for set in self._child_inventory if id in set[0:3]), False)
 
     def _get_child(self, key):
         """
@@ -399,7 +404,7 @@ class McsGroup(h5py.Group, McsHDF5):
         :param id_set: id_set must be a valid id_set identifiying a child of this group
         """
         if store_parent:
-             self._child_storage[id_set.mcs_instanceid] = self._get_mcspy_instance(self._h5py_object[id_set.h5py], self)
+            self._child_storage[id_set.mcs_instanceid] = self._get_mcspy_instance(self._h5py_object[id_set.h5py], self)
         else:
             self._child_storage[id_set.mcs_instanceid] = self._get_mcspy_instance(self._h5py_object[id_set.h5py])
 
@@ -495,6 +500,9 @@ class McsDataset(h5py.Dataset, McsHDF5):
         out += 'dtype:'.ljust(first_col_width)+self.name+'{}'.format(self.dtype)+'\n'
         return out
 
+    def to_pdDataFrame(self):
+        return pd.DataFrame(self[()])
+
 class McsStreamList(collections.UserList):
     """
     Creates helper class which is a list subclass. It is used to hand lists of streams to the McsPy user.
@@ -580,8 +588,8 @@ class McsCMOSMEAData(McsGroup):
     This class holds the information of a complete MCS Cmos data file system
     """
 
-    sensorWidth      = 65
-    sensorHeight     = 65
+    sensorWidth: int = 65
+    sensorHeight: int = 65
 
     def __init__(self, cmos_data_path):
         """
@@ -604,7 +612,7 @@ class McsCMOSMEAData(McsGroup):
 
     def __str__(self):
         col_width = 25
-        out = '<McsCMOSMEAData instance at '+str(hex(id(self)))+'>\n\n'
+        out: str = '<McsCMOSMEAData instance at '+str(hex(id(self)))+'>\n\n'
         out += 'This object represents the Mcs CMOS MEA file:\n'
         #out += ''*4+'Path:'.ljust(12)+'\\'.join(self.attributes['ID.Instance'].split('\\')[:-1])+'\n'
         out += ''*4+'Filename:'.ljust(12)+self.attributes['ID.Instance'].split('\\')[-1]+'\n\n'
@@ -625,7 +633,7 @@ class McsCMOSMEAData(McsGroup):
     #        else:
     #            self.session_info[name] = value
 
-    def  __read_acquisition(self):
+    def __read_acquisition(self):
         "Read aquisition group"
         if 'Acquisition' in list(self.h5_file.keys()):
             acquisition_folder      = self.h5_file['Acquisition']
@@ -637,7 +645,7 @@ class McsCMOSMEAData(McsGroup):
         else:
             raise AttributeError("The HDF5 file does not contain a group 'Acquisition'.")
 
-    def  __read_sta_explorer(self):
+    def __read_sta_explorer(self):
         if 'STA Explorer' in list(self.h5_file.keys()):
             "Read sta explorer group"
             sta_explorer_folder     = self.h5_file['STA Explorer']
@@ -649,19 +657,19 @@ class McsCMOSMEAData(McsGroup):
         else:
             raise AttributeError("The HDF5 file does not contain a group 'STA Explorer'.")
 
-    def  __read_filter_tool(self):
+    def __read_filter_tool(self):
         if 'Filter Tool' in list(self.h5_file.keys()):
             pass
         else:
             raise AttributeError("The HDF5 file does not contain a group 'Filter Tool'.")
 
-    def  __read_spike_explorer(self):
+    def __read_spike_explorer(self):
         if 'Spike Exporer' in list(self.h5_file.keys()):
             pass
         else:
             raise AttributeError("The HDF5 file does not contain a group 'Spike Explorer'.")
 
-    def  __read_spike_sorter(self):
+    def __read_spike_sorter(self):
         if 'Spike Sorter' in list(self.h5_file.keys()):
             pass
         else:
@@ -677,7 +685,7 @@ class McsCMOSMEAData(McsGroup):
             raise KeyError('Sensor ID out of range!')
 
     @classmethod
-    def coordinates_to_sensorID(self, row, col):
+    def coordinates_to_sensorID(self, row: int, col: int) -> int:
         if 0<row and row<=self.sensorHeight and 0<col and col<=self.sensorWidth:
             return self.sensorHeight*(col-1)+row
         else:
@@ -751,14 +759,14 @@ class Acquisition(McsGroup):
         setattr(Acquisition, 'SpikeStreams', _list_property([id_set for id_set in self._child_inventory if id_set.mcs_typeid == Acquisition._stream_types["SpikeStream"]], self, fget=self._get_children, fset=None, fdel=None))
         setattr(Acquisition, 'EventStreams', _list_property([id_set for id_set in self._child_inventory if id_set.mcs_typeid == Acquisition._stream_types["EventStream"]], self, fget=self._get_children, fset=None, fdel=None))
         
-    def __str__(self):
+    def __str__(self) -> str:
         if self._child_inventory:
-            column_width = 25
-            bold_line = '='*(column_width*3+4)+'\n'
-            line = '-'*(column_width*3+4)+'\n'
-            out = line + 'Parent Group: <'+str(type(self)).strip('<>')+' object at '+str(hex(id(self)))+'>\n\n'
-            header = '|'+'{:^{}}'.format('Subtype', column_width)+'|'+'{:^{}}'.format('HDF5 name', column_width)+'|'+'{:^{}}'.format('McsPy name', column_width)+'|\n'
-            stream_types = dict()
+            column_width: int = 25
+            bold_line: str = '='*(column_width*3+4)+'\n'
+            line: str = '-'*(column_width*3+4)+'\n'
+            out: str = line + 'Parent Group: <'+str(type(self)).strip('<>')+' object at '+str(hex(id(self)))+'>\n\n'
+            header: str = '|'+'{:^{}}'.format('Subtype', column_width)+'|'+'{:^{}}'.format('HDF5 name', column_width)+'|'+'{:^{}}'.format('McsPy name', column_width)+'|\n'
+            stream_types: Dict[str, str] = dict()
             for child in self._child_inventory:
                 #h5py_key, mcs_typeid, mcspy_key, mcs_typeid   = child
                 stream_type = self._h5py_object[child.h5py].attrs['ID.Type'].decode('utf-8')
@@ -856,8 +864,8 @@ class McsChannelStream(McsStream):
     Container class for one analog stream of several channels.
     """
 
-    channel_data_typeid =  "5efe7932-dcfe-49ff-ba53-25accff5d622"
-    channel_meta_typeid =  "9e8ac9cd-5571-4ee5-bbfa-8e9d9c436daa"
+    channel_data_typeid = "5efe7932-dcfe-49ff-ba53-25accff5d622"
+    channel_meta_typeid = "9e8ac9cd-5571-4ee5-bbfa-8e9d9c436daa"
 
     def __init__(self, channel_stream_grp):
         """
@@ -890,7 +898,6 @@ class McsChannelStream(McsStream):
     @property
     def DataChunk(self):
         sweep_numbers = np.unique(self.SensorMeta.GroupID).tolist()
-        out = dict()
         for sweep_number in sweep_numbers:
             out[sweep_number] = _list_property.McsProxy(self._get_channel_sweeps_by_number(sweep_number), obj=self, fget=self._get_children, fset=None, fdel=None)
         return out
@@ -900,6 +907,7 @@ class McsChannelStream(McsStream):
     #    if self._entities == None:
     #        self._read_entities('McsChannelEntity')
     #    return self._entitiesf
+
 
 class McsChannelEntity(McsDataset, McsStreamEntity):
     """
