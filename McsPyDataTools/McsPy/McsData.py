@@ -49,7 +49,8 @@ class RawData(object):
         self.__recordings = None
 
     def __del__(self):
-        self.h5_file.close()
+        if self.h5_file:
+            self.h5_file.close()
 
     # Stub for with-Statement:
     #def __enter_(self):
