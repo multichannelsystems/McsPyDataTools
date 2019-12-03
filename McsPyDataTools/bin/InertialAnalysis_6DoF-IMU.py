@@ -25,7 +25,7 @@ import McsPy.functions_info as fi
 #fi.print_dir_file_info(r"../McsPyDataTools/McsPy/tests/TestData")
 
 
-acc_gyro_raw_data_file_path = "../McsPyDataTools/McsPy/tests/TestData/2017-10-11T13-39-47McsRecording_X981_AccGyro.h5"
+acc_gyro_raw_data_file_path = "../McsPy/tests/TestData/2017-10-11T13-39-47McsRecording_X981_AccGyro.h5"
 #fi.print_file_info(acc_gyro_raw_data_file_path)
 
 

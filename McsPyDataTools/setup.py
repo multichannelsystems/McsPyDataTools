@@ -73,7 +73,7 @@ setup(
     package_data ={
         'McsPy.tests': ['TestData/README.md']
     },
-    scripts=['bin/McsPyDataTools.py','bin/PlotExperimentData.py', 'bin/DataStreamInfo.py', 'bin/InertialAnalysis_6DoF-IMU.py'],
+    scripts=['bin/McsPyDataTools.py', 'bin/DataStreamInfo.py', 'bin/InertialAnalysis_6DoF-IMU.py'],
     url='http://multichannelsystems.com',
     license='LICENSE.txt',
     install_requires=[
