@@ -143,13 +143,13 @@ def print_stream_info(rec):
     num_streams = get_number_of_streams(rec, stream_type)
     print_number_of_streams(rec, stream_type)
     if num_streams > 0:
-        print_segment_channel_info(rec.event_streams)
+        print_segment_channel_info(rec.segment_streams)
 
     stream_type = "timestamp"
     num_streams = get_number_of_streams(rec, stream_type)
     print_number_of_streams(rec, stream_type)
     if num_streams > 0:
-        print_timestamp_channel_info(rec.event_streams)
+        print_timestamp_channel_info(rec.timestamp_streams)
 
 
 def print_file_info(h5filename):
@@ -278,8 +278,4 @@ def data_stream_info():
             print_dir_file_info(only_files)
 
 if __name__ == "__main__":
-    #data_stream_info()
-    filepath = os.path.join(r"d:\Programming\McsDataManagement\McsPyDataTools\McsPyDataTools\McsPy\Test\TestData", r"2017-10-11T13-39-47McsRecording_N113_OptoStim.h5")
-    #filepath = os.path.join(r"d:\Programming\McsDataManagement\McsPyDataTools\McsPyDataTools\McsPy\tests\TestData", r"2017-10-11T13-39-47McsRecording_X981_AccGyro.h5")
-    print_file_info(filepath)
-    print_file_info2(filepath)
+    data_stream_info()

@@ -66,14 +66,14 @@ setup(
     author_email='dietzsch@multichannelsystems.com',
     zip_safe=True,
     packages=['McsPy', 'McsPy.tests'],
-    # Provide test data as an accompynied separate archive! -> but create the folder and show README.md
+    # Provide test data as an accompanied separate archive! -> just create the folder and show README.md
     #package_data ={
     #    'McsPy.tests': ['TestData/*.h5']
     #},
     package_data ={
         'McsPy.tests': ['TestData/README.md']
     },
-    scripts=['bin/McsPyDataTools.py','bin/PlotExperimentData.py', 'bin/DataStreamInfo.py'],
+    scripts=['bin/McsPyDataTools.py','bin/PlotExperimentData.py', 'bin/DataStreamInfo.py', 'bin/InertialAnalysis_6DoF-IMU.py'],
     url='http://multichannelsystems.com',
     license='LICENSE.txt',
     install_requires=[

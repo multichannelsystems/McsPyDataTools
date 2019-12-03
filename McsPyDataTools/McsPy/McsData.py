@@ -322,19 +322,28 @@ class AnalogStream(Stream):
         # Connect the data set
         self.channel_data = self.stream_grp['ChannelData']
 
-    def get_channel_in_range(self, channel_id, idx_start, idx_end):
+    def get_channel(self, channel_id):
         """
-        Get the signal of the given channel over the curse of time and in its measured range.
+        Get the signal of the given channel over the course of time and in its measured range.
 
         :param channel_id: ID of the channel
-        :param idx_start: index of the first sampled signal value that should be returned (0 <= idx_start < idx_end <= count samples)
-        :param idx_end: index of the last sampled signal value that should be returned (0 <= idx_start < idx_end <= count samples)
+        :return: Tuple (vector of the signal, unit of the values)
+        """
+        return self.get_channel_in_range(channel_id)
+
+    def get_channel_in_range(self, channel_id, idx_start=0, idx_end=None):
+        """
+        Get the signal of the given channel over the course of time and in its measured range.
+
+        :param channel_id: ID of the channel
+        :param idx_start: index of the first sampled signal value that should be returned (0 <= idx_start < idx_end <= count samples). Default: 0
+        :param idx_end: index of the last sampled signal value that should be returned (0 <= idx_start < idx_end <= count samples). Default: None (= last index)
         :return: Tuple (vector of the signal, unit of the values)
         """
         if channel_id in self.channel_infos.keys():
             if idx_start < 0:
                 idx_start = 0
-            if idx_end > self.channel_data.shape[1]:
+            if idx_end is None or idx_end > self.channel_data.shape[1]:
                 idx_end = self.channel_data.shape[1]
             else:
                 idx_end += 1
@@ -344,16 +353,22 @@ class AnalogStream(Stream):
             signal_corrected = (signal - self.channel_infos[channel_id].get_field('ADZero'))  * scale
             return (signal_corrected, self.channel_infos[channel_id].adc_step.units)
 
-    def get_channel_sample_timestamps(self, channel_id, idx_start, idx_end):
+    def get_channel_sample_timestamps(self, channel_id, idx_start=0, idx_end=None):
         """
         Get the timestamps of the sampled values.
 
         :param channel_id: ID of the channel
-        :param idx_start: index of the first signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples)
-        :param idx_end: index of the last signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples)
+        :param idx_start: index of the first signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples). Default: 0
+        :param idx_end: index of the last signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples). Default: None (= last index)
         :return: Tuple (vector of the timestamps, unit of the timestamps)
         """
         if channel_id in self.channel_infos.keys():
+            if idx_start < 0:
+                idx_start = 0
+            if idx_end is None or idx_end > self.channel_data.shape[1]:
+                idx_end = self.channel_data.shape[1]
+            else:
+                idx_end += 1
             start_ts = 0
             channel = self.channel_infos[channel_id]
             tick = channel.get_field('Tick')
@@ -776,8 +791,12 @@ class EventEntityInfo(Info):
             source_channel_ids = [-1]
             source_channel_labels = ["N/A"]
         else:
-            source_channel_ids = [int(x) for x in info['SourceChannelIDs'].decode('utf-8').split(',')]
-            source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].decode('utf-8').split(',')]
+            try:
+                source_channel_ids = [int(x) for x in info['SourceChannelIDs'].decode('utf-8').split(',')]
+                source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].decode('utf-8').split(',')]
+            except ValueError:
+                source_channel_ids = [-1]
+                source_channel_labels = ["N/A"]
         self.__source_channels = {}
         for idx, channel_id in enumerate(source_channel_ids):
             self.__source_channels[channel_id] = source_channel_labels[idx]

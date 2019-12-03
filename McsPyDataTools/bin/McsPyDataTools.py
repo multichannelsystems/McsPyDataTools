@@ -1,13 +1,11 @@
 import McsPy
 import McsPy.McsData
-import McsPy.functions_info
+import McsPy.functions_info as fi
 import matplotlib
 import pylab as pl
 import numpy as np
 
 from McsPy import ureg, Q_
-#from McsPy.functions_info import print_file_info
-import functions_info as fi
 
 def show_image_plot(data, aspect_ratio = 10000):
     #matshow(data)
@@ -130,7 +128,7 @@ def test_frame_raw_data():
     print(raw_data.clr_date)
     print(raw_data.date_in_clr_ticks)
     print(raw_data.file_guid)
-    print(raw_data.mea_id)
+    print(raw_data.mea_sn)
     print(raw_data.mea_name)
     print(raw_data.program_name)
     print(raw_data.program_version) 
