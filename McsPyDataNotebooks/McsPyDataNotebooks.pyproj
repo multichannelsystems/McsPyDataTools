@@ -27,9 +27,10 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="IMU_Notebook.ipynb" />
-    <Content Include="McsPyData-TutorialCMOSMEA.ipynb" />
-    <Content Include="McsPyDataNotebook.ipynb" />
+    <Content Include="McsPy-Tutorial_IMU.ipynb" />
+    <Content Include="McsPy-Tutorial_CMOS-MEA.ipynb" />
+    <Content Include="McsPy-Tutorial_Toolbox.ipynb" />
+    <Content Include="McsPy-Tutorial_Sorting.ipynb" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataStreamInfo.py" />
