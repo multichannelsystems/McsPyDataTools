@@ -10,7 +10,7 @@
 """
 
 #print("McsPy init!")
-version = "0.3.0.post2"
+version = "0.4.0"
 
 #__all__ = ["CMOSData", "CMOSConvProxy", "RawData", "Recording", "Stream", "AnalogStream", 
 #           "Info", "InfoSampledData", "ChannelInfo", "FrameStream", "FrameEntity", "Frame", 

@@ -16,8 +16,9 @@
     <InterpreterPath />
     <InterpreterArguments />
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <InterpreterId>Global|ContinuumAnalytics|Anaconda36-64</InterpreterId>
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda37-64</InterpreterId>
     <IsWindowsApplication>False</IsWindowsApplication>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,16 +42,16 @@
     <Compile Include="McsPy\functions_info.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="McsPy\tests\TestCMOS.py" />
+    <Compile Include="McsPy\tests\TestCmosMeaDataStructures.py" />
+    <Compile Include="McsPy\tests\TestRawDataStructures.py" />
+    <Compile Include="McsPy\tests\__init__.py" />
     <Compile Include="McsPy\__init__.py" />
     <Compile Include="McsPy\McsCMOS.py" />
     <Compile Include="McsPy\McsData.py" />
     <Compile Include="McsPy\McsCMOSMEA.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="McsPy\Test\__init__.py" />
-    <Compile Include="McsPy\Test\TestCMOS.py" />
-    <Compile Include="McsPy\Test\TestCmosMeaDataStructures.py" />
-    <Compile Include="McsPy\Test\TestRawDataStructures.py" />
     <Compile Include="bin\McsPyDataTools.py" />
     <Compile Include="bin\PlotExperimentData.py" />
     <Compile Include="setup.py" />
@@ -59,13 +60,12 @@
     <Folder Include="docs\images\" />
     <Folder Include="McsPy\" />
     <Folder Include="bin\" />
-    <Folder Include="McsPy\Test\" />
-    <Folder Include="McsPy\Test\TestData\" />
+    <Folder Include="McsPy\tests\" />
+    <Folder Include="McsPy\tests\TestData\" />
     <Folder Include="docs\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AUTHORS" />
-    <Content Include="CHANGES" />
+    <Content Include="AUTHORS.rst" />
     <Content Include="docs\api.rst" />
     <Content Include="docs\guide.rst" />
     <Content Include="docs\images\Hierarchy_short.png" />
@@ -74,13 +74,19 @@
     <Content Include="docs\Makefile" />
     <Content Include="docs\mcs_hdf5_protocol.rst" />
     <Content Include="docs\tutorial.rst" />
-    <Content Include="LICENSE" />
+    <Content Include="HISTORY.rst" />
+    <Content Include="LICENSE.txt" />
     <Content Include="MANIFEST.in" />
-    <Content Include="McsPy\Test\TestData\README.md" />
-    <Content Include="README" />
+    <Content Include="McsPy\tests\TestData\2014-07-09T10-17-35W8 Standard all 500 Hz.h5" />
+    <Content Include="McsPy\tests\TestData\CMOSTestRec.h5" />
+    <Content Include="McsPy\tests\TestData\CMOSTestRec.xml" />
+    <Content Include="McsPy\tests\TestData\README.md" />
+    <Content Include="README.rst" />
+    <Content Include="setup.cfg" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
+    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda37-64" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
