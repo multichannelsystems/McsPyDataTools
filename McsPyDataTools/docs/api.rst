@@ -67,7 +67,7 @@ The ''McsData'' module
    :members:
    :member-order: bysource
 
-    **DataSybType != Average** → Maps segement entity content of the HDF5 :ref:`mcs-hdf5-raw-segmentstream-label` to Python structures.
+    **DataSubType != Average** → Maps segement entity content of the HDF5 :ref:`mcs-hdf5-raw-segmentstream-label` to Python structures.
    
 .. autoclass:: AverageSegmentTuple 
    :members:
@@ -77,7 +77,7 @@ The ''McsData'' module
    :members:
    :member-order: bysource
    
-   **DataSybType == Average** → Maps segment entity content of the HDF5 :ref:`mcs-hdf5-raw-segmentstream-subtype-average-label` to Python structures.
+   **DataSubType == Average** → Maps segment entity content of the HDF5 :ref:`mcs-hdf5-raw-segmentstream-subtype-average-label` to Python structures.
    
 .. autoclass:: TimeStampStream 
    :members:
@@ -118,9 +118,113 @@ The ''McsData'' module
    :members:
    :member-order: bysource
 
-The ''McsCMOS'' module
-----------------------
+The ''McsCMOSMEA'' module
+-------------------------
 
-.. automodule:: McsPy.McsCMOS
-   :members:
+.. module:: McsPy.McsCMOSMEA
 
+.. autoclass:: McsCMOSMEAData
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsGroup
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsDataset
+    :members:
+    :member-order: bysource
+
+*Raw Data (.cmcr)* files
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Acquisition
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsInfo
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsStream
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsChannelStream
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsChannelEntity
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsEventStream
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsEventEntity
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsSensorStream
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsSensorEntity
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsSpikeStream
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsSpikeEntity
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsSegmentStream
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsSegmentStreamEntity
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsTimeStampStream
+    :members:
+    :member-order: bysource
+
+.. autoclass:: McsTimeStampStreamEntity
+    :members:
+    :member-order: bysource
+
+*Processed Data (.cmtr)* files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: NetworkExplorer
+    :members:
+    :member-order: bysource
+
+.. autoclass:: STAEntity
+    :members:
+    :member-order: bysource
+
+.. autoclass:: SpikeExplorer
+    :members:
+    :member-order: bysource
+
+.. autoclass:: SpikeSorter
+    :members:
+    :member-order: bysource
+
+.. autoclass:: SpikeSorterUnitEntity
+    :members:
+    :member-order: bysource
+
+.. autoclass:: FilterTool
+    :members:
+    :member-order: bysource
+
+.. autoclass:: ActivitySummary
+    :members:
+    :member-order: bysource

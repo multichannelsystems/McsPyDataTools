@@ -2,10 +2,12 @@
 Authors
 =======
 
-McsPyDataTools is written and maintained by Janko Dietzsch (Multi Channel Systems MCS GmbH) <dietzsch@multichannelsystems.com>.
+Alphabetical list of contributors to the McsPyDataTools toolbox:
 
-Other contributors, listed alphabetically, are:
-
+* Janko Dietzsch <dietzsch@multichannelsystems.com>
 * Florian Helmhold <helmhold@multichannelsystems.com>
 * Hans Loeffler <loeffler@multichannelsystems.com>
+* Armin Walter <walter@multichannelsystems.com>
 * Ole Wenzel <wenzel@multichannelsystems.com>
+
+The McsPyDataTools toolbox is maintained by Armin Walter (Multi Channel Systems MCS GmbH) <walter@multichannelsystems.com>.

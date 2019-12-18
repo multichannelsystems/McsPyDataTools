@@ -2,6 +2,12 @@
 History
 =======
 
+Version 0.4.0 (2019-12-18)
+--------------------------
+- Improved documentation
+- Improved support for CMOS-MEA files
+- New Jupyter Notebook Tutorials
+
 Version 0.3.0 (2018-06-13)
 --------------------------
 - Migrated to Python 3
