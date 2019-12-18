@@ -60,20 +60,20 @@ setup(
     #version=McsPy.__version__,
     version= get_current_version(),
     description='Handling data recorded and provided by MCS systems', 
-    long_description=open('README').read(),
+    long_description=open('README.rst').read(),
     keywords = 'HDF5 data electrophysiology MCS',
     author='J. Dietzsch, Multi Channel Systems MCS GmbH',
     author_email='dietzsch@multichannelsystems.com',
     zip_safe=True,
     packages=['McsPy', 'McsPy.tests'],
-    # Provide test data as an accompynied separate archive! -> but create the folder and show README.md
+    # Provide test data as an accompanied separate archive! -> just create the folder and show README.md
     #package_data ={
     #    'McsPy.tests': ['TestData/*.h5']
     #},
     package_data ={
         'McsPy.tests': ['TestData/README.md']
     },
-    scripts=['bin/McsPyDataTools.py','bin/PlotExperimentData.py', 'bin/DataStreamInfo.py'],
+    scripts=['bin/McsPyDataTools.py', 'bin/DataStreamInfo.py', 'bin/InertialAnalysis_6DoF-IMU.py'],
     url='http://multichannelsystems.com',
     license='LICENSE.txt',
     install_requires=[
@@ -83,7 +83,7 @@ setup(
         "tabulate >= 0.8.2"
     ],
     classifiers=[
-        'Development Status :: 1 - Beta',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',

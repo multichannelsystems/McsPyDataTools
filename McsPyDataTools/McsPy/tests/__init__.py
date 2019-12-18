@@ -10,7 +10,7 @@
 """
 
 #print("McsPy init!")
-version = "0.3.0"
+version = "0.3.0.post2"
 
 from pint import UnitRegistry
 ureg = UnitRegistry()

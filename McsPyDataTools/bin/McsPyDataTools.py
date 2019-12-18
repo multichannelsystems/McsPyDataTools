@@ -1,13 +1,12 @@
 import McsPy
 import McsPy.McsData
-import McsPy.functions_info
+import McsPy.functions_info as fi
 import matplotlib
 import pylab as pl
 import numpy as np
+import os
 
 from McsPy import ureg, Q_
-#from McsPy.functions_info import print_file_info
-import functions_info as fi
 
 def show_image_plot(data, aspect_ratio = 10000):
     #matshow(data)
@@ -87,8 +86,10 @@ def draw_channel_with_spectrogram(stream, channel_id):
     pl.ylabel('Frequency (Hz)')
     pl.show()
 
-def test_channel_raw_data():
-    test_raw_data_file_path = ".\\McsPy\\tests\\TestData\\2014-07-09T10-17-35W8 Standard all 500 Hz.h5"
+def test_channel_raw_data(folder=None):
+    if folder is None:
+        folder = _default_test_data_folder()
+    test_raw_data_file_path = os.path.join(folder, "2014-07-09T10-17-35W8 Standard all 500 Hz.h5")
     fi.print_file_info(test_raw_data_file_path)
     raw_data = McsPy.McsData.RawData(test_raw_data_file_path)
     print(raw_data.comment)
@@ -121,16 +122,17 @@ def plotHistogram(arr) :
     fig  = pl.figure(figsize=(8,8), dpi=80, facecolor='w',edgecolor='w',frameon=True)
     pl.hist(arr.flatten(), bins=100)
   
-def test_frame_raw_data():
-    test_raw_frame_data_file_path = "d:\\Programming\\MCSuite\\McsPyDataTools\\McsPyDataTools\\McsPyTests\\TestData\\Sensor200ms.h5"
-    #with McsData.RawData(test_raw_frame_data_file_path) as raw_data:
+def test_frame_raw_data(folder=None):
+    if folder is None:
+        folder = _default_test_data_folder()
+    test_raw_frame_data_file_path = os.path.join(folder, "Sensor200ms.h5")
     raw_data = McsPy.McsData.RawData(test_raw_frame_data_file_path)
     print(raw_data.comment)
     print(raw_data.date)
     print(raw_data.clr_date)
     print(raw_data.date_in_clr_ticks)
     print(raw_data.file_guid)
-    print(raw_data.mea_id)
+    print(raw_data.mea_sn)
     print(raw_data.mea_name)
     print(raw_data.program_name)
     print(raw_data.program_version) 
@@ -141,8 +143,10 @@ def test_frame_raw_data():
     plotHistogram(first_frame)
     pl.show()
 
-def test_event_raw_data():
-    test_raw_data_file_path = ".\\McsPy\\tests\\TestData\\2014-07-09T10-17-35W8 Standard all 500 Hz.h5"
+def test_event_raw_data(folder=None):
+    if folder is None:
+        folder = _default_test_data_folder()
+    test_raw_data_file_path = os.path.join(folder, "2014-07-09T10-17-35W8 Standard all 500 Hz.h5")
     raw_data = McsPy.McsData.RawData(test_raw_data_file_path)
     event_entity = raw_data.recordings[0].event_streams[0].event_entity[0]
     print("Event entity 0 contains: %s events" % event_entity.count)
@@ -153,8 +157,10 @@ def test_event_raw_data():
     all_event_durations = event_entity.get_event_durations()
     print(all_event_durations[0])
 
-def test_segment_raw_data():
-    test_raw_data_file_path = ".\\McsPy\\tests\\TestData\\2014-07-09T10-17-35W8 Standard all 500 Hz.h5"
+def test_segment_raw_data(folder=None):
+    if folder is None:
+        folder = _default_test_data_folder()
+    test_raw_data_file_path = os.path.join(folder, "2014-07-09T10-17-35W8 Standard all 500 Hz.h5")
     raw_data = McsPy.McsData.RawData(test_raw_data_file_path)
     first_segment_entity = raw_data.recordings[0].segment_streams[0].segment_entity[0]
     print("Segment entity 0 contains: %s segments" % first_segment_entity.segment_sample_count)
@@ -170,8 +176,10 @@ def test_segment_raw_data():
     pl.title('Sampled signal segments')
     pl.show()
 
-def test_timestamp_raw_data():
-    test_raw_data_file_path = ".\\McsPy\\tests\\TestData\\2014-07-09T10-17-35W8 Standard all 500 Hz.h5"
+def test_timestamp_raw_data(folder=None):
+    if folder is None:
+        folder = _default_test_data_folder()
+    test_raw_data_file_path = os.path.join(folder, "2014-07-09T10-17-35W8 Standard all 500 Hz.h5")
     raw_data = McsPy.McsData.RawData(test_raw_data_file_path)
     first_timestamp_entity = raw_data.recordings[0].timestamp_streams[0].timestamp_entity[0]
     print("Timestamp entity 0 contains: %s timestamps" % first_timestamp_entity.count)
@@ -181,27 +189,22 @@ def test_timestamp_raw_data():
                                               list(raw_data.recordings[0].analog_streams[1].channel_infos.keys())[0],
                                               timestamps[0])
 
-def test_imu_data():
-    test_raw_data_file_path = ".\\McsPy\\tests\\TestData\\2017-10-11T13-39-47McsRecording_X981_AccGyro.h5"
+def test_imu_data(folder=None):
+    if folder is None:
+        folder = _default_test_data_folder()
+    test_raw_data_file_path = os.path.join(folder, "2017-10-11T13-39-47McsRecording_X981_AccGyro.h5")
     fi.print_file_info_short(test_raw_data_file_path)
     fi.print_file_info(test_raw_data_file_path)
     raw_data = McsPy.McsData.RawData(test_raw_data_file_path)
     draw_raw_data(raw_data.recordings[0].analog_streams[4])
     draw_raw_data(raw_data.recordings[0].analog_streams[5])
 
-def test_opto_stim_data():
-    test_raw_data_file_path = ".\\McsPy\\tests\\TestData\\2017-10-11T13-39-47McsRecording_N113_OptoStim.h5"
+def test_opto_stim_data(folder=None):
+    if folder is None:
+        folder = _default_test_data_folder()
+    test_raw_data_file_path = os.path.join(folder, "2017-10-11T13-39-47McsRecording_N113_OptoStim.h5")
     fi.print_file_info(test_raw_data_file_path)
     raw_data = McsPy.McsData.RawData(test_raw_data_file_path)
 
-print('McsPy Version: %s' % McsPy.version)
-fi.print_dir_file_info(".\\McsPy\\tests\\TestData")
-fi.print_dir_file_info(r"/Programming/McsDataManagement/McsPyDataTools/McsPyDataNotebooks/TestData")
-#McsPy.McsData.VERBOSE = False
-test_channel_raw_data()
-##test_frame_raw_data()
-#test_event_raw_data()
-#test_segment_raw_data()
-#test_timestamp_raw_data()
-#test_imu_data()
-#test_opto_stim_data()
+def _default_test_data_folder():
+    return r"..\\McsPy\\tests\\TestData"

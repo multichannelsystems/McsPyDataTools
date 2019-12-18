@@ -111,3 +111,7 @@ docs-html
 # mypy
 #==========================
 .mypy_cache/
+*.h5
+*.cmcr
+*.cmtr
+/.vscode/*

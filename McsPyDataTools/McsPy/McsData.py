@@ -17,7 +17,7 @@ import uuid
 import collections
 import numpy as np
 
-from McsPy import *
+from McsPy import ureg, McsHdf5Protocols
 from pint import UndefinedUnitError
 
 MCS_TICK = 1 * ureg.us
@@ -35,6 +35,22 @@ def dprint_name_value(n, v):
 class RawData(object):
     """
     This class holds the information of a complete MCS raw data file
+
+    :param raw_data_path: path to the HDF5 file
+    :param h5_file: h5py File handle
+    :param mcs_hdf5_protocol_type: protocol type. Currently, only "RawData" is supported
+    :param mcs_hdf5_protocol_type_version: protocol version
+    :param comment: comment string
+    :param clr_date: recording date string
+    :param date_in_clr_ticks: recording date in CLR ticks (100 ns)
+    :param date: :class:`datetime` object representing the recording date
+    :param file_guid: file GUID
+    :param mea_layout: name of the MEA layout
+    :param mea_sn: serial number of the MEA
+    :param mea_name: name of the MEA
+    :param program_name: name of the recording software that created the file
+    :param program_version: version of the recording software that created the file
+
     """
     def __init__(self, raw_data_path):
         """
@@ -49,17 +65,14 @@ class RawData(object):
         self.__recordings = None
 
     def __del__(self):
-        self.h5_file.close()
-
-    # Stub for with-Statement:
-    #def __enter_(self):
-    #    return self
-    #
-    #def __exit__(self, type, value, traceback):
-    #    self.h5_file.close()
+        if self.h5_file:
+            self.h5_file.close()
 
     def __str__(self):
-        return super(RawData, self).__str__()
+        return "<RawData raw_data_path=" + self.raw_data_path + ", Recordings=" + str(len(self.h5_file['Data'])) + ">"
+    
+    def __repr__(self):
+        return self.__str__()
 
     def __validate_mcs_hdf5_version(self):
         "Check if the MCS-HDF5 protocol type and version of the file is supported by this class"
@@ -125,6 +138,13 @@ class RawData(object):
 class Recording(object):
     """
     Container class for one recording
+
+    :param comment: recording comment
+    :param duration: duration of the recording in microseconds
+    :param label: recording label
+    :param recording_id: recording ID
+    :param recording_type: recording type
+    :param timestamp: recording timestamp
     """
     def __init__(self, recording_grp):
         self.__recording_grp = recording_grp
@@ -134,6 +154,17 @@ class Recording(object):
         self.__event_streams = None
         self.__segment_streams = None
         self.__timestamp_streams = None
+
+    def __str__(self):
+        streams = ''
+        for stream in ['AnalogStream', 'EventStream', 'SegmentStream', 'TimeStampStream', 'FrameStream']:
+            if stream in self.__recording_grp:
+                streams += ", " + stream + "s=" + str(len(self.__recording_grp[stream]))
+        
+        return "<Recording label=" + self.label + streams + ", duration_time=" + str(self.duration_time) + ">"
+    
+    def __repr__(self):
+        return self.__str__()
 
     def __get_recording_info(self):
         "Read metadata for this recording"
@@ -234,7 +265,7 @@ class Recording(object):
 
     @property
     def segment_streams(self):
-        "Access segment streams - - collection of :class:`~McsPy.McsData.SegementStream` objects"
+        "Access segment streams - collection of :class:`~McsPy.McsData.SegementStream` objects"
         if self.__segment_streams is None:
             self.__read_segment_streams()
         return self.__segment_streams
@@ -290,6 +321,16 @@ class AnalogStream(Stream):
     """
     Container class for one analog stream of several channels.
     Description for each channel is provided by a channel-associated object of :class:`~McsPy.McsData.ChannelInfo`
+
+    :param channel_data: numpy array (channels x samples) with channel data
+    :param timestamp_index: numpy array (segment x 3) defining the timestamps for each data segment as `[first_timestamp, first_index, last_index]`. Interpretation: All samples in `channel_data` between `first_index` and `last_index` (inclusive) are in a continuous data segment and the timestamp of the samples at `first_index` is `first_timestamp`
+    :param channel_infos: dict with channel metadata. Key: ChannelID, Value: :class:`~McsPy.McsData.ChannelInfo` object
+    :param info_version: version of the Info structure
+    :param data_subtype: type of stream data ("Electrode", "Auxiliary", "Digital", ...)
+    :param label: the stream label
+    :param source_stream_guid: the GUID of the source stream
+    :param stream_guid: the stream GUID
+    :param stream_type: the stream type ("Analog")
     """
     def __init__(self, stream_grp):
         """
@@ -300,6 +341,12 @@ class AnalogStream(Stream):
         #McsHdf5Protocols.check_protocol_type_version("AnalogStreamInfoVersion", info_version)
         Stream.__init__(self, stream_grp, "AnalogStreamInfoVersion")
         self.__read_channels()
+
+    def __str__(self):
+        return "<AnalogStream label=" + self.label + ", channels=" + str(len(self.channel_infos)) + ", samples=" + str(self.channel_data.shape[1]) + ">"
+    
+    def __repr__(self):
+        return self.__str__()
 
     def __read_channels(self):
         "Read all channels -> create Info structure and connect datasets"
@@ -321,19 +368,28 @@ class AnalogStream(Stream):
         # Connect the data set
         self.channel_data = self.stream_grp['ChannelData']
 
-    def get_channel_in_range(self, channel_id, idx_start, idx_end):
+    def get_channel(self, channel_id):
         """
-        Get the signal of the given channel over the curse of time and in its measured range.
+        Get the signal of the given channel over the course of time and in its measured range.
 
         :param channel_id: ID of the channel
-        :param idx_start: index of the first sampled signal value that should be returned (0 <= idx_start < idx_end <= count samples)
-        :param idx_end: index of the last sampled signal value that should be returned (0 <= idx_start < idx_end <= count samples)
+        :return: Tuple (vector of the signal, unit of the values)
+        """
+        return self.get_channel_in_range(channel_id)
+
+    def get_channel_in_range(self, channel_id, idx_start=0, idx_end=None):
+        """
+        Get the signal of the given channel over the course of time and in its measured range.
+
+        :param channel_id: ID of the channel
+        :param idx_start: index of the first sampled signal value that should be returned (0 <= idx_start < idx_end <= count samples). Default: 0
+        :param idx_end: index of the last sampled signal value that should be returned (0 <= idx_start < idx_end <= count samples). Default: None (= last index)
         :return: Tuple (vector of the signal, unit of the values)
         """
         if channel_id in self.channel_infos.keys():
             if idx_start < 0:
                 idx_start = 0
-            if idx_end > self.channel_data.shape[1]:
+            if idx_end is None or idx_end > self.channel_data.shape[1]:
                 idx_end = self.channel_data.shape[1]
             else:
                 idx_end += 1
@@ -343,16 +399,22 @@ class AnalogStream(Stream):
             signal_corrected = (signal - self.channel_infos[channel_id].get_field('ADZero'))  * scale
             return (signal_corrected, self.channel_infos[channel_id].adc_step.units)
 
-    def get_channel_sample_timestamps(self, channel_id, idx_start, idx_end):
+    def get_channel_sample_timestamps(self, channel_id, idx_start=0, idx_end=None):
         """
         Get the timestamps of the sampled values.
 
         :param channel_id: ID of the channel
-        :param idx_start: index of the first signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples)
-        :param idx_end: index of the last signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples)
+        :param idx_start: index of the first signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples). Default: 0
+        :param idx_end: index of the last signal timestamp that should be returned (0 <= idx_start < idx_end <= count samples). Default: None (= last index)
         :return: Tuple (vector of the timestamps, unit of the timestamps)
         """
         if channel_id in self.channel_infos.keys():
+            if idx_start < 0:
+                idx_start = 0
+            if idx_end is None or idx_end > self.channel_data.shape[1]:
+                idx_end = self.channel_data.shape[1]
+            else:
+                idx_end += 1
             start_ts = 0
             channel = self.channel_infos[channel_id]
             tick = channel.get_field('Tick')
@@ -435,6 +497,8 @@ class InfoSampledData(Info):
 class ChannelInfo(InfoSampledData):
     """
     Contains all describing meta data for one sampled channel
+
+    :param info: dict containing the channel metadata
     """
     def __init__(self, info_version, info):
         """
@@ -446,6 +510,12 @@ class ChannelInfo(InfoSampledData):
         InfoSampledData.__init__(self, info)
         McsHdf5Protocols.check_protocol_type_version("InfoChannel", info_version)
         self.__version = info_version
+
+    def __str__(self):
+        return "<ChannelInfo channel_id=" + str(self.channel_id) + ", row_index=" + str(self.row_index) + ", sampling_frequency=" + str(self.sampling_frequency) + ">"
+    
+    def __repr__(self):
+        return self.__str__()
 
     @property
     def channel_id(self):
@@ -479,6 +549,14 @@ class ChannelInfo(InfoSampledData):
 class FrameStream(Stream):
     """
     Container class for one frame stream with different entities
+
+    :param frame_entity: list of :class:`~McsPy.McsData.FrameEntity` objects
+    :param info_version: version of the Info structure
+    :param data_subtype: type of stream data
+    :param label: the stream label
+    :param source_stream_guid: the GUID of the source stream
+    :param stream_guid: the stream GUID
+    :param stream_type: the stream type ("Frame")
     """
     def __init__(self, stream_grp):
         """
@@ -488,6 +566,12 @@ class FrameStream(Stream):
         """
         Stream.__init__(self, stream_grp, "FrameStreamInfoVersion")
         self.__read_frame_entities()
+
+    def __str__(self):
+        return "<FrameStream entities=" + str(len(self.frame_entity)) + ">"
+    
+    def __repr__(self):
+        return self.__str__()
 
     def __read_frame_entities(self):
         "Read all fream entities for this frame stream inside the associated frame entity folder"
@@ -514,6 +598,10 @@ class FrameEntity(object):
     """
     Contains the stream of a specific frame entity.
     Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.FrameEntityInfo`
+
+    :param data: numpy array (sensors_X x sensors_Y x time) of sensor data in ADC steps. Multiply with `info.conversion_factors` to get voltages.
+    :param info: :class:`~McsPy.McsData.FrameEntityInfo` object with Frame metadata
+    :param timestamp_index: start timestamp of the Frame
     """
     def __init__(self, frame_entity_group, frame_info):
         """
@@ -586,7 +674,7 @@ class FrameEntity(object):
 
 class Frame(object):
     """
-    Frame definition
+    Frame definition: left, top, right and bottom coordinates (1-based, inclusive)
     """
     def __init__(self, left, top, right, bottom):
         self.__left = left
@@ -596,31 +684,54 @@ class Frame(object):
 
     @property
     def left(self):
+        """
+        Left sensor index
+        """
         return self.__left
 
     @property
     def top(self):
+        """
+        Top sensor index
+        """
         return self.__top
 
     @property
     def right(self):
+        """
+        Right sensor index
+        """
         return self.__right
 
     @property
     def bottom(self):
+        """
+        Bottom sensor index
+        """
         return self.__bottom
 
     @property
     def width(self):
+        """
+        Frame width
+        """
         return self.__right - self.__left + 1
 
     @property
     def height(self):
+        """
+        Frame height
+        """
         return self.__bottom - self.__top + 1
 
 class FrameEntityInfo(InfoSampledData):
     """
     Contains all describing meta data for one frame entity
+
+    :param info: dict containing the frame metadata
+    :param frame: the rectangular area within the reference_frame
+    :param reference_frame: the reference for the frame area. Could be for example the whole chip
+    :param conversion_factors: numpy array (sensors_X x sensors_Y) of multiplication factors per sensor to convert ADC steps to voltages
     """
     def __init__(self, info_version, info, conv_factor_matrix):
         """
@@ -662,12 +773,20 @@ class FrameEntityInfo(InfoSampledData):
 
     @property
     def version(self):
-        "Version number of the Type-Definition"
+        "Version number of the type definition"
         return self.__version
 
 class EventStream(Stream):
     """
     Container class for one event stream with different entities
+
+    :param event_entity: dict of event entities. Key: event ID, value: a :class:`~McsPy.McsData.EventEntity` object
+    :param info_version: version of the Info structure
+    :param data_subtype: type of stream data ("DigitalInput", "UserData", ...)
+    :param label: the stream label
+    :param source_stream_guid: the GUID of the source stream
+    :param stream_guid: the stream GUID
+    :param stream_type: the stream type ("Event")
     """
     def __init__(self, stream_grp):
         """
@@ -696,6 +815,9 @@ class EventEntity(object):
     """
     Contains the event data of a specific entity.
     Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.EventEntityInfo`
+
+    :param data: numpy array (5 x n_events) of event data. row 0: event timestamp in microsecond; row 1: event duration in microseconds; row 2: event type; row 3-4: reserved
+    :param info: :class:`~McsPy.McsData.EventEntityInfo` object with the event metadata
     """
     def __init__(self, event_data, event_info):
         """
@@ -760,6 +882,8 @@ class EventEntity(object):
 class EventEntityInfo(Info):
     """
     Contains all meta data for one event entity
+
+    :param info: dict containing the event metadata
     """
     def __init__(self, info_version, info):
         """
@@ -775,8 +899,12 @@ class EventEntityInfo(Info):
             source_channel_ids = [-1]
             source_channel_labels = ["N/A"]
         else:
-            source_channel_ids = [int(x) for x in info['SourceChannelIDs'].decode('utf-8').split(',')]
-            source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].decode('utf-8').split(',')]
+            try:
+                source_channel_ids = [int(x) for x in info['SourceChannelIDs'].decode('utf-8').split(',')]
+                source_channel_labels = [x.strip() for x in info['SourceChannelLabels'].decode('utf-8').split(',')]
+            except ValueError:
+                source_channel_ids = [-1]
+                source_channel_labels = ["N/A"]
         self.__source_channels = {}
         for idx, channel_id in enumerate(source_channel_ids):
             self.__source_channels[channel_id] = source_channel_labels[idx]
@@ -788,12 +916,12 @@ class EventEntityInfo(Info):
 
     @property
     def raw_data_bytes(self):
-        "Lenght of raw data in bytes"
+        "Length of raw data in bytes"
         return self.info['RawDataBytes']
 
     @property
     def source_channel_ids(self):
-        "ID's of all channels that were involved in the event generation."
+        "IDs of all channels that were involved in the event generation."
         return list(self.__source_channels.keys())
 
     @property
@@ -803,15 +931,25 @@ class EventEntityInfo(Info):
 
     @property
     def version(self):
-        "Version number of the Type-Definition"
+        "Version number of the type definition"
         return self.__version
 
 class SegmentStream(Stream):
     """
     Container class for one segment stream of different segment entities
+
+    :param segment_entity: dict of segment entities. Key: segment ID, value: for data_subtype == "Cutout": :class:`~McsPy.McsData.SegmentEntity` object, for data_subtype == "Average: :class:`~McsPy.McsData.AverageSegmentEntity` object
+    :param info_version: version of the Info structure
+    :param data_subtype: type of stream data ("Cutout", "Average", ...)
+    :param label: the stream label
+    :param source_stream_guid: the GUID of the source stream
+    :param stream_guid: the stream GUID
+    :param stream_type: the stream type ("Segment")
     """
     def __init__(self, stream_grp):
         Stream.__init__(self, stream_grp, "SegmentStreamInfoVersion")
+        self.segment_entity = {}
+        self.data_subtype = None
         self.__read_segment_entities()
 
     def  __read_segment_entities(self):
@@ -852,6 +990,10 @@ class SegmentEntity(object):
     """
     Segment entity class,
     Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.SegmentEntityInfo`
+
+    :param data: numpy array (n_segments x samples) or (n_segments x n_multi x samples) with segment data
+    :param data_ts: numpy vector (n_segments) with timestamps for every segment
+    :param info: segment metadata as a :class:`~McsPy.McsData.SegmentEntityInfo` object
     """
     def __init__(self, segment_data, segment_ts, segment_info):
         """
@@ -962,6 +1104,10 @@ class AverageSegmentEntity(object):
     """
     Contains a number of signal segments that are calcualted as averages of number of segments occured in a given time range.
     Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.SegmentEntityInfo`
+
+    :param data: numpy array (2 x n_samples x n_averages) with averages and standard deviations. First row is the mean per sample data, second row is the standard deviation per sample data.
+    :param data_annotation: numpy array (3 x n_averages) with metadata describing how each average was created. row 0 and 1: start and end timestamp in microseconds of the time window in which signal segments were averaged. row 2: number of averaged signal segments in this time window
+    :param info: metadata for the average as a :class:`~McsPy.McsData.SegmentEntityInfo` object
     """
     def __init__(self, segment_average_data, segment_average_annotation, segment_info):
         """
@@ -1107,6 +1253,9 @@ class AverageSegmentEntity(object):
 class SegmentEntityInfo(Info):
     """
     Contains all meta data for one segment entity
+
+    :param info: dict containing the segment metadata
+    :param source_channel_of_segment: dict containing the channel metadata for each source channel of the segment. Key: source channel index, value: :class:`~McsPy.McsData.ChannelInfo` object
     """
     def __init__(self, info_version, info, source_channel_infos):
         """
@@ -1157,6 +1306,14 @@ class SegmentEntityInfo(Info):
 class TimeStampStream(Stream):
     """
     Container class for one timestamp stream with different entities
+
+    :param timestamp_entity: dict of timestamp entities. Key: timestamp ID, value: a :class:`~McsPy.McsData.TimeStampEntity` object
+    :param info_version: version of the Info structure
+    :param data_subtype: type of stream data
+    :param label: the stream label
+    :param source_stream_guid: the GUID of the source stream
+    :param stream_guid: the stream GUID
+    :param stream_type: the stream type ("Timestamp")
     """
     def __init__(self, stream_grp):
         """
@@ -1185,13 +1342,16 @@ class TimeStampEntity(object):
     """
     Time-Stamp entity class,
     Meta-Information for this entity is available via an associated object of :class:`~McsPy.McsData.TimestampEntityInfo`
+
+    :param data: numpy vector (n_timestamps) with timestamp data
+    :param info: timestamp metadata as a :class:`~McsPy.McsData.TimeStampEntityInfo` object
     """
     def __init__(self, timestamp_data, timestamp_info):
         """
         Initializes an timestamp entity object
 
         :param timestamp_data: dataset of the HDF5 file that contains the data for this timestamp entity
-        :param timestamp_info: object of type TimeStampEntityInfo that contains the description of this entity
+        :param timestamp_info: object of type :class:`~McsPy.McsData.TimeStampEntityInfo` that contains the description of this entity
         """
         self.info = timestamp_info
         # Connect the data set
@@ -1228,6 +1388,8 @@ class TimeStampEntity(object):
 class TimeStampEntityInfo(Info):
     """
     Contains all meta data for one timestamp entity
+
+    :param info: dict containing the timestamp metadata
     """
     def __init__(self, info_version, info):
         """
@@ -1265,7 +1427,7 @@ class TimeStampEntityInfo(Info):
         "Unit in which the timestamp entity was measured"
         try:
             provided_base_unit = ureg.parse_expression(self.unit)
-        except  UndefinedUnitError as unit_undefined:
+        except UndefinedUnitError:
             print ("Could not find unit \'%s\' in the Unit-Registry" % self.unit) #unit_undefined.unit_names
             return None
         else:
