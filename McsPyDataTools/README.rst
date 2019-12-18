@@ -53,7 +53,7 @@ Test file archive
 The **McsPyDataTools** package is accompanied by a separate archive that contains the
 the raw data files used by the unit tests. The content of this test file archive must 
 be copied to the folder **...\\McsPy\\Test\\TestData\\** to be used by the unit tests.
-The test file archive can be downloaded at https://www.multichannelsystems.com/software/multi-channel-datamanager.
+The test file archive can be downloaded at https://download.multichannelsystems.com/download_data/software/multi-channel-datamanager/McsPyDataTools-TestDataFiles.zip.
 
 Installation
 ============
