@@ -9,7 +9,7 @@
 """
 
 import h5py
-import numpy
+import numpy as np
 
 class CMOSData(h5py.File):
     """
@@ -88,7 +88,7 @@ class CMOSConvProxy:
         :type parent: CMOSData
         """
         self._parent = parent
-        self.dtype = numpy.int32
+        self.dtype = np.int32
 
     def __getitem__(self, slices):
         """
