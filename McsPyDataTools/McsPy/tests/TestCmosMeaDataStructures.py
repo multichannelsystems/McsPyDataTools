@@ -8,7 +8,7 @@ import numpy as np
 
 from McsPy import *
 
-test_data_file_path             = os.path.join(os.path.dirname(__file__), 'TestData', '2017.12.14-18.38.15-GFP8ms_470nm_100pc_10rep_nofilter(AnalysisSet1).cmtr')
+test_data_file_path             = os.path.join(os.path.dirname(__file__), 'TestData', 'CMOS_MEA_Results.cmtr')
 test_rawdata_file_path          = os.path.join(os.path.dirname(__file__), 'TestData', '2017.12.14-18.38.15-GFP8ms_470nm_100pc_10rep_nofilter.cmcr')
 test_multiple_roi_file_path     = os.path.join(os.path.dirname(__file__), 'TestData', 'Rec_1-2-3_1s.cmcr')
 test_multiple_streams_file_path = os.path.join(os.path.dirname(__file__), 'TestData', 'V200-SensorRoi-3Aux-Dig-Stim2-DiginEvts-5kHz.cmcr')
@@ -118,13 +118,38 @@ class Test_CmosDataContainer(Test_CmosData):
 
 
         #Test 
-        def test_sta_explorer(self):
-            sta_explorer = self.data.STA_Explorer
-            print(sta_explorer)
-            print(sta_explorer.sta_entity[0])
-            print(sta_explorer.sta_entity[10])
+        def test_network_explorer(self):
+            network_explorer = self.data.Network_Explorer
+            print(network_explorer)
+            print(network_explorer.sta_entity[0])
+            print(network_explorer.sta_entity[10])
 
-        test_sta_explorer(self)
+        test_network_explorer(self)
+
+        def test_spike_sorter(self):
+            spike_sorter = self.data.Spike_Sorter
+            print(spike_sorter)
+            units = spike_sorter.get_units_by_id()
+            self.assertEqual(len(units), 90, "The number of units is {} and not {} as expected!".format(len(units), 90))
+            ordered = spike_sorter.get_units_by_measure(measure='Separability', descending=False)
+            self.assertEqual(len(ordered), 90, "The number of ordered units is {} and not {} as expected!".format(len(ordered), 90))
+            ordered_sep = [u.get_measure('Separability') for u in ordered]
+            s = sorted(ordered_sep)
+            self.assertEqual(ordered_sep, s, "The units are not ordered correctly!")
+            unit = spike_sorter.get_unit(14)
+            print(unit)
+            pks = unit.get_peaks()
+            for p in pks:
+                self.assertEqual(p['IncludePeak'], 1, "IncludePeak is not set!")
+            ts = unit.get_peaks_timestamps()
+            self.assertEqual(len(pks), len(ts), "The number of timestamps is {} and not {} as expected!".format(len(pks), len(ts)))
+            cutouts = unit.get_peaks_cutouts()
+            self.assertEqual(len(pks), len(cutouts), "The number of cutouts is {} and not {} as expected!".format(len(pks), len(cutouts)))
+            amplitudes = unit.get_peaks_amplitudes()
+            self.assertEqual(len(pks), len(amplitudes), "The number of amplitudes is {} and not {} as expected!".format(len(pks), len(amplitudes)))
+
+        test_spike_sorter(self)
+
 
      #Test access to streams if multiple streams of one type exists: example multiple analog streams
     def test_analog_streams(self):
