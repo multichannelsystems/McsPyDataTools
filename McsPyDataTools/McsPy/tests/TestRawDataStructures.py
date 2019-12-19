@@ -117,7 +117,7 @@ class Test_RawDataContainer(Test_RawData):
         analog_stream = self.data.recordings[0].analog_streams[0]
         signal_ts = analog_stream.get_channel_sample_timestamps(6, 1996, 2000)
         sig_ts = signal_ts[0]
-        expected_ts = [3992000, 3994000, 3996000, 3998000, 4000000]
+        expected_ts = [3992000, 3994000, 3996000, 3998000, 4000000, 4002000]
         np.testing.assert_array_equal(sig_ts, expected_ts, "Selected timestamps were '%s' and not as expected '%s'" % (sig_ts, expected_ts))
         self.assertEqual(str(signal_ts[1]), 'microsecond', "Unit of timestamps was expected to be 'microsecond' but was '%s'!" % str(signal_ts[1]))
 

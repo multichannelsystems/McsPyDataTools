@@ -59,11 +59,13 @@ setup(
     name='McsPyDataTools',
     #version=McsPy.__version__,
     version= get_current_version(),
-    description='Handling data recorded and provided by MCS systems', 
+    description='Handling data recorded and provided by Multi Channel Systems MCS GmbH systems', 
     long_description=open('README.rst').read(),
     keywords = 'HDF5 data electrophysiology MCS',
     author='J. Dietzsch, Multi Channel Systems MCS GmbH',
     author_email='dietzsch@multichannelsystems.com',
+    maintainer='A. Walter, Multi Channel Systems MCS GmbH',
+    maintainer_email='walter@multichannelsystems.com',
     zip_safe=True,
     packages=['McsPy', 'McsPy.tests'],
     # Provide test data as an accompanied separate archive! -> just create the folder and show README.md
@@ -80,10 +82,11 @@ setup(
         "Pint >= 0.8.1",
         "numpy >= 1.14.3",
         "h5py >= 2.8.0",
-        "tabulate >= 0.8.2"
+        "tabulate >= 0.8.2",
+        "pandas >= 0.25.1"
     ],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
@@ -96,5 +99,6 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ]
 )
