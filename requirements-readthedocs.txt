@@ -1,4 +1,8 @@
 ./McsPyDataTools/
 nbsphinx
-
+Pint >= 0.8.1
+numpy >= 1.14.3
+h5py >= 2.8.0
+tabulate >= 0.8.2
+pandas >= 0.25.1
 
