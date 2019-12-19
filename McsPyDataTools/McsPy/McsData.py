@@ -948,8 +948,6 @@ class SegmentStream(Stream):
     """
     def __init__(self, stream_grp):
         Stream.__init__(self, stream_grp, "SegmentStreamInfoVersion")
-        self.segment_entity = {}
-        self.data_subtype = None
         self.__read_segment_entities()
 
     def  __read_segment_entities(self):
