@@ -1,6 +1,6 @@
-include README AUTHORS CHANGES LICENSE
+include README.rst AUTHORS.rst HISTORY.rst LICENSE.txt
 recursive-include docs *
-recursive-include docs-html *
 recursive-include docs-pdf *
+recursive-exclude docs-html *
 prune docs/_build
 global-exclude *.pyc *~ *__pycache__* *.pyo
