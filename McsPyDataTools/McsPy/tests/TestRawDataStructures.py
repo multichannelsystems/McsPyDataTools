@@ -115,11 +115,21 @@ class Test_RawDataContainer(Test_RawData):
 
     def test_analog_stream_data_timestamps(self):
         analog_stream = self.data.recordings[0].analog_streams[0]
+        signal = analog_stream.get_channel_in_range(6, 1996, 2000)
         signal_ts = analog_stream.get_channel_sample_timestamps(6, 1996, 2000)
         sig_ts = signal_ts[0]
-        expected_ts = [3992000, 3994000, 3996000, 3998000, 4000000, 4002000]
+        expected_ts = [3992000, 3994000, 3996000, 3998000, 4000000]
         np.testing.assert_array_equal(sig_ts, expected_ts, "Selected timestamps were '%s' and not as expected '%s'" % (sig_ts, expected_ts))
         self.assertEqual(str(signal_ts[1]), 'microsecond', "Unit of timestamps was expected to be 'microsecond' but was '%s'!" % str(signal_ts[1]))
+        self.assertEqual(len(sig_ts), len(signal[0]), 'Number of timestamps and number of samples should be equal')
+
+    def test_analog_stream_data_timestamps_full(self):
+        analog_stream = self.data.recordings[0].analog_streams[0]
+        signal = analog_stream.get_channel_in_range(6)
+        signal_ts = analog_stream.get_channel_sample_timestamps(6)
+        sig_ts = signal_ts[0]
+        print(sig_ts)
+        self.assertEqual(len(sig_ts), len(signal[0]), 'Number of timestamps and number of samples should be equal')
 
     # Test frame streams:
     def test_count_frame_streams(self):
@@ -171,10 +181,10 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(frame.shape, (65,65), "Second slice was '%s' and not '(65,65)' as expected!" % str(frame.shape))
         selected_values = [frame[0,0], frame[9,3], frame[0,5]]
         expected_values = [    -10000,        211,       -727]
-        self.assertEquals(selected_values, expected_values, "Selected ADC values were '%s' and not as expected '%s'" % (selected_values, expected_values))
+        self.assertEqual(selected_values, expected_values, "Selected ADC values were '%s' and not as expected '%s'" % (selected_values, expected_values))
         sensor_signal = frame_entity.get_sensor_signal(30, 30, 0, 1000)
         sig = sensor_signal[0]
-        self.assertEquals(len(sig), 1001, "Length of sensor signal was '%s' and not as expected '1001'" % len(sig))
+        self.assertEqual(len(sig), 1001, "Length of sensor signal was '%s' and not as expected '1001'" % len(sig))
 
     def test_frame_data_timestamps(self):
         frame_entity = self.raw_frame_data.recordings[0].frame_streams[0].frame_entity[1]
@@ -266,9 +276,9 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(str(fifth_segment_entity.info.post_interval.units), 'microsecond', "Post-Interval unit was '%s' and not 'microsecond' as expected!" % str(fifth_segment_entity.info.post_interval.units))
         self.assertEqual(fifth_segment_entity.info.type, 'Cutout', "Type was '%s' and not 'Cutout' as expected!" % fifth_segment_entity.info.type)
         self.assertEqual(fifth_segment_entity.info.count, 1, "Count of segments was '%s' and not '1' as expected!" % fifth_segment_entity.info.count)
-        self.assertEquals(list(fifth_segment_entity.info.source_channel_of_segment.keys()), [0], 
+        self.assertEqual(list(fifth_segment_entity.info.source_channel_of_segment.keys()), [0], 
                           "Source channel dataset index was different (was '%s' instead of '['0']')!" % fifth_segment_entity.info.source_channel_of_segment.keys()) 
-        self.assertEquals(fifth_segment_entity.info.source_channel_of_segment[0].channel_id, 4, 
+        self.assertEqual(fifth_segment_entity.info.source_channel_of_segment[0].channel_id, 4, 
                           "Source channel ID was different (was '%s' instead of '4')!" % fifth_segment_entity.info.source_channel_of_segment[0].channel_id) 
 
     def test_segment_data(self):
@@ -290,10 +300,10 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(str(signal_ts[1]), 'microsecond', "Unit of timestamps was expected to be 'microsecond' but was '%s'!" % str(signal_ts[1]))
         ts_selected = (signal_ts[0][:,0]).tolist()
         expected_ts_first_segment = [943000, 945000]
-        self.assertEquals(ts_selected, expected_ts_first_segment, "Timestamps for the first segment were '%s' and not as expected '%s" % (ts_selected, expected_ts_first_segment))
+        self.assertEqual(ts_selected, expected_ts_first_segment, "Timestamps for the first segment were '%s' and not as expected '%s" % (ts_selected, expected_ts_first_segment))
         ts_selected = (signal_ts[0][:,2]).tolist()
         expected_ts_third_segment = [963000, 965000]
-        self.assertEquals(ts_selected, expected_ts_third_segment, "Timestamps for the third segment were '%s' and not as expected '%s" % (ts_selected, expected_ts_third_segment))
+        self.assertEqual(ts_selected, expected_ts_third_segment, "Timestamps for the third segment were '%s' and not as expected '%s" % (ts_selected, expected_ts_third_segment))
         signal_flat_ts = first_segment_entity.get_segment_sample_timestamps(0, flat = True)
         self.assertEqual(len(signal_flat_ts[0]), 52, "Vector ('flat = True') of segment signal points was expected to be '52' but was '%s'!" % len(signal_flat_ts[0]))
         self.assertRaises(IndexError, first_segment_entity.get_segment_sample_timestamps, segment_id = 0, flat = False, idx_start = 16, idx_end = 4)
@@ -350,7 +360,7 @@ class Test_RawDataContainer(Test_RawData):
                        7226000, 9290000, 9298000, 11376000, 11386000, 11442000, 
                        13462000, 13472000, 13528000, 15548000, 15558000, 17634000, 
                        17644000, 17686000]
-        self.assertEquals(timestamps[0][0].tolist(), expected_ts, "Timestamps of the first TS-Entity were '%s' and not as expected '%s" % (timestamps[0], expected_ts))
+        self.assertEqual(timestamps[0][0].tolist(), expected_ts, "Timestamps of the first TS-Entity were '%s' and not as expected '%s" % (timestamps[0], expected_ts))
 
     # Test Accelerometer stream:
     def test_count_analog_streams_acc_gyro(self):
