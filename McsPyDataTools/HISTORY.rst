@@ -2,6 +2,10 @@
 History
 =======
 
+Version 0.4.1 (2020-04-01)
+--------------------------
+- Bugfix for the get_channel_sample_timestamps function in McsData.py
+
 Version 0.4.0 (2019-12-18)
 --------------------------
 - Improved documentation

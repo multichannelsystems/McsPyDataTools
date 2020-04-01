@@ -413,8 +413,7 @@ class AnalogStream(Stream):
                 idx_start = 0
             if idx_end is None or idx_end > self.channel_data.shape[1]:
                 idx_end = self.channel_data.shape[1]
-            else:
-                idx_end += 1
+            # no need to increase the idx_end, this is done in np.arange
             start_ts = 0
             channel = self.channel_infos[channel_id]
             tick = channel.get_field('Tick')
@@ -427,9 +426,9 @@ class AnalogStream(Stream):
                     idx_segment = idx_start - ts_range[1]
                     start_ts = ts_range[0] + idx_segment * tick # timestamp of first index
                 if idx_end <= ts_range[2]:
-                    time_range = start_ts + np.arange(0, (idx_end - ts_range[1] + 1) - idx_segment, 1) * tick
+                    time_range = start_ts + np.arange(0, idx_end - ts_range[1] - idx_segment + 1, 1) * tick
                 else:
-                    time_range = start_ts + np.arange(0, (ts_range[2] - ts_range[1] + 1) - idx_segment, 1) * tick
+                    time_range = start_ts + np.arange(0, ts_range[2] - ts_range[1] - idx_segment + 1, 1) * tick
                     idx_start = ts_range[2] + 1
                 if 'time' in locals():
                     time = np.append(time, time_range)
