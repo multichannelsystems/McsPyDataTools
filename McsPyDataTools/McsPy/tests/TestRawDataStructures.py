@@ -18,6 +18,8 @@ acc_gyro_data_file_path = os.path.join(os.path.dirname(__file__), os.path.join('
 
 opto_stim_data_file_path = os.path.join(os.path.dirname(__file__), os.path.join('TestData', '2017-10-11T13-39-47McsRecording_N113_OptoStim.h5'))
 
+infoChannel_v2_data_file_path = os.path.join(os.path.dirname(__file__), os.path.join('TestData', 'InfoChannelV2.h5'))
+
 #@unittest.skip("showing the principle structure of python unit tests")
 #class Test_TestRawDataStructures(unittest.TestCase):
 #    def test_A(self):
@@ -30,6 +32,7 @@ class Test_RawData(unittest.TestCase):
         self.average_segments = McsData.RawData(average_segment_data_file_path)
         self.acc_gyro = McsData.RawData(acc_gyro_data_file_path)
         self.opto_stim = McsData.RawData(opto_stim_data_file_path)
+        self.info_channel = McsData.RawData(infoChannel_v2_data_file_path)
 
 class Test_RawDataContainer(Test_RawData):
     # Test MCS-HDF5 version
@@ -109,7 +112,7 @@ class Test_RawDataContainer(Test_RawData):
         signal = analog_stream.get_channel_in_range(0, 1569, 1584)
         sig = signal[0]
         scale = 381469 * 10**-9
-        expected_sig = np.array([4, 5, 0, -3, 2, -1, -6, 6, 0, 0, 0, 0, 0, 0, 3, -9], dtype=np.float) * scale
+        expected_sig = np.array([4, 5, 0, -3, 2, -1, -6, 6, 0, 0, 0, 0, 0, 0, 3, -9], dtype=float) * scale
         np.testing.assert_almost_equal(sig, expected_sig, decimal = 5)
         self.assertEqual(str(signal[1]), 'volt', "Unit of sampled values was expected to be 'volt' but was '%s'!" % str(signal[1]))
 
@@ -527,6 +530,12 @@ class Test_RawDataContainer(Test_RawData):
         self.assertEqual(opto_stim_channel.info['Label'], 'N113 Opto Stim Current Data 0', 'Label is not as expected!!!')
         self.assertEqual(opto_stim_channel.adc_step.units, McsPy.ureg.ampere, "ADC step unit was %s and is not \'Ampere\' as expected!" % opto_stim_channel.adc_step.units)
         self.assertEqual(opto_stim_channel.adc_step.magnitude, 0.001, "ADC step magnitude is not as expected!!!")
+
+    def test_import_info_channel_V2(self):
+        analog_streams = self.info_channel.recordings[0].analog_streams
+        self.assertEqual(3, len(analog_streams))
+        self.assertEqual(288, len(analog_streams[0].channel_infos))
+        self.assertEqual(analog_streams[0].channel_infos[0].version, 2, 'InfoChannel-Type version 2 expected but was %s' % analog_streams[0].channel_infos[0].version)
 
 if __name__ == '__main__':
     unittest.main()
