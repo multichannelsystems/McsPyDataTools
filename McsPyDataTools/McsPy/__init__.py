@@ -5,12 +5,12 @@
     McsPy is a Python module/package to read, handle and operate on HDF5-based raw data
     files converted from recordings of devices of the Multi Channel Systems MCS GmbH.
 
-    :copyright: (c) 2020 by Multi Channel Systems MCS GmbH
+    :copyright: (c) 2022 by Multi Channel Systems MCS GmbH
     :license: see LICENSE for more details
 """
 
 #print("McsPy init!")
-version = "0.4.1"
+version = "0.4.2"
 
 #__all__ = ["CMOSData", "CMOSConvProxy", "RawData", "Recording", "Stream", "AnalogStream", 
 #           "Info", "InfoSampledData", "ChannelInfo", "FrameStream", "FrameEntity", "Frame", 
@@ -27,7 +27,7 @@ class McsHdf5Protocols:
     """
     SUPPORTED_PROTOCOLS = {"RawData" : (1, 3),  # from first to second version number and including this versions
                            "CMOS_MEA" : (1, 1), #from first to first version
-                           "InfoChannel" : (1, 1), # Info-Object Versions
+                           "InfoChannel" : (1, 2), # Info-Object Versions
                            "FrameEntityInfo" : (1, 1),
                            "EventEntityInfo" : (1, 1),
                            "SegmentEntityInfo" : (1, 4),
