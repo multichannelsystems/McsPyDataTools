@@ -1074,8 +1074,8 @@ class SegmentEntity(object):
             idx_start, idx_end = self.__handle_indices(idx_start, idx_end)
             data_ts = self.data_ts[idx_start:idx_end]
             source_channel = self.info.source_channel_of_segment[segment_id]
-            signal_ts = np.zeros((self.data.shape[0], data_ts.shape[1]), dtype=np.long)
-            segment_ts = np.zeros(self.data.shape[0], dtype=np.long) + source_channel.sampling_tick.magnitude
+            signal_ts = np.zeros((self.data.shape[0], data_ts.shape[1]), dtype=np.compat.long)
+            segment_ts = np.zeros(self.data.shape[0], dtype=np.compat.long) + source_channel.sampling_tick.magnitude
             segment_ts[0] = 0
             segment_ts = np.cumsum(segment_ts)
             for i in range(data_ts.shape[1]):

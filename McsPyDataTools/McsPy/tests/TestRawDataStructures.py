@@ -112,7 +112,7 @@ class Test_RawDataContainer(Test_RawData):
         signal = analog_stream.get_channel_in_range(0, 1569, 1584)
         sig = signal[0]
         scale = 381469 * 10**-9
-        expected_sig = np.array([4, 5, 0, -3, 2, -1, -6, 6, 0, 0, 0, 0, 0, 0, 3, -9], dtype=np.float) * scale
+        expected_sig = np.array([4, 5, 0, -3, 2, -1, -6, 6, 0, 0, 0, 0, 0, 0, 3, -9], dtype=float) * scale
         np.testing.assert_almost_equal(sig, expected_sig, decimal = 5)
         self.assertEqual(str(signal[1]), 'volt', "Unit of sampled values was expected to be 'volt' but was '%s'!" % str(signal[1]))
 
