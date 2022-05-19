@@ -9,8 +9,7 @@
     :license: see LICENSE for more details
 """
 
-#print("McsPy init!")
-version = "0.4.2"
+version = "0.4.3"
 
 #__all__ = ["CMOSData", "CMOSConvProxy", "RawData", "Recording", "Stream", "AnalogStream", 
 #           "Info", "InfoSampledData", "ChannelInfo", "FrameStream", "FrameEntity", "Frame", 
@@ -25,18 +24,18 @@ class McsHdf5Protocols:
 
     Entry: (Protocol Type Name => Tuple of supported version range from (including) the first version entry up to (including) the second version entry)
     """
-    SUPPORTED_PROTOCOLS = {"RawData" : (1, 3),  # from first to second version number and including this versions
-                           "CMOS_MEA" : (1, 1), #from first to first version
-                           "InfoChannel" : (1, 2), # Info-Object Versions
-                           "FrameEntityInfo" : (1, 1),
-                           "EventEntityInfo" : (1, 1),
-                           "SegmentEntityInfo" : (1, 4),
-                           "TimeStampEntityInfo" : (1, 1),
-                           "AnalogStreamInfoVersion" : (1, 1), # StreamInfo-Object Versions
-                           "FrameStreamInfoVersion" : (1, 1),
-                           "EventStreamInfoVersion" : (1, 1),
-                           "SegmentStreamInfoVersion" : (1, 1),
-                           "TimeStampStreamInfoVersion" : (1, 1)}
+    SUPPORTED_PROTOCOLS = {"RawData" : (1, -1),  # from first to second version number and including this versions. If second version number is -1, accept all later versions
+                           "CMOS_MEA" : (1, -1), 
+                           "InfoChannel" : (1, -1), # Info-Object Versions
+                           "FrameEntityInfo" : (1, -1),
+                           "EventEntityInfo" : (1, -1),
+                           "SegmentEntityInfo" : (1, -1),
+                           "TimeStampEntityInfo" : (1, -1),
+                           "AnalogStreamInfoVersion" : (1, -1), # StreamInfo-Object Versions
+                           "FrameStreamInfoVersion" : (1, -1),
+                           "EventStreamInfoVersion" : (1, -1),
+                           "SegmentStreamInfoVersion" : (1, -1),
+                           "TimeStampStreamInfoVersion" : (1, -1)}
 
     @classmethod
     def check_protocol_type_version(self, protocol_type_name, version):
@@ -49,12 +48,42 @@ class McsHdf5Protocols:
         """
         if protocol_type_name in McsHdf5Protocols.SUPPORTED_PROTOCOLS:
             supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[protocol_type_name]
-            if (version < supported_versions[0]) or (supported_versions[1] < version):
-                raise IOError('Given HDF5 file contains \'%s\' type of version %s and supported are only all versions from %s up to %s' % 
+            if not McsHdf5Protocols.check_version(version, supported_versions):
+                if (supported_versions[1] == -1):
+                    raise IOError('Given HDF5 file contains \'%s\' type of version %s and supported are only versions from %s and later' % 
+                               (protocol_type_name, version, supported_versions[0]))
+                else:
+                    raise IOError('Given HDF5 file contains \'%s\' type of version %s and supported are all versions from %s up to %s' % 
                                (protocol_type_name, version, supported_versions[0], supported_versions[1]))
         else:
             raise IOError("The given HDF5 contains a type \'%s\' that is unknown in this implementation!" % protocol_type_name)
         return True
+
+    @classmethod
+    def check_hdf5_protocol_version(self, protocol_name, version):
+        """
+        Check if the given version of the HDF5 protocol is supported
+
+        :param protocol_name: name of the protocol that is tested
+        :param version: version number that should be checked
+        :returns: is true if the given protocol and version is supported
+        """
+        if protocol_name in McsHdf5Protocols.SUPPORTED_PROTOCOLS:
+            supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[protocol_name]
+            if not McsHdf5Protocols.check_version(version, supported_versions):
+                if (supported_versions[1] == -1):
+                    raise IOError('Given HDF5 file has MCS-HDF5 %s protocol version %s and supported are all versions from %s and later' % 
+                               (protocol_name, version, supported_versions[0]))
+                else:
+                    raise IOError('Given HDF5 file has MCS-HDF5 %s protocol version %s and supported are all versions from %s up to %s' % 
+                               (protocol_name, version, supported_versions[0], supported_versions[1]))
+        else:
+            raise IOError("The given HDF5 contains a HDF5 protocol \'%s\' that is unknown in this implementation!" % protocol_name)
+        return True
+
+    @classmethod
+    def check_version(self, version, supported_versions):
+        return version >= supported_versions[0] and (supported_versions[1] == -1 or version <= supported_versions[1])
 
 # Supported MCS-HDF5 file structure types and versions:
 class McsHdf5Types:

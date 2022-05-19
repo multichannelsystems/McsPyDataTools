@@ -81,11 +81,7 @@ class RawData(object):
             self.mcs_hdf5_protocol_type = root_grp.attrs['McsHdf5ProtocolType'].decode('UTF-8')
             if self.mcs_hdf5_protocol_type == "RawData":
                 self.mcs_hdf5_protocol_type_version = root_grp.attrs['McsHdf5ProtocolVersion']
-                supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[self.mcs_hdf5_protocol_type]
-                if ((self.mcs_hdf5_protocol_type_version < supported_versions[0]) or
-                    (supported_versions[1] < self.mcs_hdf5_protocol_type_version)):
-                    raise IOError('Given HDF5 file has MCS-HDF5 RawData protocol version %s and supported are all versions from %s to %s' %
-                                  (self.mcs_hdf5_protocol_type_version, supported_versions[0], supported_versions[1]))
+                McsHdf5Protocols.check_hdf5_protocol_version(self.mcs_hdf5_protocol_type, self.mcs_hdf5_protocol_type_version)
             else:
                 raise IOError("The root group of this HDF5 file has no 'McsHdf5ProtocolVersion' attribute -> so it could't be checked if the version is supported!")
         else:
