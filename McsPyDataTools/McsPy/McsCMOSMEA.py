@@ -581,22 +581,14 @@ class McsData(object):
             mcs_hdf5_protocol_type = root_grp.attrs['McsHdf5ProtocolType'].decode('UTF-8')
             if mcs_hdf5_protocol_type == "RawData":
                 mcs_hdf5_protocol_type_version = root_grp.attrs['McsHdf5ProtocolVersion']
-                supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[mcs_hdf5_protocol_type]
-                if ((mcs_hdf5_protocol_type_version < supported_versions[0]) or
-                    (supported_versions[1] < mcs_hdf5_protocol_type_version)):
-                    raise IOError('Given HDF5 file has MCS-HDF5 RawData protocol version %s and supported are all versions from %s to %s' %
-                                  (mcs_hdf5_protocol_type_version, supported_versions[0], supported_versions[1]))
+                McsHdf5Protocols.check_hdf5_protocol_version(mcs_hdf5_protocol_type, mcs_hdf5_protocol_type_version)
             else:
                 raise IOError("The root group of this HDF5 file has no 'McsHdf5ProtocolVersion' attribute -> so it could't be checked if the version is supported!")
         elif 'ID.Type' in root_grp.attrs: #check for CMOS MEA file type
             mcs_hdf5_protocol_type = "CMOS_MEA"
             if 'FileVersion' in root_grp.attrs:
                 mcs_hdf5_protocol_type_version = root_grp.attrs['FileVersion']
-                supported_versions = McsHdf5Protocols.SUPPORTED_PROTOCOLS[mcs_hdf5_protocol_type]
-                if ((mcs_hdf5_protocol_type_version[0] < supported_versions[0]) or
-                    (supported_versions[1] < mcs_hdf5_protocol_type_version[0])):
-                    raise IOError('Given HDF5 file has MCS-HDF5 CMOS-MEA version %s and supported are all versions from %s to %s' %
-                                  (mcs_hdf5_protocol_type_version, supported_versions[0], supported_versions[1]))
+                McsHdf5Protocols.check_hdf5_protocol_version(mcs_hdf5_protocol_type, mcs_hdf5_protocol_type_version)
             else:
                 raise IOError("The root group of this HDF5 file has no 'FileID' attribute -> so it could't be checked if the version is supported!")
         else:
